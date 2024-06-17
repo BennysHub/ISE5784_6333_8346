@@ -54,4 +54,7 @@ class TriangleTest {
     }
 
 
+    @Test
+    void findIntsersections() {
+    }
 }

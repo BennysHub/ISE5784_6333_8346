@@ -58,4 +58,8 @@ class PlaneTest {
         assertEquals(p1.getNormal(new Point(0,0,0)), p1.getNormal(),
                 "The getNormal() method should return a consistent normal vector for the plane.");
     }
+
+    @Test
+    void findIntsersections() {
+    }
 }

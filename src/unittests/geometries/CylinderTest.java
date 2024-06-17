@@ -52,4 +52,8 @@ class CylinderTest {
         assertEquals(new Vector(1,0,0), cylinder.getNormal(new Point(2, 0, 1)),
                 "Normal calculation is incorrect for an edge point on the back base.");
     }
+
+    @Test
+    void findIntsersections() {
+    }
 }

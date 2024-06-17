@@ -10,7 +10,7 @@ import primitives.Vector;
  *
  * @author Benny Avrahami
  */
-public interface Geometry {
+public interface Geometry extends Intersectable {
 
     /**
      * Calculates the normal vector to the geometry at the specified point.

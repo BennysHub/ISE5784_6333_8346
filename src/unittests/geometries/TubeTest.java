@@ -31,4 +31,8 @@ class TubeTest {
         assertEquals(new Vector(0, 0, 1), tube.getNormal(new Point(0, 0, 1)),
                 "The normal at point (0,0,1) should be perpendicular to the tube's starting cap.");
     }
+
+    @Test
+    void findIntsersections() {
+    }
 }
