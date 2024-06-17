@@ -13,10 +13,11 @@ import static primitives.Util.isZero;
  */
 class VectorTest {
 
-    private final Vector v1 = new Vector(1, 2, 3);
-    private final Vector v2 = new Vector(-2, -4, -6); // Parallel opposite vector to v1
-    private final Vector v3 = new Vector(0, 3, -2); // Orthogonal vector to v1
-    private final Vector v4 = new Vector(1, 2, 2);
+    private static final Vector v1 = new Vector(1, 2, 3);
+    private static final Vector v2 = new Vector(-2, -4, -6); // Parallel opposite vector to v1
+    private static final Vector v3 = new Vector(0, 3, -2); // Orthogonal vector to v1
+    private static final Vector v4 = new Vector(1, 2, 2);
+    static private final double DELTA = 0.000001; // Delta value for accuracy when comparing 'double' types
 
     /**
      * Test method for {@link primitives.Vector#Vector(double, double, double)}.
@@ -37,27 +38,48 @@ class VectorTest {
     }
 
     /**
-     * Test method for {@link primitives.Vector#lengthSquared()} and {@link primitives.Vector#length()}.
+     * Test method for {@link primitives.Vector#length()}.
      */
     @Test
     void testVectorLength() {
         // ============ Equivalence Partitions Tests ==============
 
         // TC01: The length of a non-zero vector
-        assertEquals(3, v4.length(), "The length of the vector is incorrect.");
+        assertEquals(3d, v4.length(), DELTA,
+                "The length of the vector is incorrect.");
 
-        // TC02: The length squared of a non-zero vector
-        assertEquals(9, v4.lengthSquared(), "The length squared of the vector is incorrect.");
+        // TC02: The length of a unit vector
+        assertEquals(1d, new Vector(1, 0, 0).length(), DELTA,
+                "The length of a unit vector should be 1.");
 
         // =============== Boundary Values Tests ==================
 
-        // TC10: The length squared of a unit vector
-        assertTrue(isZero(new Vector(1, 0, 0).lengthSquared() - 1),
-                "The length squared of a unit vector should be 1.");
-
-        // TC20: The length of a vector is the square root of the length squared
+        // TC10: The length of a vector is the square root of the length squared
         assertEquals(Math.sqrt(v1.lengthSquared()), v1.length(),
                 "The length of a vector should be the square root of the length squared.");
+    }
+
+    /**
+     * Test method for {@link primitives.Vector#lengthSquared()}
+     */
+    @Test
+    void testVectorLengthSquared() {
+        // ============ Equivalence Partitions Tests ==============
+
+        // TC01: The length squared of a non-zero vector
+        assertEquals(9d, v4.lengthSquared(), DELTA,
+                "The length squared of the vector is incorrect.");
+
+        // TC02: The length squared of a unit vector
+        assertEquals(1d, new Vector(1, 0, 0).lengthSquared(), DELTA,
+                "The length squared of a unit vector should be 1.");
+
+        // =============== Boundary Values Tests ==================
+
+        // TC10: The length of a vector is the square root of the length squared
+        assertEquals(Math.pow(v1.length(), 2), v1.lengthSquared(),
+                "The length of a vector should be the square root of the length squared.");
+
     }
 
     /**
@@ -76,6 +98,27 @@ class VectorTest {
         // TC10: Adding opposite vectors
         assertThrows(IllegalArgumentException.class, () -> v1.add(new Vector(-1, -2, -3)),
                 "Adding opposite vectors should throw an exception.");
+    }
+
+    /**
+     * Test method for {@link primitives.Vector#subtract(primitives.Point)}.
+     */
+    @Test
+    void testSubtract() {
+
+        final Point p1 = new Point(1, 2, 3);
+        final Point p2 = new Point(-5, 2, 49);
+        // ============ Equivalence Partitions Tests ==============
+
+        // TC01: Subtracting two points returns a vector from the second point to the first point
+        assertEquals(new Vector(6, 0, -46), p1.subtract(p2),
+                "Subtracting one point from another did not return the correct vector.");
+
+        // =============== Boundary Values Tests ==================
+
+        // TC10: Subtracting the same point should throw an exception
+        assertThrows(IllegalArgumentException.class, () -> p1.subtract(p1),
+                "Subtracting a point from itself should throw an exception.");
     }
 
     /**
@@ -114,12 +157,16 @@ class VectorTest {
         // =============== Boundary Values Tests ==================
 
         // TC10: Dot product of orthogonal vectors
-        assertTrue(isZero(v1.dotProduct(v3)),
+        assertEquals(0d, v1.dotProduct(v3), DELTA,
                 "Dot product of orthogonal vectors should be zero.");
 
-        // TC11: Dot product of parallel vectors
-        assertTrue(isZero(v1.dotProduct(v2) + 28),
+        // TC20: Dot product of parallel vectors same direction
+        assertEquals(28d, v1.dotProduct(new Vector(2, 4, 6)), DELTA,
                 "Dot product of parallel vectors should be the product of their lengths.");
+
+        // TC30: Dot product of parallel vectors opposite directions
+        assertEquals(-28d, v1.dotProduct(v2), DELTA,
+                "Dot product of parallel vectors with opposite directions should be the minus product of their lengths.");
     }
 
     /**

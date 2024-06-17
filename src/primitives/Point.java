@@ -73,8 +73,10 @@ public class Point {
      * @return The squared distance between this point and the given point.
      */
     public double distanceSquared(Point point) {
-        double x = xyz.d1 - point.xyz.d1, y = xyz.d2 - point.xyz.d2, z = xyz.d3 - point.xyz.d3;
-        return x * x + y * y + z * z;//simple 3d distance squared
+        double dx = xyz.d1 - point.xyz.d1;
+        double dy = xyz.d2 - point.xyz.d2;
+        double dz = xyz.d3 - point.xyz.d3;
+        return dx * dx + dy * dy + dz * dz;//simple 3d distance squared
     }
 
     @Override

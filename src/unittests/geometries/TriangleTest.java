@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for geometries.Triangle class.
+ *
  * @author Benny Avrahami
  */
 class TriangleTest {
@@ -46,15 +47,18 @@ class TriangleTest {
         // TC01: Correct normal calculation
         Triangle triangle = new Triangle(new Point(1, 0, 0), new Point(0, 1, 0), new Point(0, 0, 1));
         Point p = new Point(0, 0, 1); // A point on the triangle
-        Vector expectedNormal = new Vector(1, 1, 1).normalize(); // Expected normal
+
+        // Expected normal can be on both side of triangle
+        Vector expectedNormal1 = new Vector(1, 1, 1).normalize();
+        Vector expectedNormal2 = new Vector(-1, -1, -1).normalize();
 
         Vector actualNormal = triangle.getNormal(p);
-        assertEquals(expectedNormal, actualNormal,
+        assertTrue(expectedNormal1.equals(actualNormal) || expectedNormal2.equals(actualNormal),
                 "getNormal() - The normal of the Triangle is not being calculated correctly.");
     }
 
 
     @Test
-    void findIntsersections() {
+    void findIntersections() {
     }
 }

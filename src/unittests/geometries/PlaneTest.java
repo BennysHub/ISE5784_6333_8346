@@ -3,6 +3,7 @@ package geometries;
 import org.junit.jupiter.api.Test;
 import primitives.Point;
 import primitives.Vector;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -15,7 +16,7 @@ class PlaneTest {
      * Verifies that a plane is correctly constructed with three distinct, non-collinear points.
      */
     @Test
-    void testConstructor(){
+    void testConstructor() {
         // ============ Equivalence Partitions Tests ==============
 
         // TC01: Successfully constructing a plane in the xy axis.
@@ -51,15 +52,15 @@ class PlaneTest {
 
         // TC01: Verifying the normal of the plane.
         var p1 = new Plane(new Point(0, 0, 0), new Point(1, 0, 0), new Point(0, 1, 0));
-        assertTrue(p1.getNormal().equals(new Vector(0,0,1)) || p1.getNormal().equals(new Vector(0,0,-1)),
+        assertTrue(p1.getNormal().equals(new Vector(0, 0, 1)) || p1.getNormal().equals(new Vector(0, 0, -1)),
                 "The normal of the plane should be perpendicular to the xy axis.");
 
         // TC02: Ensuring consistency of normal vector regardless of the method used.
-        assertEquals(p1.getNormal(new Point(0,0,0)), p1.getNormal(),
+        assertEquals(p1.getNormal(new Point(0, 0, 0)), p1.getNormal(),
                 "The getNormal() method should return a consistent normal vector for the plane.");
     }
 
     @Test
-    void findIntsersections() {
+    void findIntersections() {
     }
 }

@@ -5,14 +5,18 @@ import primitives.Ray;
 
 import java.util.List;
 
+
 /**
- * interface for all the geometries that intersect with the rays
+ * An interface for geometric shapes that can be intersected by a ray.
+ * Implementing classes will provide the logic to find intersection points.
  */
 public interface Intersectable {
-    /** *
-     * calculate list of all the points on the surface of the object that intersect with the given ray
-     * @param ray from the camera
-     * @return list of all the points on the surface of the object that intersect with the given ray
+
+    /**
+     * Finds the intersection points of a given ray with this geometric shape.
+     *
+     * @param ray The ray to intersect with this geometric shape.
+     * @return A list of intersection points, if any, between the ray and the geometric shape.
      */
     List<Point> findIntersections(Ray ray);
 }

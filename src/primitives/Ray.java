@@ -25,8 +25,8 @@ public class Ray {
      * @param vector The direction vector of the ray.
      */
     public Ray(Point point, Vector vector) {
-        head = new Point(point.xyz);
-        direction = new Vector(vector.xyz).normalize();
+        head = point;
+        direction = vector.normalize();
     }
 
     /**
