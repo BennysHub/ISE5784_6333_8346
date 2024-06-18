@@ -8,6 +8,7 @@ import primitives.Vector;
 import java.util.Comparator;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -30,16 +31,16 @@ class SphereTest {
     }
 
 
-    private static Point p001 = new Point(0, 0, 1);
-    private static Point p100 = new Point(1, 0, 0);
-    private static final Vector v001 = new Vector(0, 0, 1);
+    private final Point p001 = new Point(0, 0, 1);
+    private final Point p100 = new Point(1, 0, 0);
+    private final Vector v001 = new Vector(0, 0, 1);
 
     /**
      * Test method for {@link geometries.Sphere#findIntersections(primitives.Ray)}.
      */
     @Test
     public void testFindIntersections() {
-        Sphere sphere = new Sphere(1, p100);
+        Sphere sphere = new Sphere(1d, p100);
         final Point gp1 = new Point(0.0651530771650466, 0.355051025721682, 0);
         final Point gp2 = new Point(1.53484692283495, 0.844948974278318, 0);
         final var exp = List.of(gp1, gp2);
@@ -49,6 +50,7 @@ class SphereTest {
 // ============ Equivalence Partitions Tests ==============
 // TC01: Ray's line is outside the sphere (0 points)
         assertNull(sphere.findIntersections(new Ray(p01, v110)), "Ray's line out of sphere");
+        //TODO: check test
 // TC02: Ray starts before and crosses the sphere (2 points)
         final var result1 = sphere.findIntersections(new Ray(p01, v310))
                 .stream().sorted(Comparator.comparingDouble(p -> p.distance(p01))).toList();
