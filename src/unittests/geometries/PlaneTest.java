@@ -82,7 +82,7 @@ class PlaneTest {
         // =============== Boundary Values Tests ==================
         // Ray is parallel to the plane:
         // TC01: The ray included in the plane
-        final var result3 = p1.findIntersections(new Ray(new Point(0, 0, 0), new Vector(1, 1, 0)));
+        final var result3 = p1.findIntersections(new Ray(new Point(1, 0, 0), new Vector(1, 1, 0)));
         assertNull(result3, "Ray is included in the plane, should be no intersection");
 
         // TC02: The ray not included in the plane

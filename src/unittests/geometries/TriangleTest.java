@@ -2,6 +2,7 @@ package geometries;
 
 import org.junit.jupiter.api.Test;
 import primitives.Point;
+import primitives.Ray;
 import primitives.Vector;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,5 +61,37 @@ class TriangleTest {
 
     @Test
     void findIntersections() {
+        Triangle triangle = new Triangle(
+                new Point(1, 1, 0),
+                new Point(2, 1, 0),
+                new Point(1, 2, 0)
+        );
+        Vector v = new Vector(0, 0, -1);
+        // ============ Equivalence Partitions Tests ==============
+        // TC01: Ray intersects inside the triangle
+        var result1 = triangle.findIntersections(new Ray(new Point(1.35, 1.35, 1), v));
+        assertNotNull(result1, "No intersection inside the triangle");
+        assertEquals(new Point(1.35, 1.35, 0), result1.getFirst(), "Wrong intersection point inside the triangle");
+
+        // TC02: Ray intersects next to one of the edges
+        var result2 = triangle.findIntersections(new Ray(new Point(1.5, 0.5, 1), v));
+        assertNull(result2, "Ray intersects next to one of the edges, should be no intersection");
+
+        // TC03: Ray intersects next to one of the points
+        var result3 = triangle.findIntersections(new Ray(new Point(2.5, 0.75, 0), v));
+        assertNull(result3, "Ray intersects next to one of the points, should be no intersection");
+
+        // =============== Boundary Values Tests ==================
+        // TC01: Ray intersects triangle edge
+        var result4 = triangle.findIntersections(new Ray(new Point(1.5, 1.5, 1), v));
+        assertNull(result4, "Ray intersects triangle edge, should be no intersection");
+
+        // TC02: Ray intersects triangle point
+        var result5 = triangle.findIntersections(new Ray(new Point(1, 1, 1), v));
+        assertNull(result5, "Ray intersects triangle point, should be no intersection");
+
+        // TC03: Ray intersects the plane on a line that continues the side of the triangle
+        var result6 = triangle.findIntersections(new Ray(new Point(3, 1, 1), v));
+        assertNull(result6, "Ray intersects the plane on a line that continues the side of the triangle, should be no intersection");
     }
 }
