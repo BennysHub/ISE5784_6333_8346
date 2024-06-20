@@ -6,6 +6,8 @@ import primitives.Vector;
 
 import java.util.List;
 
+import static primitives.Util.isZero;
+
 /**
  * Represents a sphere in 3D space, defined by its center point and radius.
  * Inherits the radius property from RadialGeometry.
@@ -37,6 +39,40 @@ public class Sphere extends RadialGeometry {
 
     @Override
     public List<Point> findIntersections(Ray ray) {
-        return null;
+        // If the ray starts at the sphere's center, return the point on the sphere's surface
+        if (ray.getHead().equals(center))
+            return List.of(center.add(ray.getDirection().scale(radius)));
+
+        // Calculate coefficients for the quadratic equation
+        Vector oc = ray.getHead().subtract(center);
+        double b = oc.dotProduct(ray.getDirection()) * 2d;
+        double c = oc.dotProduct(oc) - radius * radius;
+        double discriminant = b * b - 4d * c;
+
+        // Check if there are valid intersection points
+        if (discriminant < 0 || isZero(discriminant)) {
+            return null; // No intersections
+        }
+
+        // Compute intersection parameters t1 and t2
+        double sqrtDiscriminant = Math.sqrt(discriminant);
+        double t1 = (-b - sqrtDiscriminant) / 2d;
+        double t2 = (-b + sqrtDiscriminant) / 2d;
+
+        // If t2 <= 0 so t1, it indicates that the ray is moving away from the sphere.
+        // There are no intersection points in this case.
+        if (t2 < 0 || isZero(t2))
+            return null;
+
+        Point rayHead = ray.getHead();
+        Vector rayDir = ray.getDirection();
+        Point p2 = rayHead.add(rayDir.scale(t2));
+        // If t1 > 0 so t2, It means the ray enters the sphere and exits from the other side (two intersection points)
+        if (t1 > 0 && !isZero(t1)) {
+            Point p1 = rayHead.add(rayDir.scale(t1));
+            return List.of(p1, p2); // Two valid intersection points
+        } else {//If t2 is positive and t2 is negative, it means the ray starts inside the sphere.
+            return List.of(p2); // Only t2 is positive
+        }
     }
 }
