@@ -86,12 +86,21 @@ class TriangleTest {
         var result4 = triangle.findIntersections(new Ray(new Point(1.5, 1.5, 1), v));
         assertNull(result4, "Ray intersects triangle edge, should be no intersection");
 
-        // TC02: Ray intersects triangle point
+        // TC02: Ray intersects triangle vertex
         var result5 = triangle.findIntersections(new Ray(new Point(1, 1, 1), v));
         assertNull(result5, "Ray intersects triangle point, should be no intersection");
 
         // TC03: Ray intersects the plane on a line that continues the side of the triangle
         var result6 = triangle.findIntersections(new Ray(new Point(3, 1, 1), v));
         assertNull(result6, "Ray intersects the plane on a line that continues the side of the triangle, should be no intersection");
+
+        // TC04: Ray parallel to triangle
+        var result7 = triangle.findIntersections(new Ray(new Point(3, 1, 1), new Vector(4,2,0)));
+        assertNull(result7, "Ray parallel to triangle, should be no intersection");
+
+        // TC05: Ray parallel inside triangle
+        var result8 = triangle.findIntersections(new Ray(new Point(1, 1, 0), new Vector(4,2,0)));
+        assertNull(result8, "Ray parallel inside triangle, should be no intersection");
+
     }
 }
