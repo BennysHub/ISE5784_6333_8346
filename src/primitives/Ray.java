@@ -1,5 +1,7 @@
 package primitives;
 
+import static primitives.Util.isZero;
+
 /**
  * Represents a ray in 3D space, defined by a starting point (head) and a direction vector.
  * The direction vector is normalized to ensure it is a unit vector.
@@ -45,6 +47,16 @@ public class Ray {
      */
     public Vector getDirection() {
         return direction;
+    }
+
+    /**
+     * The method calculates a point on the line of the ray, at the distance t
+     *
+     * @param t the distance from the head
+     * @return new point on the line of the ray, at the distance t
+     */
+    public Point getPoint(double t) {
+        return isZero(t) ? head : head.add(direction.scale(t));
     }
 
     @Override
