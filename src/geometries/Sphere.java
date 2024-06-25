@@ -2,6 +2,7 @@ package geometries;
 
 import primitives.Point;
 import primitives.Ray;
+import primitives.Util;
 import primitives.Vector;
 
 import java.util.List;
@@ -61,14 +62,14 @@ public class Sphere extends RadialGeometry {
 
         // If t2 <= 0 so t1, it indicates that the ray is moving away from the sphere.
         // There are no intersection points in this case.
-        if (t2 < 0 || isZero(t2))
+        if (Util.alignZero(t2) <= 0)
             return null;
 
         Point rayHead = ray.getHead();
         Vector rayDir = ray.getDirection();
         Point p2 = rayHead.add(rayDir.scale(t2));
         // If t1 > 0 so t2, It means the ray enters the sphere and exits from the other side (two intersection points)
-        if (t1 > 0 && !isZero(t1)) {
+        if (Util.alignZero(t1) > 0) {
             Point p1 = rayHead.add(rayDir.scale(t1));
             return List.of(p1, p2); // Two valid intersection points
         } else {//If t2 is positive and t2 is negative, it means the ray starts inside the sphere.

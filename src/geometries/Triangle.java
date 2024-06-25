@@ -2,6 +2,7 @@ package geometries;
 
 import primitives.Point;
 import primitives.Ray;
+import primitives.Util;
 import primitives.Vector;
 
 import java.util.List;
@@ -41,9 +42,6 @@ public class Triangle extends Polygon {
             return null;
         }
 
-        // Small value for numerical stability (tolerance)
-        final double DELTA = 0.000001;
-
         // Retrieve the other two vertices of the triangle
         Point vertex1 = vertices.get(1);
         Point vertex2 = vertices.get(2);
@@ -66,7 +64,7 @@ public class Triangle extends Polygon {
         double u = inv_det * s.dotProduct(rayCrossEdge2);
 
         // Check if 'u' is within valid range (0, 1)
-        if (u - DELTA < 0.0 || u + DELTA > 1.0) {
+        if (Util.alignZero(u) <= 0 || Util.alignZero(u - 1d) >= 0) {
             // Outside valid range, no intersection
             return null;
         }
@@ -78,7 +76,7 @@ public class Triangle extends Polygon {
         double v = inv_det * rayDirection.dotProduct(q);
 
         // Check if 'v' is within valid range (0, 1) and u + v < 1
-        if (v - DELTA < 0.0 || u + v + DELTA > 1.0) {
+        if (Util.alignZero(v) <= 0 || Util.alignZero(u + v - 1d) >= 0) {
             // Outside valid range, no intersection
             return null;
         }
@@ -86,10 +84,9 @@ public class Triangle extends Polygon {
         // Compute parameter 't' to find the intersection point on the line
         double t = inv_det * edge2.dotProduct(q);
 
-        if (!isZero(t)) {
+        if (Util.alignZero(t) > 0) {
             // Ray intersection: Compute the actual intersection point
-            Point intersectionPoint = rayOrigin.add(rayDirection.scale(t));
-            return List.of(intersectionPoint);
+            return List.of(ray.getPoint(t));
         } else {
             // Line intersection but not a ray intersection
             return null;

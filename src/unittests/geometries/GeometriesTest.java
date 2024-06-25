@@ -24,8 +24,9 @@ class GeometriesTest {
         assertNotNull(g);
     }
 
+
     @Test
-    void testFindIntersections() {//TODO:
+    void testFindIntersections() {
         Sphere s = new Sphere(1, new Point(1.5, 0, 0));
         Triangle t = new Triangle(new Point(3, 0, 2),
                 new Point(3, 2, -1),
@@ -63,7 +64,7 @@ class GeometriesTest {
         // ============ Equivalence Partitions Tests ==============
         var result3 = g.findIntersections(new Ray(new Point(2.75, 0, 0), new Vector(1, 0, 0)));
         //TC05: some of the geometries intersect
-        assertEquals(4, result3.size(), "wrong intersection amount");
+        assertEquals(2, result3.size(), "wrong intersection amount");
         assertEquals(List.of(new Point(3, 0, 0), new Point(4, 0, 0)), result3,
                 "wrong intersection");
     }

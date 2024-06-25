@@ -83,8 +83,8 @@ public class Plane implements Geometry {
             return null; // The intersection is behind the ray's start point
         }
 
-        Point p = p0.add(dir.scale(t));
-        return List.of(p);
+        //Point p = p0.add(dir.scale(t));
+        return List.of(ray.getPoint(t));
     }
 }
 
