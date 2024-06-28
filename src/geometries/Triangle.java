@@ -55,7 +55,7 @@ public class Triangle extends Polygon {
 
         // Calculate the determinant (used for inverse determinant later)
         double det = rayCrossEdge2.dotProduct(edge1);
-        double inv_det = 1.0 / det; // Inverse determinant
+        double inv_det = 1d / det; // Inverse determinant
 
         // Compute vector 's' from ray origin to vertex0
         Vector s = rayOrigin.subtract(vertex0);
