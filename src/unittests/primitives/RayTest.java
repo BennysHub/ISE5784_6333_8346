@@ -25,7 +25,7 @@ class RayTest {
 
         // =============== Boundary Values Tests ==================
 
-        // TC10: Zero distance from head (returns the head point)
+        // TC03: Zero distance from head (returns the head point)
         assertEquals(ray.getHead(), ray.getPoint(0),
                 "Expected head point (distance = 0)");
 

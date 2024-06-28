@@ -65,10 +65,7 @@ public class Cylinder extends Tube {
         if (isZero(projection - height))
             return dir;
 
-        //normal is the vector normal at point p
-        Vector normal = p.subtract(p1);
-
-        return normal.normalize();
+        return p.subtract(p1).normalize();
     }
 
     @Override

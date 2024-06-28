@@ -50,7 +50,7 @@ public class Tube extends RadialGeometry {
 
         //p1 as mention above (create a 90 degrees triangle between p, p0, p1)
         //point p1 will be equal p0 if dir and pMinusP0 are orthogonal
-        Point p1 = (isZero(projection)) ? p0 : p0.add(dir.scale(projection));
+        Point p1 = axis.getPoint(projection);
 
         //normal is the vector normal at point p
         Vector normal = p.subtract(p1);

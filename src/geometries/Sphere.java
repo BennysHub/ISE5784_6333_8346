@@ -65,12 +65,10 @@ public class Sphere extends RadialGeometry {
         if (Util.alignZero(t2) <= 0)
             return null;
 
-        Point rayHead = ray.getHead();
-        Vector rayDir = ray.getDirection();
-        Point p2 = rayHead.add(rayDir.scale(t2));
+        Point p2 = ray.getPoint(t2);
         // If t1 > 0 so t2, It means the ray enters the sphere and exits from the other side (two intersection points)
         if (Util.alignZero(t1) > 0) {
-            Point p1 = rayHead.add(rayDir.scale(t1));
+            Point p1 = ray.getPoint(t1);
             return List.of(p1, p2); // Two valid intersection points
         } else {//If t2 is positive and t2 is negative, it means the ray starts inside the sphere.
             return List.of(p2); // Only t2 is positive
