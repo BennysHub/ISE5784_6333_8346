@@ -6,8 +6,6 @@ import primitives.Vector;
 
 import java.util.List;
 
-import static primitives.Util.isZero;
-
 /**
  * Represents a tube in 3D space, defined by its axis ray and radius.
  * Inherits the radius property from RadialGeometry.

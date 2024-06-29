@@ -61,7 +61,7 @@ public class Ray {
 
     @Override
     public String toString() {
-        return head + direction.toString();
+        return String.format("Ray ➞ %s in direction %s", head, direction);
     }
 
     @Override

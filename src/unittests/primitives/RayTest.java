@@ -10,7 +10,7 @@ class RayTest {
      * Test method for {@link primitives.Ray#getPoint(double t)}.
      */
     @Test
-    void getPoint() {
+    void getPointTest() {
 
         Ray ray = new Ray(new Point(1, 0, 0), new Vector(1, 0, 0));
         // ============ Equivalence Partitions Tests ==============

@@ -108,7 +108,7 @@ public class Vector extends Point {
 
     @Override
     public String toString() {
-        return xyz.toString() + " vector";
+        return String.format("Vector --> %s", xyz);
     }
 
     @Override
