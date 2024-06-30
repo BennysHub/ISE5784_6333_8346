@@ -79,6 +79,28 @@ public class Point {
         return dx * dx + dy * dy + dz * dz;//simple 3d distance squared
     }
 
+    /**
+     * @return the x coordinate of the point
+     */
+    public double getX() {
+        return this.xyz.d1;
+    }
+
+    /**
+     * @return the y coordinate of the point
+     */
+    public double getY() {
+        return this.xyz.d2;
+    }
+
+    /**
+     * @return the z coordinate of the point
+     */
+    public double getZ() {
+        return this.xyz.d3;
+    }
+
+
     @Override
     public String toString() {
         return String.valueOf(xyz);
