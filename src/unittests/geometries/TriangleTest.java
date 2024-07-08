@@ -95,11 +95,11 @@ class TriangleTest {
         assertNull(result6, "Ray intersects the plane on a line that continues the side of the triangle, should be no intersection");
 
         // TC04: Ray parallel to triangle
-        var result7 = triangle.findIntersections(new Ray(new Point(3, 1, 1), new Vector(4,2,0)));
+        var result7 = triangle.findIntersections(new Ray(new Point(3, 1, 1), new Vector(4, 2, 0)));
         assertNull(result7, "Ray parallel to triangle, should be no intersection");
 
         // TC05: Ray parallel inside triangle
-        var result8 = triangle.findIntersections(new Ray(new Point(1, 1, 0), new Vector(4,2,0)));
+        var result8 = triangle.findIntersections(new Ray(new Point(1, 1, 0), new Vector(4, 2, 0)));
         assertNull(result8, "Ray parallel inside triangle, should be no intersection");
 
     }

@@ -8,7 +8,8 @@ import primitives.Vector;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Test class for Sphere geometry.
@@ -47,7 +48,7 @@ class SphereTest {
 
         final Vector v310 = new Vector(3, 1, 0);
         final Vector v110 = new Vector(1, 1, 0);
-        final Vector v100 = new Vector(1,0,0);
+        final Vector v100 = new Vector(1, 0, 0);
         final Point p01 = new Point(-1, 0, 0);
 
         // ============ Equivalence Partitions Tests ==============
@@ -111,13 +112,13 @@ class SphereTest {
         // **** Group: Ray's line is tangent to the sphere (all tests 0 points)
 
         // TC19: Ray starts before the tangent point (1,0,1)
-        assertNull(sphere.findIntersections(new Ray(new Point(-1,0,1), v100)), "Ray should start before the tangent point");
+        assertNull(sphere.findIntersections(new Ray(new Point(-1, 0, 1), v100)), "Ray should start before the tangent point");
 
         // TC20: Ray starts at the tangent point
-        assertNull(sphere.findIntersections(new Ray(new Point(1,0,1), v100)), "Ray should start at the tangent point");
+        assertNull(sphere.findIntersections(new Ray(new Point(1, 0, 1), v100)), "Ray should start at the tangent point");
 
         // TC21: Ray starts after the tangent point
-        assertNull(sphere.findIntersections(new Ray(new Point(2,0,1), v100)), "Ray should start after the tangent point");
+        assertNull(sphere.findIntersections(new Ray(new Point(2, 0, 1), v100)), "Ray should start after the tangent point");
 
         // **** Group: Special cases
 
@@ -128,9 +129,9 @@ class SphereTest {
                 "Ray should be orthogonal to sphere's center line");
 
         // TC23: Ray's is inside, ray is orthogonal to ray start to sphere's center line
-        List<Point> startAInsideOrthogonal = sphere.findIntersections(new Ray(new Point(0.5, 0,0), v001));
+        List<Point> startAInsideOrthogonal = sphere.findIntersections(new Ray(new Point(0.5, 0, 0), v001));
         assertEquals(1, startAInsideOrthogonal.size(), "Incorrect number of intersection points");
-        assertEquals(new Point(0.5, 0,Math.sqrt(3)/2), startAInsideOrthogonal.getFirst(), "Ray should start at the center");
+        assertEquals(new Point(0.5, 0, Math.sqrt(3) / 2), startAInsideOrthogonal.getFirst(), "Ray should start at the center");
     }
 }
 

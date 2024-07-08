@@ -81,7 +81,7 @@ public class Triangle extends Polygon {
             return null;
         }
 
-        // Compute parameter 't' to find the intersection point on the line
+        // Compute parameter "t" to find the intersection point on the line
         double t = inv_det * edge2.dotProduct(q);
 
         if (Util.alignZero(t) > 0) {

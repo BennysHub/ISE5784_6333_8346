@@ -7,14 +7,13 @@ package primitives;
  */
 public class Point {
     /**
-     * The x, y, and z coordinates of the point, encapsulated in a Double3 object.
-     */
-    final protected Double3 xyz;
-
-    /**
      * A constant representing the origin point (0,0,0).
      */
     public static final Point ZERO = new Point(0, 0, 0);
+    /**
+     * The x, y, and z coordinates of the point, encapsulated in a Double3 object.
+     */
+    final protected Double3 xyz;
 
     /**
      * Constructs a new Point with the specified coordinates.
@@ -80,21 +79,27 @@ public class Point {
     }
 
     /**
-     * @return the x coordinate of the point
+     * Retrieves the x-coordinate of this point.
+     *
+     * @return the x-coordinate represented as a double.
      */
     public double getX() {
         return this.xyz.d1;
     }
 
     /**
-     * @return the y coordinate of the point
+     * Retrieves the y-coordinate of this point.
+     *
+     * @return the y-coordinate represented as a double.
      */
     public double getY() {
         return this.xyz.d2;
     }
 
     /**
-     * @return the z coordinate of the point
+     * Retrieves the z-coordinate of this point.
+     *
+     * @return the z-coordinate represented as a double.
      */
     public double getZ() {
         return this.xyz.d3;
