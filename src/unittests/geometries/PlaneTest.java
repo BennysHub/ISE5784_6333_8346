@@ -1,6 +1,7 @@
 package geometries;
 
 import org.junit.jupiter.api.Test;
+import primitives.Double3;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
@@ -38,7 +39,7 @@ class PlaneTest {
         // TC20: Attempting to construct a plane with three collinear points.
         assertThrows(IllegalArgumentException.class,
                 () -> new Plane(new Point(0, 0, 0),
-                        new Point(1, 1, 1),
+                        new Point(Double3.ONE),
                         new Point(2, 2, 2)),
                 "Construction should fail with three collinear points as they cannot define a plane.");
     }

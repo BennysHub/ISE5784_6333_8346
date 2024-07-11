@@ -151,7 +151,8 @@ public class Camera implements Cloneable {
             if (camera.up == null) {
                 throw new MissingResourceException("Missing camera up vector", Camera.class.getName(), "up");
             }
-            camera.to = camera.up.crossProduct(camera.right).normalize();
+            // Updating Vector to based on right, up vectors
+            camera.to = camera.up.crossProduct(camera.right);
             if (camera.to == null) {
                 throw new MissingResourceException("Missing camera 'to' vector", Camera.class.getName(), "to");
             }

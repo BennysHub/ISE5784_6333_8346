@@ -1,6 +1,7 @@
 package geometries;
 
 import org.junit.jupiter.api.Test;
+import primitives.Double3;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
@@ -87,7 +88,7 @@ class TriangleTest {
         assertNull(result4, "Ray intersects triangle edge, should be no intersection");
 
         // TC02: Ray intersects triangle vertex
-        var result5 = triangle.findIntersections(new Ray(new Point(1, 1, 1), v));
+        var result5 = triangle.findIntersections(new Ray(new Point(Double3.ONE), v));
         assertNull(result5, "Ray intersects triangle point, should be no intersection");
 
         // TC03: Ray intersects the plane on a line that continues the side of the triangle
