@@ -22,7 +22,7 @@ public final class Util {
      * The {@code double} data format in memory is as follows:
      * seee eeee eeee (1.)mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
      * where 's' is the sign bit, 'e' represents the 11 bits of the exponent, and 'm' represents the 52 bits of the normalized mantissa (53 bits including the leading 1).
-     * The actual number is calculated as m * 2^e, where 1 <= m < 2.
+     * The actual number is calculated as m * 2^e, where 1 &lt;= m &lt; 2.
      * Note: The exponent is stored "normalized" (i.e., it is always positive by adding a bias of 1023).
      *
      * @param num the original {@code double} number
