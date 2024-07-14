@@ -7,6 +7,7 @@ import primitives.Vector;
 
 import java.util.List;
 
+import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
 
 /**
@@ -37,10 +38,9 @@ public class Triangle extends Polygon {
         Point vertex0 = vertices.getFirst(); // First vertex of the triangle
 
         // Check if the ray direction is parallel to the triangle's plane
-        if (isZero(this.plane.getNormal().dotProduct(rayDirection)) || rayOrigin.equals(vertex0)) {
+        if (isZero(this.plane.getNormal().dotProduct(rayDirection)) || rayOrigin.equals(vertex0))
             // If parallel or starting from the vertex, no intersection
             return null;
-        }
 
         // Retrieve the other two vertices of the triangle
         Point vertex1 = vertices.get(1);
@@ -59,38 +59,30 @@ public class Triangle extends Polygon {
 
         // Compute vector 's' from ray origin to vertex0
         Vector s = rayOrigin.subtract(vertex0);
-
         // Calculate barycentric coordinate 'u'
         double u = inv_det * s.dotProduct(rayCrossEdge2);
 
         // Check if 'u' is within valid range (0, 1)
-        if (Util.alignZero(u) <= 0 || Util.alignZero(u - 1d) >= 0) {
+        if (alignZero(u) <= 0 || alignZero(u - 1d) >= 0)
             // Outside valid range, no intersection
             return null;
-        }
 
         // Compute vector 'q' (cross product of 's' and edge1)
         Vector q = s.crossProduct(edge1);
-
         // Calculate barycentric coordinate 'v'
         double v = inv_det * rayDirection.dotProduct(q);
 
         // Check if 'v' is within valid range (0, 1) and u + v < 1
-        if (Util.alignZero(v) <= 0 || Util.alignZero(u + v - 1d) >= 0) {
+        if (alignZero(v) <= 0 || alignZero(u + v - 1d) >= 0)
             // Outside valid range, no intersection
             return null;
-        }
 
         // Compute parameter "t" to find the intersection point on the line
         double t = inv_det * edge2.dotProduct(q);
-
-        if (Util.alignZero(t) > 0) {
+        return alignZero(t) > 0
             // Ray intersection: Compute the actual intersection point
-            return List.of(ray.getPoint(t));
-        } else {
+            ? List.of(ray.getPoint(t))
             // Line intersection but not a ray intersection
-            return null;
-        }
+            : null;
     }
-
 }

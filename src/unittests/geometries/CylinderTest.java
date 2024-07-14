@@ -54,7 +54,4 @@ class CylinderTest {
                 "Normal calculation is incorrect for an edge point on the back base.");
     }
 
-    @Test
-    void findIntersections() {
-    }
 }

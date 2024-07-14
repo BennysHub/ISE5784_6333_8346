@@ -110,7 +110,7 @@ class PlaneTest {
         assertNull(result8, "Ray starts in the plane, should be no intersection");
 
         // TC07: begins in the same point which appears as reference point in the plane
-        final var result9 = p1.findIntersections(new Ray(new Point(0, 1, 0), new Vector(1, 1, -1)));
+        final var result9 = p1.findIntersections(new Ray(new Point(0, 0, 0), new Vector(1, 1, -1)));
         assertNull(result9, "Ray starts at a reference point in the plane, should be no intersection");
     }
 }

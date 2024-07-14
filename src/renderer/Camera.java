@@ -18,8 +18,12 @@ import static primitives.Util.isZero;
  */
 public class Camera implements Cloneable {
     private Point location;
-    private Vector right, up, to;
-    private double height = 0.0, width = 0.0, vpDistance = 0.0; //view plane distance;
+    private Vector right;
+    private Vector up;
+    private Vector to;
+    private double height = 0.0;
+    private double  width = 0.0;
+    private double  vpDistance = 0.0; //view plane distance;
 
     /**
      * Default constructor for {@code Camera}.
@@ -88,17 +92,19 @@ public class Camera implements Cloneable {
          * Sets the direction of the camera based on the right and up vectors.
          * The vectors must be perpendicular to each other.
          *
-         * @param right the right direction vector.
-         * @param up    the up direction vector.
+         * @param to the direction vector.
+         * @param up the up direction vector.
          * @return the current Builder object for chaining method calls.
          * @throws IllegalArgumentException if the vectors are not perpendicular.
          */
-        public Builder setDirection(Vector right, Vector up) {
-            if (!isZero(right.dotProduct(up))) {
+        public Builder setDirection(Vector to, Vector up) {
+            if (!isZero(to.dotProduct(up))) {
                 throw new IllegalArgumentException("the vectors are not perpendicular");
             }
-            camera.right = right.normalize();
+            camera.to = to.normalize();
             camera.up = up.normalize();
+            // Updating Vector to based on right, up vectors
+            camera.right = camera.to.crossProduct(camera.up);
             return this;
         }
 
@@ -151,10 +157,11 @@ public class Camera implements Cloneable {
             if (camera.up == null) {
                 throw new MissingResourceException("Missing camera up vector", Camera.class.getName(), "up");
             }
-            // Updating Vector to based on right, up vectors
-            camera.to = camera.up.crossProduct(camera.right);
             if (camera.to == null) {
                 throw new MissingResourceException("Missing camera 'to' vector", Camera.class.getName(), "to");
+            }
+            if (!isZero(camera.to.dotProduct(camera.up))) {
+                throw new IllegalArgumentException("the vectors are not perpendicular");
             }
             if (alignZero(camera.height) <= 0 || alignZero(camera.width) <= 0) {
                 throw new MissingResourceException("Invalid view plane dimensions", Camera.class.getName(), "height/width");

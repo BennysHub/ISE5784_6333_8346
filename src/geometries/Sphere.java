@@ -46,13 +46,12 @@ public class Sphere extends RadialGeometry {
         // Calculate coefficients for the quadratic equation
         Vector oc = ray.getHead().subtract(center);
         double b = oc.dotProduct(ray.getDirection());//we don't multiply by 2 since we can ...
-        double c = oc.dotProduct(oc) - radius * radius;
+        double c = oc.dotProduct(oc) - radiusSquared;
         double discriminant = b * b - c;// we don't multiply c by 4a since a = dir^2 which is one, and 4 since we didn't multiply b by 2 so b^2 is 4*x.
 
         // Check if there are valid intersection points
-        if (alignZero(discriminant) <= 0) {
+        if (alignZero(discriminant) <= 0)
             return null; // No intersections
-        }
 
         // Compute intersection parameters t1 and t2
         double sqrtDiscriminant = Math.sqrt(discriminant);
@@ -67,11 +66,8 @@ public class Sphere extends RadialGeometry {
         double t1 = (-b - sqrtDiscriminant);
 
         // If t1 > 0 so t2, It means the ray enters the sphere and exits from the other side (two intersection points)
-        if (alignZero(t1) > 0) {
-            Point p1 = ray.getPoint(t1);
-            return List.of(p1, p2); // Two valid intersection points
-        } else {//If t2 is positive and t2 is negative, it means the ray starts inside the sphere.
-            return List.of(p2); // Only t2 is positive
-        }
+        return alignZero(t1) > 0 ? List.of(ray.getPoint(t1), p2) // Two valid intersection points
+                //If t2 is positive and t2 is negative, it means the ray starts inside the sphere.
+                : List.of(p2); // Only t2 is positive
     }
 }

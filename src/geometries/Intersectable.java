@@ -5,7 +5,6 @@ import primitives.Ray;
 
 import java.util.List;
 
-
 /**
  * An interface for geometric shapes that can be intersected by a ray.
  * Implementing classes will provide the logic to find intersection points.

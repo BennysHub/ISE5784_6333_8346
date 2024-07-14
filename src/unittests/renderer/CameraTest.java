@@ -26,7 +26,7 @@ class CameraTest {
 
     private final Camera.Builder cameraBuilder = Camera.getBuilder()
             .setLocation(Point.ZERO)
-            .setDirection(new Vector(-1, 0, 0), new Vector(0, -1, 0))//change the coordinate from "new Vector(0, 0, -1), new Vector(0, -1, 0)" to (new Vector(-1, 0, 0),new Vector(0, -1, 0) in order for it to work where to*up
+        .setDirection(new Vector(0, 0, -1), new Vector(0, -1, 0))
             .setVpDistance(10);
 
     /**

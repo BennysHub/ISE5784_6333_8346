@@ -199,6 +199,7 @@ class VectorTest {
     void testNormalize() {
         // ============ Equivalence Partitions Tests ==============
 
+        
         // TC01: Normalizing a vector
         Vector normalizedV1 = v1.normalize();
         assertTrue(isZero(normalizedV1.length() - 1),
