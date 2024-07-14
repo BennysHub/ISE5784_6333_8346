@@ -22,8 +22,8 @@ public class Camera implements Cloneable {
     private Vector up;
     private Vector to;
     private double height = 0.0;
-    private double  width = 0.0;
-    private double  vpDistance = 0.0; //view plane distance;
+    private double width = 0.0;
+    private double vpDistance = 0.0; //view plane distance;
 
     /**
      * Default constructor for {@code Camera}.
@@ -176,6 +176,5 @@ public class Camera implements Cloneable {
                 throw new RuntimeException("Failed to clone the camera object", e);
             }
         }
-
     }
 }

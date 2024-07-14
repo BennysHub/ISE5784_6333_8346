@@ -17,7 +17,7 @@ class VectorTest {
     private static final Vector v2 = new Vector(-2, -4, -6); // Parallel opposite vector to v1
     private static final Vector v3 = new Vector(0, 3, -2); // Orthogonal vector to v1
     private static final Vector v4 = new Vector(1, 2, 2);
-    static private final double DELTA = 0.000001; // Delta value for accuracy when comparing 'double' types
+    private static final double DELTA = 0.000001; // Delta value for accuracy when comparing 'double' types
 
     /**
      * Test method for {@link primitives.Vector#Vector(double, double, double)}.
@@ -199,7 +199,7 @@ class VectorTest {
     void testNormalize() {
         // ============ Equivalence Partitions Tests ==============
 
-        
+
         // TC01: Normalizing a vector
         Vector normalizedV1 = v1.normalize();
         assertTrue(isZero(normalizedV1.length() - 1),
