@@ -12,9 +12,9 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class PointTest {
     private static final Point p1 = new Point(1, 2, 3);
-    private final static Point p2 = new Point(-5, 2, 49);
-    private final static Point p3 = new Point(1, 2, 3);
-    static private final double DELTA = 0.000001; // Delta value for accuracy when comparing 'double' types
+    private static final Point p2 = new Point(-5, 2, 49);
+    private static final Point p3 = new Point(1, 2, 3);
+    private static final double DELTA = 0.000001; // Delta value for accuracy when comparing 'double' types
 
     /**
      * Test method for {@link primitives.Point#add(primitives.Vector)}.

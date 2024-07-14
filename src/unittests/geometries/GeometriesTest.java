@@ -9,8 +9,15 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Test class for Geometries.
+ * Author: Benny Avrahami and Tzvi Yisrael
+ */
 class GeometriesTest {
 
+    /**
+     * Test method for {@link Geometries#Geometries()}.
+     */
     @Test
     void testConstructor() {
         Sphere s = new Sphere(1, new Point(1.5, 0, 0));
@@ -24,7 +31,9 @@ class GeometriesTest {
         assertNotNull(g);
     }
 
-
+    /**
+     * Test method for {@link Geometries#findIntersections(Ray)}.
+     */
     @Test
     void testFindIntersections() {
         Sphere s = new Sphere(1, new Point(1.5, 0, 0));
