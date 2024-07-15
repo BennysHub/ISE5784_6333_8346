@@ -178,11 +178,12 @@ class VectorTest {
 
         // TC01: Cross product of non-parallel vectors
         Vector crossProduct = v1.crossProduct(v3);
+        //assertAll();
         assertTrue(isZero(crossProduct.dotProduct(v1)) && isZero(crossProduct.dotProduct(v3)),
                 "Cross product of non-parallel vectors should be orthogonal to both.");
 
         // TC02: Cross product resulting in correct length
-        assertTrue(isZero(v1.crossProduct(v3).length() - v1.length() * v3.length()),
+        assertEquals(v1.length() * v3.length(), v1.crossProduct(v3).length(), DELTA,
                 "Cross product did not result in a vector with the correct length.");
 
         // =============== Boundary Values Tests ==================
@@ -202,7 +203,7 @@ class VectorTest {
 
         // TC01: Normalizing a vector
         Vector normalizedV1 = v1.normalize();
-        assertTrue(isZero(normalizedV1.length() - 1),
+        assertEquals(1, normalizedV1.length(), DELTA,
                 "Normalizing a vector did not result in a unit vector.");
 
         // =============== Boundary Values Tests ==================
