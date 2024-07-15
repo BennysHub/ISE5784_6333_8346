@@ -1,5 +1,6 @@
 package renderer;
 import primitives.Color;
+import primitives.Point;
 import primitives.Ray;
 import scene.Scene;
 
@@ -11,8 +12,12 @@ public abstract class RayTracerBase {
     }
 
     public Color traceRay(Ray ray){
-        return Color.BLACK;
+        var list = scene.geometries.findIntersections(ray);
+        return (list == null)? Color.BLACK : calcColor(ray.findClosestPoint(list));
     }
 
+    private Color calcColor(Point point){
+        return scene.background;
+    }
 
 }
