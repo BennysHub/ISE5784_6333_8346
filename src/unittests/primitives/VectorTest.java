@@ -178,7 +178,6 @@ class VectorTest {
 
         // TC01: Cross product of non-parallel vectors
         Vector crossProduct = v1.crossProduct(v3);
-        //assertAll();
         assertTrue(isZero(crossProduct.dotProduct(v1)) && isZero(crossProduct.dotProduct(v3)),
                 "Cross product of non-parallel vectors should be orthogonal to both.");
 
