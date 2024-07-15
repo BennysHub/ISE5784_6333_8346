@@ -1,5 +1,6 @@
 package renderer;
 
+import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
@@ -24,6 +25,8 @@ public class Camera implements Cloneable {
     private double height = 0.0;
     private double width = 0.0;
     private double vpDistance = 0.0; //view plane distance;
+    private ImageWriter imageWriter;
+    private RayTracerBase rayTracerBase;
 
     /**
      * Default constructor for {@code Camera}.
@@ -68,6 +71,32 @@ public class Camera implements Cloneable {
 
         // Create the ray from the camera location to the pixel's position
         return new Ray(location, pIJ.subtract(location));
+    }
+
+    public void renderImage() {
+
+        int nX = imageWriter.getNx();
+        int nY = imageWriter.getNy();
+        for (int x = 0; x < nX; x++)
+            for (int y = 0; y < nY; y++)
+                castRay(nX, nY, x, y);
+        throw new UnsupportedOperationException();
+    }
+
+    private void castRay(int nX, int nY, int x, int y) {
+        Ray ray = constructRay(nX, nY, x, y);
+        Color color = rayTracerBase.traceRay(ray);
+        imageWriter.writePixel(x, y, color);
+    }
+
+    public void printGrid(int interval, Color color) {
+        for (int x = 0; x < imageWriter.getNx(); x += interval)
+            for (int y = 0; y < imageWriter.getNy(); y += interval)
+                imageWriter.writePixel(x, y, color);
+    }
+
+    public void writeToImage() {
+        imageWriter.writeToImage();
     }
 
     /**
@@ -140,6 +169,16 @@ public class Camera implements Cloneable {
             return this;
         }
 
+        public Builder setImageWriter(ImageWriter imageWriter) {
+            camera.imageWriter = imageWriter;
+            return this;
+        }
+
+        public Builder setRayTracer(RayTracerBase rayTracer) {
+            camera.rayTracerBase = rayTracer;
+            return this;
+        }
+
         /**
          * Constructs a new {@code Camera} instance using the parameters set in the {@code Builder}.
          * This method ensures that all required fields are properly set and that the camera's configuration is valid.
@@ -168,6 +207,12 @@ public class Camera implements Cloneable {
             }
             if (alignZero(camera.vpDistance) <= 0) {
                 throw new MissingResourceException("Invalid view plane distance", Camera.class.getName(), "vpDistance");
+            }
+            if (camera.imageWriter == null) {
+                throw new MissingResourceException("Missing camera imageWriter", Camera.class.getName(), "imageWriter");
+            }
+            if (camera.rayTracerBase == null) {
+                throw new MissingResourceException("Missing camera rayTracerBase", Camera.class.getName(), "rayTracerBase");
             }
 
             try {
