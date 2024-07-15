@@ -17,15 +17,14 @@ class ImageWriterTest {
      */
     @Test
     void gridTest() {
-        ImageWriter imageWriter = new ImageWriter("grid", 800, 500);
-        for (int x = 0; x < 800; x++)
-            for (int y = 0; y < 500; y++)
-                if (x % 50 == 0 || y % 50 == 0) {
-                    imageWriter.writePixel(x, y, new Color(90, 30, 70));
-                } else
-                    imageWriter.writePixel(x, y, new Color(34, 231, 20));
-        ;
+        final int nX = 800, nY = 500, step = 50;
+        final ImageWriter imageWriter = new ImageWriter("grid", nX, nY);
 
+        final Color color1 = new Color(90, 30, 70);
+        final Color color2 = new Color(34, 231, 20);
+        for (int x = 0; x < nX; x++)
+            for (int y = 0; y < nY; y++)
+                imageWriter.writePixel(x, y, x % step == 0 || y % step == 0 ? color2 : color1);
 
         imageWriter.writeToImage();
     }

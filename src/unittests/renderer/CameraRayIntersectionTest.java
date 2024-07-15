@@ -7,6 +7,7 @@ import geometries.Triangle;
 import org.junit.jupiter.api.Test;
 import primitives.Point;
 import primitives.Vector;
+import scene.Scene;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,7 +19,12 @@ public class CameraRayIntersectionTest {
      * The camera instance to use in all the tests with predefined location and direction.
      */
     final private Camera camera =
-            Camera.getBuilder().setLocation(new Point(0, 0, 0.5)).setDirection(new Vector(1, 0, 0), new Vector(0, 1, 0)).setVpDistance(1).setVpSize(3, 3).build();
+            Camera.getBuilder()
+                    .setRayTracer(new SimpleRayTracer(new Scene("Test")))
+                    .setImageWriter(new ImageWriter("Test", 1, 1))
+                    .setLocation(new Point(0, 0, 0.5))
+                    .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
+                    .setVpDistance(1).setVpSize(3, 3).build();
 
     /**
      * Sums up the number of intersection points found between a camera ray and a given geometry.

@@ -32,20 +32,6 @@ public abstract class RayTracerBase {
      * @param ray the ray to be traced
      * @return the color at the closest intersection point or the background color if no intersections are found
      */
-    public Color traceRay(Ray ray) {
-        var list = scene.geometries.findIntersections(ray);
-        return (list == null) ? scene.background : calcColor(ray.findClosestPoint(list));
-    }
-
-    /**
-     * Calculates the color at the given point.
-     * This method currently returns the background color of the scene.
-     *
-     * @param point the point at which the color is to be calculated
-     * @return the color at the specified point
-     */
-    private Color calcColor(Point point) {
-        return scene.ambientLight.getIntensity();
-    }
+    public abstract Color traceRay(Ray ray);
 }
 

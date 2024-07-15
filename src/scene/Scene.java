@@ -14,12 +14,12 @@ public class Scene {
     /**
      * The name of the scene
      */
-    public String name;
+    public final String name;
 
     /**
      * The background color of the scene
      */
-    public Color background;
+    public Color background = Color.BLACK;
 
     /**
      * The ambient light in the scene, default is no ambient light
@@ -38,17 +38,6 @@ public class Scene {
      */
     public Scene(String sceneName) {
         name = sceneName;
-    }
-
-    /**
-     * Sets the name of the scene.
-     *
-     * @param name the new name of the scene
-     * @return the current Scene object, for method chaining
-     */
-    public Scene setName(String name) {
-        this.name = name;
-        return this;
     }
 
     /**

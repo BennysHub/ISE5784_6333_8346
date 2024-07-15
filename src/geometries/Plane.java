@@ -84,7 +84,7 @@ public class Plane implements Geometry {
         double t = planeNormalizedVector.dotProduct(planePoint.subtract(p0)) / nv;
         return alignZero(t) <= 0 ? null // The intersection is behind the ray's start point
                 //Point p = p0.add(dir.scale(t));
-                :  List.of(ray.getPoint(t));
+                : List.of(ray.getPoint(t));
     }
 }
 

@@ -80,9 +80,9 @@ public class Triangle extends Polygon {
         // Compute parameter "t" to find the intersection point on the line
         double t = inv_det * edge2.dotProduct(q);
         return alignZero(t) > 0
-            // Ray intersection: Compute the actual intersection point
-            ? List.of(ray.getPoint(t))
-            // Line intersection but not a ray intersection
-            : null;
+                // Ray intersection: Compute the actual intersection point
+                ? List.of(ray.getPoint(t))
+                // Line intersection but not a ray intersection
+                : null;
     }
 }

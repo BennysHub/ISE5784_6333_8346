@@ -43,16 +43,18 @@ public class Geometries implements Intersectable {
 
     @Override
     public List<Point> findIntersections(Ray ray) {
-
         List<Point> combinedIntersections = null;
+
         for (Intersectable intersectable : geometries) {
             var intersections = intersectable.findIntersections(ray);
             if (intersections != null) {
                 if (combinedIntersections == null)
-                    combinedIntersections = new LinkedList<>();
-                combinedIntersections.addAll(intersections);
+                    combinedIntersections = new LinkedList<>(intersections);
+                else
+                    combinedIntersections.addAll(intersections);
             }
         }
+
         return combinedIntersections;
     }
 }

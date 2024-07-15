@@ -71,7 +71,7 @@ public class Ray {
         if (pointList == null || pointList.isEmpty()) return null;
 
         Point closest = null;
-        double shortestDistance = Double.MAX_VALUE;
+        double shortestDistance = Double.POSITIVE_INFINITY;
         for (Point p : pointList) {
             double distance = p.distanceSquared(head);
             if (distance < shortestDistance) {
@@ -81,7 +81,6 @@ public class Ray {
         }
         return closest;
     }
-
 
     @Override
     public String toString() {

@@ -14,12 +14,12 @@ public class AmbientLight {
     /**
      * The intensity of the ambient light
      */
-    final private Color intensity;
+    private final Color intensity;
 
     /**
      * A static constant representing no ambient light
      */
-    final public static AmbientLight NONE = new AmbientLight(Color.BLACK, 0d);
+    public static final AmbientLight NONE = new AmbientLight(Color.BLACK, 0d);
 
     /**
      * Constructs an AmbientLight object with specified intensity and attenuation factors.

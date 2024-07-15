@@ -61,8 +61,8 @@ public class Camera implements Cloneable {
         final double ratioX = width / nX;
 
         // Calculate the pixel's position on the view plane
-        final double yI = -(i - (double) (nY - 1) / 2) * ratioY;
-        final double xJ = (j - (double) (nX - 1) / 2) * ratioX;
+        final double yI = -(i - (nY - 1) / 2d) * ratioY;
+        final double xJ = (j - (nX - 1) / 2d) * ratioX;
 
         // Starting from the center, move to the pixel's position
         Point pIJ = center;
@@ -81,8 +81,8 @@ public class Camera implements Cloneable {
     public Camera renderImage() {
         int nX = imageWriter.getNx();
         int nY = imageWriter.getNy();
-        for (int x = 0; x < nX; x++)
-            for (int y = 0; y < nY; y++)
+        for (int x = nX - 1; x >= 0; --x)
+            for (int y = nY - 1; y >= 0; --y)
                 castRay(nX, nY, x, y);
         return this;
         //throw new UnsupportedOperationException();
@@ -216,7 +216,6 @@ public class Camera implements Cloneable {
             return this;
         }
 
-
         /**
          * Constructs a new {@code Camera} instance using the parameters set in the {@code Builder}.
          * This method ensures that all required fields are properly set and that the camera's configuration is valid.
@@ -256,7 +255,7 @@ public class Camera implements Cloneable {
             try {
                 return (Camera) camera.clone();
             } catch (CloneNotSupportedException e) {
-                throw new RuntimeException("Failed to clone the camera object", e);
+                throw new AssertionError("Failed to clone the camera object", e);
             }
         }
     }
