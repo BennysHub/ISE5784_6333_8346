@@ -73,28 +73,53 @@ public class Camera implements Cloneable {
         return new Ray(location, pIJ.subtract(location));
     }
 
-    public void renderImage() {
-
+    /**
+     * Renders the entire image by iterating through each pixel and casting a ray to determine the color.
+     *
+     * @return the Camera instance for method chaining
+     */
+    public Camera renderImage() {
         int nX = imageWriter.getNx();
         int nY = imageWriter.getNy();
         for (int x = 0; x < nX; x++)
             for (int y = 0; y < nY; y++)
                 castRay(nX, nY, x, y);
-        throw new UnsupportedOperationException();
+        return this;
+        //throw new UnsupportedOperationException();
     }
 
+    /**
+     * Casts a ray through the given pixel coordinates and writes the computed color to the image.
+     *
+     * @param nX the number of pixels in the x-direction
+     * @param nY the number of pixels in the y-direction
+     * @param x  the x-coordinate of the pixel
+     * @param y  the y-coordinate of the pixel
+     */
     private void castRay(int nX, int nY, int x, int y) {
         Ray ray = constructRay(nX, nY, x, y);
         Color color = rayTracerBase.traceRay(ray);
         imageWriter.writePixel(x, y, color);
     }
 
-    public void printGrid(int interval, Color color) {
-        for (int x = 0; x < imageWriter.getNx(); x += interval)
-            for (int y = 0; y < imageWriter.getNy(); y += interval)
-                imageWriter.writePixel(x, y, color);
+    /**
+     * Prints a grid on the image with the specified interval and color.
+     *
+     * @param interval the spacing between grid lines
+     * @param color    the color of the grid lines
+     * @return the Camera instance for method chaining
+     */
+    public Camera printGrid(int interval, Color color) {
+        for (int x = 0; x < imageWriter.getNx(); x++)
+            for (int y = 0; y < imageWriter.getNy(); y++)
+                if (x % interval == 0 || y % interval == 0)
+                    imageWriter.writePixel(x, y, color);
+        return this;
     }
 
+    /**
+     * Writes the image to a file.
+     */
     public void writeToImage() {
         imageWriter.writeToImage();
     }
@@ -169,15 +194,28 @@ public class Camera implements Cloneable {
             return this;
         }
 
+        /**
+         * Sets the ImageWriter for the camera.
+         *
+         * @param imageWriter the ImageWriter to be set
+         * @return the Builder instance for method chaining
+         */
         public Builder setImageWriter(ImageWriter imageWriter) {
             camera.imageWriter = imageWriter;
             return this;
         }
 
+        /**
+         * Sets the RayTracerBase for the camera.
+         *
+         * @param rayTracer the RayTracerBase to be set
+         * @return the Builder instance for method chaining
+         */
         public Builder setRayTracer(RayTracerBase rayTracer) {
             camera.rayTracerBase = rayTracer;
             return this;
         }
+
 
         /**
          * Constructs a new {@code Camera} instance using the parameters set in the {@code Builder}.
