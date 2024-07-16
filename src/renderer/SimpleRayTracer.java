@@ -35,7 +35,7 @@ public class SimpleRayTracer extends RayTracerBase {
      * @param geoPoint the point at which the color is to be calculated
      * @return the color at the specified point
      */
-    private Color calcColor(GeoPoint geoPoint) {//TODO: SEE IF WE NEED TO ADD AMBIENT LIGHT ALSO or somthing elsa like "point color"
+    private Color calcColor(GeoPoint geoPoint) {
 
         return(geoPoint.geometry.getEmission().add(scene.ambientLight.getIntensity()));
     }
