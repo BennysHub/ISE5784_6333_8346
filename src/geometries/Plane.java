@@ -16,7 +16,7 @@ import static primitives.Util.isZero;
  *
  * @author Benny Avrahami
  */
-public class Plane implements Geometry {
+public class Plane extends Geometry {
     /**
      * A point on the plane.
      */
@@ -71,7 +71,7 @@ public class Plane implements Geometry {
     }
 
     @Override
-    public List<Point> findIntersections(Ray ray) {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray)  {
         Point p0 = ray.getHead();
         if (planePoint.equals(p0)) return null;
 
@@ -84,7 +84,7 @@ public class Plane implements Geometry {
         double t = planeNormalizedVector.dotProduct(planePoint.subtract(p0)) / nv;
         return alignZero(t) <= 0 ? null // The intersection is behind the ray's start point
                 //Point p = p0.add(dir.scale(t));
-                : List.of(ray.getPoint(t));
+                : List.of(new GeoPoint(this, ray.getPoint(t)));
     }
 }
 
