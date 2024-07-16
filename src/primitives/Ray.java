@@ -1,5 +1,7 @@
 package primitives;
 
+import geometries.Intersectable.GeoPoint;
+
 import java.util.List;
 
 import static primitives.Util.isZero;
@@ -61,25 +63,44 @@ public class Ray {
         return isZero(t) ? head : head.add(direction.scale(t));
     }
 
-    /**
-     * Finds the point in the given list that is closest to the ray's head.
-     *
-     * @param pointList the list of points to search through
-     * @return the closest point to the 'head' point, or null if the list is null or empty
-     */
-    public Point findClosestPoint(List<Point> pointList) {
-        if (pointList == null || pointList.isEmpty()) return null;
+//    /**
+//     * Finds the point in the given list that is closest to the ray's head.
+//     *
+//     * @param pointList the list of points to search through
+//     * @return the closest point to the 'head' point, or null if the list is null or empty
+//     */
+//    public Point findClosestPoint(List<Point> pointList) {
+//        if (pointList == null || pointList.isEmpty()) return null;
+//
+//        Point closest = null;
+//        double shortestDistance = Double.POSITIVE_INFINITY;
+//        for (Point p : pointList) {
+//            double distance = p.distanceSquared(head);
+//            if (distance < shortestDistance) {
+//                closest = p;
+//                shortestDistance = distance;
+//            }
+//        }
+//        return closest;
+//    }
 
-        Point closest = null;
+    public GeoPoint findClosestGeoPoint(List<GeoPoint> geoPointList) {
+        if (geoPointList == null || geoPointList.isEmpty()) return null;
+        GeoPoint closest = null;
         double shortestDistance = Double.POSITIVE_INFINITY;
-        for (Point p : pointList) {
-            double distance = p.distanceSquared(head);
+        for (GeoPoint gP : geoPointList) {
+            double distance = gP.point.distanceSquared(head);
             if (distance < shortestDistance) {
-                closest = p;
+                closest = gP;
                 shortestDistance = distance;
             }
         }
         return closest;
+    }
+
+    public Point findClosestPoint(List<Point> points) {
+        return points == null || points.isEmpty() ? null
+                : findClosestGeoPoint(points.stream().map(p -> new GeoPoint(null, p)).toList()).point;
     }
 
     @Override

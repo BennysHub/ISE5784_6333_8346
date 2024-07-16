@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Represents a collection of geometric objects that can be intersected by a ray.
  */
-public class Geometries implements Intersectable {
+public class Geometries extends Intersectable {
 
     /**
      * A list to hold an arbitrary amount of geometric objects that implement the Intersectable interface.
@@ -42,11 +42,11 @@ public class Geometries implements Intersectable {
     }
 
     @Override
-    public List<Point> findIntersections(Ray ray) {
-        List<Point> combinedIntersections = null;
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+        List<GeoPoint> combinedIntersections = null;
 
         for (Intersectable intersectable : geometries) {
-            var intersections = intersectable.findIntersections(ray);
+            var intersections = intersectable.findGeoIntersectionsHelper(ray);
             if (intersections != null) {
                 if (combinedIntersections == null)
                     combinedIntersections = new LinkedList<>(intersections);

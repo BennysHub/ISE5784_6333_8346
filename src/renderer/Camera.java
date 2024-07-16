@@ -110,8 +110,11 @@ public class Camera implements Cloneable {
      * @return the Camera instance for method chaining
      */
     public Camera printGrid(int interval, Color color) {
-        for (int x = 0; x < imageWriter.getNx(); x++)
-            for (int y = 0; y < imageWriter.getNy(); y++)
+
+        int nX = imageWriter.getNx();
+        int nY = imageWriter.getNy();
+        for (int x = nX - 1; x >= 0; --x)
+            for (int y = nY - 1; y >= 0; --y)
                 if (x % interval == 0 || y % interval == 0)
                     imageWriter.writePixel(x, y, color);
         return this;
