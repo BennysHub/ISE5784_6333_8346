@@ -25,6 +25,7 @@ public class Camera implements Cloneable {
     private double height = 0.0;
     private double width = 0.0;
     private double vpDistance = 0.0; //view plane distance;
+    private Point center; // viewing plane center point
     private ImageWriter imageWriter;
     private RayTracerBase rayTracerBase;
 
@@ -53,8 +54,6 @@ public class Camera implements Cloneable {
      * @return the constructed {@code Ray}.
      */
     public Ray constructRay(int nX, int nY, int j, int i) {
-        // Calculate the center point of the view plane
-        final Point center = location.add(to.scale(vpDistance));
 
         // Calculate the width and height ratios of a pixel
         final double ratioY = height / nY;
@@ -163,6 +162,7 @@ public class Camera implements Cloneable {
             // Updating Vector to based on right, up vectors
             camera.right = camera.to.crossProduct(camera.up);
             return this;
+
         }
 
         /**
@@ -227,33 +227,38 @@ public class Camera implements Cloneable {
          * @throws MissingResourceException if any of the required fields are not set or are invalid.
          */
         public Camera build() {
-            if (camera.location == null) {
+            if (camera.location == null)
                 throw new MissingResourceException("Missing camera location", Camera.class.getName(), "location");
-            }
-            if (camera.right == null) {
+
+            if (camera.right == null)
                 throw new MissingResourceException("Missing camera right vector", Camera.class.getName(), "right");
-            }
-            if (camera.up == null) {
+
+            if (camera.up == null)
                 throw new MissingResourceException("Missing camera up vector", Camera.class.getName(), "up");
-            }
-            if (camera.to == null) {
+
+            if (camera.to == null)
                 throw new MissingResourceException("Missing camera 'to' vector", Camera.class.getName(), "to");
-            }
-            if (!isZero(camera.to.dotProduct(camera.up))) {
+
+            if (!isZero(camera.to.dotProduct(camera.up)))
                 throw new IllegalArgumentException("the vectors are not perpendicular");
-            }
-            if (alignZero(camera.height) <= 0 || alignZero(camera.width) <= 0) {
+
+            if (alignZero(camera.height) <= 0 || alignZero(camera.width) <= 0)
                 throw new MissingResourceException("Invalid view plane dimensions", Camera.class.getName(), "height/width");
-            }
-            if (alignZero(camera.vpDistance) <= 0) {
+
+            if (alignZero(camera.vpDistance) <= 0)
                 throw new MissingResourceException("Invalid view plane distance", Camera.class.getName(), "vpDistance");
-            }
-            if (camera.imageWriter == null) {
+
+            if (camera.imageWriter == null)
                 throw new MissingResourceException("Missing camera imageWriter", Camera.class.getName(), "imageWriter");
-            }
-            if (camera.rayTracerBase == null) {
+
+            if (camera.rayTracerBase == null)
                 throw new MissingResourceException("Missing camera rayTracerBase", Camera.class.getName(), "rayTracerBase");
-            }
+
+            camera.center = camera.location.add(camera.to.scale(camera.vpDistance));
+
+            if (camera.center == null)
+                throw new MissingResourceException("Missing camera center", Camera.class.getName(), "center");
+
 
             try {
                 return (Camera) camera.clone();
