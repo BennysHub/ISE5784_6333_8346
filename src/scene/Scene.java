@@ -2,11 +2,14 @@ package scene;
 
 import geometries.Geometries;
 import lighting.AmbientLight;
+import lighting.LightSource;
 import primitives.Color;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -23,6 +26,7 @@ public class Scene {
      */
     public final String name;
 
+
     /**
      * The background color of the scene
      */
@@ -33,6 +37,7 @@ public class Scene {
      */
     public AmbientLight ambientLight = AmbientLight.NONE;
 
+    public List<LightSource> lights = new LinkedList<>();
     /**
      * The collection of geometries in the scene
      */
@@ -70,6 +75,11 @@ public class Scene {
         return this;
     }
 
+    public Scene setLights(List<LightSource> lights) {
+        this.lights = lights;
+        return this;
+    }
+
     /**
      * Sets the geometries in the scene.
      *
@@ -87,7 +97,8 @@ public class Scene {
      * @param filePath the path to the JSON file
      * @return the current Scene object, for method chaining
      */
-    public static Scene loadFromJson(String filePath) {
+    public static Scene loadFromJson(String filePath)//TODO: DELETE
+    {
         Scene s = new Scene(filePath);
         try {
             // Read the file content into a string
