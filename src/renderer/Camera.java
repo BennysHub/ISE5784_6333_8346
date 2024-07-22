@@ -166,6 +166,60 @@ public class Camera implements Cloneable {
         }
 
         /**
+         * Sets the vectors of the camera, so it will point to the target point
+         *
+         * @param target the point the camera is directed towards.
+         * @return the current Builder object for chaining method calls.
+         */
+        public Builder setTarget(Point target) {
+            camera.to = target.subtract(camera.location).normalize();
+
+            camera.up = new Vector(0, 1, 0); // The y-axis is up
+            if (!isZero(camera.to.dotProduct(camera.up))) {
+                camera.up = new Vector(0, 0, 1); // Switch to Z-axis if Vector to is (0, 1, 0)
+            }
+            camera.right = camera.to.crossProduct(camera.up).normalize();
+            camera.up = camera.right.crossProduct(camera.to).normalize();
+            return this;
+        }
+
+        /**
+         * Rotates the 'right' and 'up' vectors of the camera by a given angle in degrees
+         * in a clockwise direction.
+         *
+         * @param angle the angle by which to rotate the vectors, in degrees.
+         * @return the current Builder object for chaining method calls.
+         */
+        public Builder rotateVectors(double angle) {
+            if (angle == 0) return this;
+
+            double radians = Math.toRadians(angle); //convert to radians
+            double cos = Math.cos(radians);
+            double sin = Math.sin(radians);
+            if (isZero(cos)) {
+                Vector newRight = camera.up.scale(-sin);
+                Vector newUp = camera.right.scale(sin);
+                camera.right = newRight.normalize();
+                camera.up = newUp.normalize();
+                return this;
+            }
+            if (isZero(sin)) {
+                Vector newRight = camera.right.scale(cos);
+                Vector newUp = camera.up.scale(cos);
+                camera.right = newRight.normalize();
+                camera.up = newUp.normalize();
+                return this;
+            }
+            Vector newRight = camera.right.scale(cos)
+                    .add(camera.up.scale(-sin));
+            Vector newUp = camera.right.scale(sin)
+                    .add(camera.up.scale(cos));
+            camera.right = newRight.normalize();
+            camera.up = newUp.normalize();
+            return this;
+        }
+
+        /**
          * Sets the view plane size of the camera.
          *
          * @param height the height of the view plane.

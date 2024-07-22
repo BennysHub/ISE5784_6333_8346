@@ -18,10 +18,6 @@ class CameraTest {
     /**
      * Camera builder for the tests
      */
-//    private final Camera.Builder cameraBuilder = Camera.getBuilder()
-//            .setLocation(Point.ZERO)
-//            .setDirection(new Vector(0, 0, -1), new Vector(0, -1, 0))
-//            .setVpDistance(10);
 
     private final Camera.Builder cameraBuilder = Camera.getBuilder()
             .setLocation(Point.ZERO)
@@ -71,6 +67,4 @@ class CameraTest {
                 camera2.constructRay(3, 3, 0, 0), badRay);
 
     }
-
-
 }

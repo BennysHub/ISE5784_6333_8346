@@ -40,6 +40,7 @@ public class Scene {
         name = sceneName;
     }
 
+
     /**
      * Sets the background color of the scene.
      *
