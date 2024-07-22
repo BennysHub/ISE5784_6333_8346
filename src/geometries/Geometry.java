@@ -16,12 +16,26 @@ import java.util.List;
  */
 public abstract class Geometry extends Intersectable {
 
+    /**
+     * The emission color of the geometry, default is black
+     */
     protected Color emission = Color.BLACK;
 
+    /**
+     * Gets the emission color of the geometry.
+     *
+     * @return the emission color of the geometry
+     */
     public Color getEmission() {
         return emission;
     }
-
+    
+    /**
+     * Sets the emission color of the geometry.
+     *
+     * @param emission the new emission color
+     * @return the current Geometry object, for method chaining
+     */
     public Geometry setEmission(Color emission) {
         this.emission = emission;
         return this;

@@ -54,36 +54,21 @@ public class Ray {
     }
 
     /**
-     * The method calculates a point on the line of the ray, at the distance t
+     * Calculates a point on the ray at a specified distance from the head.
      *
-     * @param t the distance from the head
-     * @return new point on the line of the ray, at the distance t
+     * @param t the distance from the head point along the direction vector
+     * @return a point on the ray at the specified distance
      */
     public Point getPoint(double t) {
         return isZero(t) ? head : head.add(direction.scale(t));
     }
 
-//    /**
-//     * Finds the point in the given list that is closest to the ray's head.
-//     *
-//     * @param pointList the list of points to search through
-//     * @return the closest point to the 'head' point, or null if the list is null or empty
-//     */
-//    public Point findClosestPoint(List<Point> pointList) {
-//        if (pointList == null || pointList.isEmpty()) return null;
-//
-//        Point closest = null;
-//        double shortestDistance = Double.POSITIVE_INFINITY;
-//        for (Point p : pointList) {
-//            double distance = p.distanceSquared(head);
-//            if (distance < shortestDistance) {
-//                closest = p;
-//                shortestDistance = distance;
-//            }
-//        }
-//        return closest;
-//    }
-
+    /**
+     * Finds the closest geometric point from a list of intersection points to the ray's head.
+     *
+     * @param geoPointList a list of geometric intersection points
+     * @return the closest geometric intersection point to the ray's head, or null if the list is empty
+     */
     public GeoPoint findClosestGeoPoint(List<GeoPoint> geoPointList) {
         if (geoPointList == null || geoPointList.isEmpty()) return null;
         GeoPoint closest = null;
@@ -98,6 +83,12 @@ public class Ray {
         return closest;
     }
 
+    /**
+     * Finds the closest point from a list of points to the ray's head.
+     *
+     * @param points a list of points
+     * @return the closest point to the ray's head, or null if the list is empty
+     */
     public Point findClosestPoint(List<Point> points) {
         return points == null || points.isEmpty() ? null
                 : findClosestGeoPoint(points.stream().map(p -> new GeoPoint(null, p)).toList()).point;
@@ -116,4 +107,3 @@ public class Ray {
                 && direction.equals(other.direction);
     }
 }
-

@@ -90,7 +90,7 @@ public class RenderTests {
      */
     @Test
     public void renderMultipleAnglesTest() {
-        int testNum = 1;
+        int testNum = 10;
         Camera.Builder camera = Camera.getBuilder()
                 .setRayTracer(new SimpleRayTracer(scene))
                 .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0)) //changed
@@ -113,7 +113,7 @@ public class RenderTests {
         for (int i = 0; i < testNum; i += 1) {
             camera.setLocation(new Point((i * 10) - 50, 0, 0))
                     .setTarget(new Point(0, 0, -100))
-                    .rotateVectors(180)
+                    .rotateVectors(0 * 10)
                     .setImageWriter(new ImageWriter("render Multiple Angles Test:" + i, 1000, 1000))
                     .build()
                     .renderImage()
@@ -124,22 +124,26 @@ public class RenderTests {
 
     }
 
-//    /**
-//     * Test for XML based scene - for bonus
-//     */
-//    @Test
-//    public void basicRenderXml() {
-//        // enter XML file name and parse from XML file into scene object
-//        // using the code you added in appropriate packages
-//        // ...
-//        // NB: unit tests is not the correct place to put XML parsing code
-//
-//        camera
-//                .setImageWriter(new ImageWriter("xml render test", 1000, 1000))
-//                .build()
-//                .renderImage()
-//                .printGrid(100, new Color(YELLOW))
-//                .writeToImage();
-//    }
+    /**
+     * Test for XML based scene - for bonus
+     */
+    @Test
+    public void basicRenderXml() {
+        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/twoColorJson.json");
+        final Scene scene1 = jsp.scene;
+        //final Scene scene1 = Scene.loadFromJson("src/unittests/renderer/twoColorJson.json");
+
+        final Camera.Builder camera = Camera.getBuilder()
+                .setRayTracer(new SimpleRayTracer(scene1))
+                .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0)) //changed
+                .setVpDistance(100)
+                .setVpSize(500, 500);
+
+        camera.setImageWriter(new ImageWriter("xml render test", 1000, 1000))
+                .build()
+                .renderImage()
+                .printGrid(100, new Color(YELLOW))
+                .writeToImage();
+    }
 }
 

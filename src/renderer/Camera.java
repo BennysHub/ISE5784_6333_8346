@@ -10,6 +10,7 @@ import java.util.MissingResourceException;
 import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
 
+
 /**
  * The {@code Camera} class represents a camera in a 3D scene.
  * It is defined by its location and orientation vectors (right, up, and to).
@@ -191,8 +192,6 @@ public class Camera implements Cloneable {
          * @return the current Builder object for chaining method calls.
          */
         public Builder rotateVectors(double angle) {
-            if (angle == 0) return this;
-
             double radians = Math.toRadians(angle); //convert to radians
             double cos = Math.cos(radians);
             double sin = Math.sin(radians);
