@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Test class for Ray.
- * Author: Benny Avrahami
+ * Author: Benny
  */
 class RayTest {
 
@@ -48,7 +48,7 @@ class RayTest {
         Point p2 = new Point(1, 0, 5);
         Point p3 = new Point(1, 0, 7);
 
-        List<Point> list = List.of(p1, p2, p3);
+        List<Point> list;
         // ============ Equivalence Partitions Tests ==============
         //TC01 the middle point is the closest
         list = List.of(p2, p1, p3);

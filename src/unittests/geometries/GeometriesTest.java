@@ -58,11 +58,13 @@ class GeometriesTest {
                 new Ray(new Point(3.5, 0, 0),
                         new Vector(1, 0, 0)));
         //TC03: only one intersection
+        assert result1 != null;
         assertEquals(1, result1.size(), "wrong intersection amount");
         assertEquals(List.of(new Point(4, 0, 0)), result1, "wrong intersection");
 
         var result2 = g.findIntersections(new Ray(new Point(-1, 0, 0), new Vector(1, 0, 0)));
         //TC04: all the geometries intersect
+        assert result2 != null;
         assertEquals(4, result2.size(), "wrong intersection amount");
         assertEquals(List.of(new Point(0.5, 0, 0),
                 new Point(2.5, 0, 0),
@@ -73,6 +75,7 @@ class GeometriesTest {
         // ============ Equivalence Partitions Tests ==============
         var result3 = g.findIntersections(new Ray(new Point(2.75, 0, 0), new Vector(1, 0, 0)));
         //TC05: some of the geometries intersect
+        assert result3 != null;
         assertEquals(2, result3.size(), "wrong intersection amount");
         assertEquals(List.of(new Point(3, 0, 0), new Point(4, 0, 0)), result3,
                 "wrong intersection");

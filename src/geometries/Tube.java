@@ -55,8 +55,9 @@ public class Tube extends RadialGeometry {
 
         return normal.normalize();
     }
+
     @Override
-    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray)  {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
         return null;
     }
 

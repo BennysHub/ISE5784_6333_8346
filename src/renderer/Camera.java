@@ -312,7 +312,6 @@ public class Camera implements Cloneable {
             if (camera.center == null)
                 throw new MissingResourceException("Missing camera center", Camera.class.getName(), "center");
 
-
             try {
                 return (Camera) camera.clone();
             } catch (CloneNotSupportedException e) {

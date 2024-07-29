@@ -73,7 +73,7 @@ public class Color {
         int ir = (int) rgb.d1;
         int ig = (int) rgb.d2;
         int ib = (int) rgb.d3;
-        return new java.awt.Color(ir > 255 ? 255 : ir, ig > 255 ? 255 : ig, ib > 255 ? 255 : ib);
+        return new java.awt.Color(Math.min(ir, 255), Math.min(ig, 255), Math.min(ib, 255));
     }
 
     /**
@@ -123,7 +123,7 @@ public class Color {
      * @param k reduction factor
      * @return new Color object which is the result of the operation
      */
-    public Color reduce(int k) {
+    public Color reduce(double k) {//TODO: CHANGED FROM INT K TO DOUBLE K
         if (k < 1) throw new IllegalArgumentException("Can't scale a color by a by a number lower than 1");
         return new Color(rgb.reduce(k));
     }

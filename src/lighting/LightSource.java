@@ -4,9 +4,25 @@ import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
 
+/**
+ * Interface representing a light source in a 3D scene.
+ * Provides methods to get the intensity and direction of the light at a given point.
+ */
 public interface LightSource {
 
-    public Color getIntensity(Point p);
+    /**
+     * Gets the intensity of the light at a specific point.
+     *
+     * @param p the point at which the light intensity is to be calculated
+     * @return the color representing the light intensity at the given point
+     */
+    Color getIntensity(Point p);
 
-    public Vector getL(Point p);
+    /**
+     * Gets the vector from the light source to a specific point.
+     *
+     * @param p the point at which the vector is to be calculated
+     * @return the vector from the light source to the given point
+     */
+    Vector getL(Point p);
 }

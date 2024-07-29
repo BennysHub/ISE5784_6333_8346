@@ -1,11 +1,10 @@
 package renderer;
 
+import geometries.Intersectable.GeoPoint;
 import lighting.LightSource;
 import primitives.*;
 import scene.Scene;
-import geometries.Intersectable.GeoPoint;
 
-import static java.lang.Math.*;
 import static primitives.Util.alignZero;
 
 /**
@@ -35,33 +34,29 @@ public class SimpleRayTracer extends RayTracerBase {
      * This method currently returns the background color of the scene.
      *
      * @param gp the point at which the color is to be calculated
+     * @param v  the ray's direction vector intersect with the gp
      * @return the color at the specified point
      */
     private Color calcColor(GeoPoint gp, Vector v) {
-        Vector n = gp.geometry.getNormal(gp.point);
         return scene.ambientLight.getIntensity()
                 .add(calcLocalEffects(gp, v));
-
-//        for (LightSource ls : scene.lights) {
-//            Vector r = ls.getL(gp.point).subtract(
-//                    n.scale(ls.getL(gp.point).dotProduct(n))).scale(2);
-//            combinedColor.add(
-//                    ls.getIntensity(gp.point)
-//                            .scale((gp.geometry.getMaterial().kD
-//                                    .scale(abs(ls.getL(gp.point).dotProduct(n))))
-//                                    .add(gp.geometry.getMaterial().kS
-//                                            .scale(pow(max(0, -v.dotProduct(r)), gp.geometry.getMaterial().shininess))))
-//            );
-//        }
-//        return combinedColor;
     }
 
+    /**
+     * Calculates the local effects of lighting at the given point.
+     *
+     * @param gp the point at which the local effects are to be calculated
+     * @param v  the ray's direction vector intersecting with the gp
+     * @return the color at the specified point including local lighting effects
+     */
     private Color calcLocalEffects(GeoPoint gp, Vector v) {
         Vector n = gp.geometry.getNormal(gp.point);
         double nv = alignZero(n.dotProduct(v));
         if (nv == 0) return Color.BLACK;
+
         Material material = gp.geometry.getMaterial();
         Color color = gp.geometry.getEmission();
+
         for (LightSource lightSource : scene.lights) {
             Vector l = lightSource.getL(gp.point);
             double nl = alignZero(n.dotProduct(l));
@@ -75,12 +70,31 @@ public class SimpleRayTracer extends RayTracerBase {
         return color;
     }
 
+    /**
+     * Calculates the diffusive component of the lighting.
+     *
+     * @param material the material of the geometry
+     * @param nl       the dot product of the normal and light direction vectors
+     * @return the diffusive component of the lighting
+     */
     private Double3 calcDiffusive(Material material, double nl) {
-        return material.kD.scale(abs(nl));
+        return material.kD.scale(Math.abs(nl));
     }
 
+    /**
+     * Calculates the specular component of the lighting.
+     *
+     * @param material the material of the geometry
+     * @param n        the normal vector at the point
+     * @param l        the vector from the light to the point
+     * @param nl       the dot product of the normal and light vector to point
+     * @param v        the ray of intersection, direction vector
+     * @return the specular component of the lighting
+     */
     private Double3 calcSpecular(Material material, Vector n, Vector l, double nl, Vector v) {
-        return material.kS.scale(pow(max(0, -v.dotProduct(l.subtract(n.scale(2 * nl)))), material.shininess));
+        Vector r = l.subtract(n.scale(2 * nl)); // Reflection vector
+        double vr = Math.max(0, -v.dotProduct(r));
+        return material.kS.scale(Math.pow(vr, material.shininess));
     }
 }
 

@@ -1,25 +1,23 @@
-package renderer;
+package scene;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;
 import primitives.Color;
 import primitives.Double3;
 import primitives.Point;
-import scene.Scene;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 
 public class JsonSceneParser {
-    public Scene scene = new Scene("");
+    public Scene scene;
 
     public JsonSceneParser(String filePath) {
         try {

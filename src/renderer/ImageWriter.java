@@ -1,14 +1,13 @@
 package renderer;
 
+import primitives.Color;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
-
-import primitives.Color;
 
 /**
  * Image writer class combines accumulation of pixel color matrix and finally
@@ -22,11 +21,11 @@ public class ImageWriter {
     /**
      * Horizontal resolution of the image - number of pixels in row
      */
-    private int nX;
+    private final int nX;
     /**
      * Vertical resolution of the image - number of pixels in column
      */
-    private int nY;
+    private final int nY;
 
     /**
      * Directory path for the image file generation - relative to the user
@@ -37,15 +36,15 @@ public class ImageWriter {
     /**
      * Image generation buffer (the matrix of the pixels)
      */
-    private BufferedImage image;
+    private final BufferedImage image;
     /**
      * image file name, not including the file extension '.png'
      */
-    private String imageName;
+    private final String imageName;
     /**
      * logger for reporting I/O failures
      */
-    private Logger logger = Logger.getLogger("ImageWriter");
+    private final Logger logger = Logger.getLogger("ImageWriter");
 
     // ***************** Constructors ********************** //
 

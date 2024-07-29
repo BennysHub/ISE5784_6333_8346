@@ -41,7 +41,7 @@ public class Sphere extends RadialGeometry {
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
         // If the ray starts at the sphere's center, return the point on the sphere's surface
         if (ray.getHead().equals(center))
-            return List.of(new GeoPoint(this,ray.getPoint(radius)));
+            return List.of(new GeoPoint(this, ray.getPoint(radius)));
 
         // Calculate coefficients for the quadratic equation
         Vector oc = ray.getHead().subtract(center);

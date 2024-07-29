@@ -1,13 +1,17 @@
 package renderer;
 
-import static java.awt.Color.*;
-
-import org.junit.jupiter.api.Test;
-
-import geometries.*;
+import geometries.Sphere;
+import geometries.Triangle;
 import lighting.AmbientLight;
-import primitives.*;
+import org.junit.jupiter.api.Test;
+import primitives.Color;
+import primitives.Double3;
+import primitives.Point;
+import primitives.Vector;
+import scene.JsonSceneParser;
 import scene.Scene;
+
+import static java.awt.Color.*;
 
 /**
  * Test rendering a basic image
@@ -90,7 +94,7 @@ public class RenderTests {
      */
     @Test
     public void renderMultipleAnglesTest() {
-        int testNum = 1;
+        int testNum = 3;
         Camera.Builder camera = Camera.getBuilder()
                 .setRayTracer(new SimpleRayTracer(scene))
                 .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0)) //changed
@@ -110,10 +114,10 @@ public class RenderTests {
                         .setEmission(new Color(BLUE)));
         scene.setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.2, 0.2, 0.2)));
 
-        for (int i = 0; i < testNum; i += 1) {
+        for (int i = 0; i < testNum; ++i) {
             camera.setLocation(new Point((i * 10) - 50, 0, 0))
                     .setTarget(new Point(0, 0, -100))
-                    .rotateVectors(0 * 10)
+                    .rotateVectors(10)
                     .setImageWriter(new ImageWriter("render Multiple Angles Test:" + i, 1000, 1000))
                     .build()
                     .renderImage()

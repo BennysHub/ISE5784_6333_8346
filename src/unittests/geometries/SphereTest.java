@@ -7,6 +7,7 @@ import primitives.Vector;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -57,13 +58,14 @@ class SphereTest {
         assertNull(sphere.findIntersections(new Ray(p01, v110)), "Ray's line should be outside the sphere");
 
         // TC02: Ray starts before and crosses the sphere (2 points)
-        List<Point> intersectionPointsTC02 = sphere.findIntersections(new Ray(p01, v310))
+        List<Point> intersectionPointsTC02 = Objects.requireNonNull(sphere.findIntersections(new Ray(p01, v310)))
                 .stream().sorted(Comparator.comparingDouble(p -> p.distance(p01))).toList();
         assertEquals(2, intersectionPointsTC02.size(), "Incorrect number of intersection points");
         assertEquals(exp, intersectionPointsTC02, "Ray should cross the sphere");
 
         // TC03: Ray starts inside the sphere (1 point)
         List<Point> insideIntersectionTC03 = sphere.findIntersections(new Ray(new Point(1, 0.5, 0), v001));
+        assert insideIntersectionTC03 != null;
         assertEquals(1, insideIntersectionTC03.size(), "Incorrect number of intersection points");
         assertEquals(gp3, insideIntersectionTC03.getFirst(), "Ray should start inside the sphere");
 
@@ -74,6 +76,7 @@ class SphereTest {
 
         // TC11: Ray starts at sphere and goes inside (1 point)
         List<Point> startAtSphereInside = sphere.findIntersections(new Ray(new Point(1, 0, -1), v001));
+        assert startAtSphereInside != null;
         assertEquals(1, startAtSphereInside.size(), "Incorrect number of intersection points");
         assertEquals(new Point(1, 0, 1), startAtSphereInside.getFirst(), "Ray should start at the sphere and go inside");
 
@@ -84,22 +87,26 @@ class SphereTest {
 
         // TC13: Ray starts before the sphere (2 points)
         List<Point> throughCenterBefore = sphere.findIntersections(new Ray(p01, v100));
+        assert throughCenterBefore != null;
         assertEquals(2, throughCenterBefore.size(), "Incorrect number of intersection points");
         assertEquals(Point.ZERO, throughCenterBefore.get(0), "Ray should go through the center before the sphere");
         assertEquals(new Point(2, 0, 0), throughCenterBefore.get(1), "Ray should go through the center before the sphere");
 
         // TC14: Ray starts at sphere and goes inside (1 point)
         List<Point> throughCenterInside = sphere.findIntersections(new Ray(Point.ZERO, v100));
+        assert throughCenterInside != null;
         assertEquals(1, throughCenterInside.size(), "Incorrect number of intersection points");
         assertEquals(new Point(2, 0, 0), throughCenterInside.getFirst(), "Ray should start at the sphere and go inside");
 
         // TC15: Ray starts inside (1 point)
         List<Point> throughCenterStartInside = sphere.findIntersections(new Ray(new Point(0.5, 0, 0), v100));
+        assert throughCenterStartInside != null;
         assertEquals(1, throughCenterStartInside.size(), "Incorrect number of intersection points");
         assertEquals(new Point(2, 0, 0), throughCenterStartInside.getFirst(), "Ray should start inside the sphere");
 
         // TC16: Ray starts at the center (1 point)
         List<Point> startAtCenter = sphere.findIntersections(new Ray(p100, v001));
+        assert startAtCenter != null;
         assertEquals(1, startAtCenter.size(), "Incorrect number of intersection points");
         assertEquals(new Point(1, 0, 1), startAtCenter.getFirst(), "Ray should start at the center");
 
@@ -130,6 +137,7 @@ class SphereTest {
 
         // TC23: Ray's is inside, ray is orthogonal to ray start to sphere's center line
         List<Point> startAInsideOrthogonal = sphere.findIntersections(new Ray(new Point(0.5, 0, 0), v001));
+        assert startAInsideOrthogonal != null;
         assertEquals(1, startAInsideOrthogonal.size(), "Incorrect number of intersection points");
         assertEquals(new Point(0.5, 0, Math.sqrt(3) / 2), startAInsideOrthogonal.getFirst(), "Ray should start at the center");
     }

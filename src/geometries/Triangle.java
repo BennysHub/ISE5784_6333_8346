@@ -2,7 +2,6 @@ package geometries;
 
 import primitives.Point;
 import primitives.Ray;
-import primitives.Util;
 import primitives.Vector;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public class Triangle extends Polygon {
     }
 
     @Override
-    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray)  {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
         // Extract relevant information from the input
         Vector rayDirection = ray.getDirection(); // Direction vector of the ray
         Point rayOrigin = ray.getHead(); // Origin point of the ray
@@ -81,7 +80,7 @@ public class Triangle extends Polygon {
         double t = inv_det * edge2.dotProduct(q);
         return alignZero(t) > 0
                 // Ray intersection: Compute the actual intersection point
-                ? List.of(new GeoPoint(this,ray.getPoint(t)))
+                ? List.of(new GeoPoint(this, ray.getPoint(t)))
                 // Line intersection but not a ray intersection
                 : null;
     }
