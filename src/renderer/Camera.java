@@ -23,8 +23,8 @@ public class Camera implements Cloneable {
     private Vector right;
     private Vector up;
     private Vector to;
-    private double height = 0.0;
-    private double width = 0.0;
+    private double vpHeight = 0.0;
+    private double vpWidth = 0.0;
     private double vpDistance = 0.0; //view plane distance;
     private Point center; // viewing plane center point
     private ImageWriter imageWriter;
@@ -57,8 +57,8 @@ public class Camera implements Cloneable {
     public Ray constructRay(int nX, int nY, int j, int i) {
 
         // Calculate the width and height ratios of a pixel
-        final double ratioY = height / nY;
-        final double ratioX = width / nX;
+        final double ratioY = vpHeight / nY;
+        final double ratioX = vpWidth / nX;
 
         // Calculate the pixel's position on the view plane
         final double yI = -(i - (nY - 1) / 2d) * ratioY;
@@ -85,7 +85,6 @@ public class Camera implements Cloneable {
             for (int y = nY - 1; y >= 0; --y)
                 castRay(nX, nY, x, y);
         return this;
-        //throw new UnsupportedOperationException();
     }
 
     /**
@@ -180,7 +179,7 @@ public class Camera implements Cloneable {
                 camera.up = new Vector(0, 0, 1); // Switch to Z-axis if Vector to is (0, 1, 0)
             }
             camera.right = camera.to.crossProduct(camera.up).normalize();
-            camera.up = camera.right.crossProduct(camera.to).normalize();
+            camera.up = camera.right.crossProduct(camera.to);
             return this;
         }
 
@@ -230,8 +229,8 @@ public class Camera implements Cloneable {
             if (alignZero(height) <= 0 || alignZero(width) <= 0) {
                 throw new IllegalArgumentException("the height and width must be positive");
             }
-            camera.height = height;
-            camera.width = width;
+            camera.vpHeight = height;
+            camera.vpWidth = width;
             return this;
         }
 
@@ -295,7 +294,7 @@ public class Camera implements Cloneable {
             if (!isZero(camera.to.dotProduct(camera.up)))
                 throw new IllegalArgumentException("the vectors are not perpendicular");
 
-            if (alignZero(camera.height) <= 0 || alignZero(camera.width) <= 0)
+            if (alignZero(camera.vpHeight) <= 0 || alignZero(camera.vpWidth) <= 0)
                 throw new MissingResourceException("Invalid view plane dimensions", Camera.class.getName(), "height/width");
 
             if (alignZero(camera.vpDistance) <= 0)

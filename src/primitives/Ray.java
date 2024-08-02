@@ -70,7 +70,7 @@ public class Ray {
      * @return the closest geometric intersection point to the ray's head, or null if the list is empty
      */
     public GeoPoint findClosestGeoPoint(List<GeoPoint> geoPointList) {
-        if (geoPointList == null || geoPointList.isEmpty()) return null;
+        if (geoPointList == null) return null;
         GeoPoint closest = null;
         double shortestDistance = Double.POSITIVE_INFINITY;
         for (GeoPoint gP : geoPointList) {

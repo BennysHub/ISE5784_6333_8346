@@ -109,14 +109,7 @@ public class SimpleRayTracer extends RayTracerBase {
         Point point = gp.point.add(epsVector);
         Ray ray = new Ray(point, lightDirection);
         List<Point> intersections = scene.geometries.findIntersections(ray, light.getDistance(gp.point));
-        if (intersections == null) return true;
-
-        double distanceFromLightSource = light.getDistance(gp.point);
-        for (Point p : intersections) {
-            if (distanceFromLightSource > p.distance(gp.point)  )
-                return false;
-        }
-        return true;
+        return intersections == null;
     }
 }
 

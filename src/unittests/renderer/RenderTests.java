@@ -94,7 +94,7 @@ public class RenderTests {
      */
     @Test
     public void renderMultipleAnglesTest() {
-        int testNum = 3;
+        int testNum = 25;
         Camera.Builder camera = Camera.getBuilder()
                 .setRayTracer(new SimpleRayTracer(scene))
                 .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0)) //changed
@@ -118,7 +118,7 @@ public class RenderTests {
             camera.setLocation(new Point((i * 10) - 50, 0, 0))
                     .setTarget(new Point(0, 0, -100))
                     .rotateVectors(10)
-                    .setImageWriter(new ImageWriter("render Multiple Angles Test:" + i, 1000, 1000))
+                    .setImageWriter(new ImageWriter("render Multiple Angles Test" + i, 1000, 1000))
                     .build()
                     .renderImage()
                     .printGrid(100, new Color(YELLOW))

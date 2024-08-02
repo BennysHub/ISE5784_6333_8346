@@ -67,7 +67,7 @@ public class Triangle extends Polygon {
             return null;
 
         // Compute vector 'q' (cross product of 's' and edge1)
-        Vector q = s.crossProduct(edge1);
+        Vector q = s.crossProduct(edge1);//TODO possible vector zero?
         // Calculate barycentric coordinate 'v'
         double v = inv_det * rayDirection.dotProduct(q);
 
