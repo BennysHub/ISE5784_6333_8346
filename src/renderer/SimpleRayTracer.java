@@ -5,6 +5,8 @@ import lighting.LightSource;
 import primitives.*;
 import scene.Scene;
 
+import java.util.List;
+
 import static primitives.Util.alignZero;
 
 /**
@@ -22,6 +24,8 @@ public class SimpleRayTracer extends RayTracerBase {
     public SimpleRayTracer(Scene scene) {
         super(scene);
     }
+
+    private static final double DELTA = 0.1;
 
     @Override
     public Color traceRay(Ray ray) {
@@ -60,7 +64,7 @@ public class SimpleRayTracer extends RayTracerBase {
         for (LightSource lightSource : scene.lights) {
             Vector l = lightSource.getL(gp.point);
             double nl = alignZero(n.dotProduct(l));
-            if (nl * nv > 0) { // sign(nl) == sing(nv)
+            if ((nl * nv > 0) && unshaded(gp, lightSource, l, n, nl)) { // sign(nl) == sing(nv)
                 Color iL = lightSource.getIntensity(gp.point);
                 color = color.add(
                         iL.scale(calcDiffusive(material, nl)
@@ -95,6 +99,24 @@ public class SimpleRayTracer extends RayTracerBase {
         Vector r = l.subtract(n.scale(2 * nl)); // Reflection vector
         double vr = Math.max(0, -v.dotProduct(r));
         return material.kS.scale(Math.pow(vr, material.shininess));
+    }
+
+
+
+    private boolean unshaded(GeoPoint gp, LightSource light, Vector l, Vector n, double nl) {
+        Vector lightDirection = l.scale(-1); // from point to light source
+        Vector epsVector = n.scale(nl < 0 ? DELTA : -DELTA);
+        Point point = gp.point.add(epsVector);
+        Ray ray = new Ray(point, lightDirection);
+        List<Point> intersections = scene.geometries.findIntersections(ray, light.getDistance(gp.point));
+        if (intersections == null) return true;
+
+        double distanceFromLightSource = light.getDistance(gp.point);
+        for (Point p : intersections) {
+            if (distanceFromLightSource > p.distance(gp.point)  )
+                return false;
+        }
+        return true;
     }
 }
 

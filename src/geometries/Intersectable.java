@@ -52,23 +52,36 @@ public abstract class Intersectable {
     /**
      * Finds the intersection points of a given ray with this geometric shape.
      *
+     * @param ray         the ray to intersect with this geometric shape
+     * @param maxDistance the maximum distance within which to search for intersections
+     * @return a list of intersection points, or null if there are no intersections
+     */
+    public final List<Point> findIntersections(Ray ray, double maxDistance) {
+        List<GeoPoint> geoList = findGeoIntersections(ray, maxDistance);
+        return geoList == null ? null
+                : geoList.stream().map(gp -> gp.point).toList();
+    }
+
+    /**
+     * Finds the intersection points of a given ray with this geometric shape.
+     * This version of the method uses the default maximum distance (Double.POSITIVE_INFINITY).
+     *
      * @param ray the ray to intersect with this geometric shape
      * @return a list of intersection points, or null if there are no intersections
      */
     public final List<Point> findIntersections(Ray ray) {
-        List<GeoPoint> geoList = findGeoIntersections(ray);
-        return geoList == null ? null
-                : geoList.stream().map(gp -> gp.point).toList();
+        return findIntersections(ray, Double.POSITIVE_INFINITY);
     }
 
     /**
      * Finds the geometric intersection points of a given ray with this geometric shape.
      * This method must be implemented by subclasses.
      *
-     * @param ray the ray to intersect with this geometric shape
+     * @param ray         the ray to intersect with this geometric shape
+     * @param maxDistance the maximum distance within which to search for intersections
      * @return a list of geometric intersection points, or null if there are no intersections
      */
-    protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray);
+    protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance);
 
     /**
      * Finds the geometric intersection points of a given ray with this geometric shape.
@@ -78,6 +91,18 @@ public abstract class Intersectable {
      * @return a list of geometric intersection points, or null if there are no intersections
      */
     public final List<GeoPoint> findGeoIntersections(Ray ray) {
-        return findGeoIntersectionsHelper(ray);
+        return findGeoIntersectionsHelper(ray, Double.POSITIVE_INFINITY);
+    }
+
+    /**
+     * Finds the geometric intersection points of a given ray with this geometric shape.
+     * This method uses the helper method implemented by subclasses.
+     *
+     * @param ray         the ray to intersect with this geometric shape
+     * @param maxDistance the maximum distance within which to search for intersections
+     * @return a list of geometric intersection points, or null if there are no intersections
+     */
+    public final List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
+        return findGeoIntersectionsHelper(ray, maxDistance);
     }
 }

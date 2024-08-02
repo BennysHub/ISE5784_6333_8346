@@ -38,7 +38,7 @@ public class Sphere extends RadialGeometry {
     }
 
     @Override
-    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
         // If the ray starts at the sphere's center, return the point on the sphere's surface
         if (ray.getHead().equals(center))
             return List.of(new GeoPoint(this, ray.getPoint(radius)));
@@ -65,9 +65,13 @@ public class Sphere extends RadialGeometry {
         Point p2 = ray.getPoint(t2);
         double t1 = (-b - sqrtDiscriminant);
 
+        //if t1 >= max distance (so is t2) even if its valid intersection it still out of boundary
+        if (alignZero(t1 - maxDistance) >= 0)
+            return null;
+
         // If t1 > 0 so t2, It means the ray enters the sphere and exits from the other side (two intersection points)
-        return alignZero(t1) > 0 ? List.of(new GeoPoint(this, ray.getPoint(t1)), new GeoPoint(this, p2)) // Two valid intersection points
+        return (alignZero(t1) > 0 && alignZero(t2 - maxDistance) < 0) ? List.of(new GeoPoint(this, ray.getPoint(t1)), new GeoPoint(this, p2)) // Two valid in range intersection points
                 //If t2 is positive and t2 is negative, it means the ray starts inside the sphere.
-                : List.of(new GeoPoint(this, p2)); // Only t2 is positive
+                :(alignZero(t1) > 0)? List.of(new GeoPoint(this, ray.getPoint(t1))) : List.of(new GeoPoint(this, p2)); // Only t2 is positive
     }
 }

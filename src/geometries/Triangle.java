@@ -30,7 +30,7 @@ public class Triangle extends Polygon {
     }
 
     @Override
-    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
         // Extract relevant information from the input
         Vector rayDirection = ray.getDirection(); // Direction vector of the ray
         Point rayOrigin = ray.getHead(); // Origin point of the ray
@@ -78,7 +78,7 @@ public class Triangle extends Polygon {
 
         // Compute parameter "t" to find the intersection point on the line
         double t = inv_det * edge2.dotProduct(q);
-        return alignZero(t) > 0
+        return alignZero(t) > 0 && alignZero(t - maxDistance) < 0
                 // Ray intersection: Compute the actual intersection point
                 ? List.of(new GeoPoint(this, ray.getPoint(t)))
                 // Line intersection but not a ray intersection
