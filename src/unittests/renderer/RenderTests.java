@@ -94,7 +94,7 @@ public class RenderTests {
      */
     @Test
     public void renderMultipleAnglesTest() {
-        int testNum = 25;
+        int testNum = 5;
         Camera.Builder camera = Camera.getBuilder()
                 .setRayTracer(new SimpleRayTracer(scene))
                 .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0)) //changed

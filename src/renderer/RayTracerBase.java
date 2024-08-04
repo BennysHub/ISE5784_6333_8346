@@ -1,5 +1,6 @@
 package renderer;
 
+import geometries.Intersectable;
 import primitives.Color;
 import primitives.Ray;
 import scene.Scene;
@@ -32,5 +33,6 @@ public abstract class RayTracerBase {
      * @return the color at the closest intersection point or the background color if no intersections are found
      */
     public abstract Color traceRay(Ray ray);
+
 }
 

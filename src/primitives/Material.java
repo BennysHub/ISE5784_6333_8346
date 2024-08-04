@@ -16,6 +16,16 @@ public class Material {
     public Double3 kS = Double3.ZERO;
 
     /**
+     * The transmission coefficient, default is zero.
+     */
+    public Double3 kT = Double3.ZERO;
+
+    /**
+     * The reflection coefficient, default is zero.
+     */
+    public Double3 kR = Double3.ZERO;
+
+    /**
      * The shininess factor, default is zero.
      */
     public int shininess = 0;
@@ -43,6 +53,28 @@ public class Material {
     }
 
     /**
+     * Sets the transmission coefficient.
+     *
+     * @param kT the transmission coefficient
+     * @return the current Material instance for chaining
+     */
+    public Material setKt(Double kT) {
+        this.kT = new Double3(kT);
+        return this;
+    }
+
+    /**
+     * Sets the reflection coefficient.
+     *
+     * @param kR the reflection coefficient
+     * @return the current Material instance for chaining
+     */
+    public Material setKr(Double kR) {
+        this.kR = new Double3(kR);
+        return this;
+    }
+
+    /**
      * Sets the diffuse reflection coefficient.
      *
      * @param kD the diffuse reflection coefficient
@@ -61,6 +93,28 @@ public class Material {
      */
     public Material setKs(Double3 kS) {
         this.kS = kS;
+        return this;
+    }
+    
+    /**
+     * Sets the transmission coefficient.
+     *
+     * @param kT the transmission coefficient
+     * @return the current Material instance for chaining
+     */
+    public Material setKt(Double3 kT) {
+        this.kT = kT;
+        return this;
+    }
+
+    /**
+     * Sets the reflection coefficient.
+     *
+     * @param kR the reflection coefficient
+     * @return the current Material instance for chaining
+     */
+    public Material setKr(Double3 kR) {
+        this.kR = kR;
         return this;
     }
 
