@@ -2,6 +2,7 @@ package geometries;
 
 import primitives.Point;
 import primitives.Ray;
+import primitives.Vector;
 
 import java.util.List;
 
@@ -10,44 +11,6 @@ import java.util.List;
  * Implementing classes will provide the logic to find intersection points.
  */
 public abstract class Intersectable {
-
-    /**
-     * A class representing a geometric point of intersection.
-     */
-    public static class GeoPoint {
-        /**
-         * The geometry associated with this intersection point
-         */
-        public Geometry geometry;
-
-        /**
-         * The point of intersection
-         */
-        public Point point;
-
-        /**
-         * Constructs a GeoPoint with the specified geometry and intersection point.
-         *
-         * @param geometry the geometry of the intersection
-         * @param point    the intersection point
-         */
-        public GeoPoint(Geometry geometry, Point point) {
-            this.geometry = geometry;
-            this.point = point;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("GeoPoint{geometry=%s, point=%s}", geometry.getClass().getName(), point);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (!(obj instanceof GeoPoint other)) return false;
-            return other.geometry == geometry && other.point.equals(point);
-        }
-    }
 
     /**
      * Finds the intersection points of a given ray with this geometric shape.
@@ -104,6 +67,51 @@ public abstract class Intersectable {
      */
     public final List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
         return findGeoIntersectionsHelper(ray, maxDistance);
+    }
+
+    /**
+     * A class representing a geometric point of intersection.
+     */
+    public static class GeoPoint {
+        /**
+         * The geometry associated with this intersection point
+         */
+        public Geometry geometry;
+
+        /**
+         * The point of intersection
+         */
+        public Point point;
+
+        /**
+         * Constructs a GeoPoint with the specified geometry and intersection point.
+         *
+         * @param geometry the geometry of the intersection
+         * @param point    the intersection point
+         */
+        public GeoPoint(Geometry geometry, Point point) {
+            this.geometry = geometry;
+            this.point = point;
+        }
+
+        /**
+         * @return the normal vector at the geometry in the current gp point
+         */
+        public Vector getNormal() {
+            return geometry.getNormal(point);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("GeoPoint{geometry=%s, point=%s}", geometry.getClass().getName(), point);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof GeoPoint other)) return false;
+            return other.geometry == geometry && other.point.equals(point);
+        }
     }
 
 

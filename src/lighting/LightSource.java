@@ -28,6 +28,7 @@ public interface LightSource {
 
     /**
      * Calculate the distance between the light source and a point
+     *
      * @param point the point witch we refer to
      * @return the distance between the position and the given point
      */

@@ -19,6 +19,11 @@ import java.util.logging.Logger;
  */
 public class ImageWriter {
     /**
+     * Directory path for the image file generation - relative to the user
+     * directory
+     */
+    private static final String FOLDER_PATH = System.getProperty("user.dir") + "/images";
+    /**
      * Horizontal resolution of the image - number of pixels in row
      */
     private final int nX;
@@ -26,13 +31,6 @@ public class ImageWriter {
      * Vertical resolution of the image - number of pixels in column
      */
     private final int nY;
-
-    /**
-     * Directory path for the image file generation - relative to the user
-     * directory
-     */
-    private static final String FOLDER_PATH = System.getProperty("user.dir") + "/images";
-
     /**
      * Image generation buffer (the matrix of the pixels)
      */

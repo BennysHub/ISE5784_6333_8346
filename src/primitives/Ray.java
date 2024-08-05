@@ -13,11 +13,11 @@ import static primitives.Util.isZero;
  * @author Benny Avrahami
  */
 public class Ray {
+    private static final double DELTA = 0.1;
     /**
      * The starting point of the ray.
      */
     final private Point head;
-
     /**
      * The direction vector of the ray, normalized to be a unit vector.
      */
@@ -33,6 +33,13 @@ public class Ray {
     public Ray(Point point, Vector vector) {
         head = point;
         direction = vector.normalize();
+    }
+
+    public Ray(Point head, Vector direction, Vector normal) {
+        this.direction = direction.normalize();
+        double dn = direction.dotProduct(normal);
+        Vector epsVector = normal.scale(dn > 0 ? DELTA : -DELTA);
+        this.head = isZero(dn) ? head : head.add(epsVector);
     }
 
     /**
@@ -60,7 +67,8 @@ public class Ray {
      * @return a point on the ray at the specified distance
      */
     public Point getPoint(double t) {
-        return isZero(t) ? head : head.add(direction.scale(t));
+        return direction.xyz.scale(t).equals(Double3.ZERO) ? head : head.add(direction.scale(t));
+        //TODO: if t is not zero (!isZero(t)) but the scaling of t with ray vector direction is zero a vector zero exception will emerge there for we compare the scaling and not just t
     }
 
     /**

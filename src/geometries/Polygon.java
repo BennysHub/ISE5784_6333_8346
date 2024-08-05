@@ -73,7 +73,7 @@ public class Polygon extends Geometry {
         // Generate the direction of the polygon according to the angle between last and
         // first edge being less than 180 deg. It is hold by the sign of its dot product
         // with the normal. If all the rest consequent edges will generate the same sign
-        // - the polygon is convex ("kamur" in Hebrew).
+        // - the polygon is convex
         boolean positive = edge1.crossProduct(edge2).dotProduct(n) > 0;
         for (var i = 1; i < vertices.length; ++i) {
             // Test that the point is in the same plane as calculated originally

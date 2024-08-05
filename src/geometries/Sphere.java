@@ -72,6 +72,7 @@ public class Sphere extends RadialGeometry {
         // If t1 > 0 so t2, It means the ray enters the sphere and exits from the other side (two intersection points)
         return (alignZero(t1) > 0 && alignZero(t2 - maxDistance) < 0) ? List.of(new GeoPoint(this, ray.getPoint(t1)), new GeoPoint(this, p2)) // Two valid in range intersection points
                 //If t2 is positive and t2 is negative, it means the ray starts inside the sphere.
-                :(alignZero(t1) > 0)? List.of(new GeoPoint(this, ray.getPoint(t1))) : List.of(new GeoPoint(this, p2)); // Only t2 is positive
+                : (alignZero(t1) > 0) ? List.of(new GeoPoint(this, ray.getPoint(t1)))
+                : (alignZero(t2 - maxDistance) < 0) ? List.of(new GeoPoint(this, p2)) : null; // Only t2 is positive
     }
 }

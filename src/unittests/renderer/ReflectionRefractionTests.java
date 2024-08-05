@@ -3,17 +3,15 @@
  */
 package renderer;
 
-import static java.awt.Color.*;
-
-import org.junit.jupiter.api.Test;
-
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;
 import lighting.SpotLight;
+import org.junit.jupiter.api.Test;
 import primitives.*;
-import renderer.*;
 import scene.Scene;
+
+import static java.awt.Color.*;
 
 /**
  * Tests for reflection and transparency functionality, test for partial
@@ -57,7 +55,7 @@ public class ReflectionRefractionTests {
     }
 
     /**
-     * Produce a picture of a sphere lighted by a spot light
+     * Produce a picture of a sphere lighted by a spotlight
      */
     @Test
     public void twoSpheresOnMirrors() {

@@ -53,28 +53,6 @@ public class Material {
     }
 
     /**
-     * Sets the transmission coefficient.
-     *
-     * @param kT the transmission coefficient
-     * @return the current Material instance for chaining
-     */
-    public Material setKt(Double kT) {
-        this.kT = new Double3(kT);
-        return this;
-    }
-
-    /**
-     * Sets the reflection coefficient.
-     *
-     * @param kR the reflection coefficient
-     * @return the current Material instance for chaining
-     */
-    public Material setKr(Double kR) {
-        this.kR = new Double3(kR);
-        return this;
-    }
-
-    /**
      * Sets the diffuse reflection coefficient.
      *
      * @param kD the diffuse reflection coefficient
@@ -95,7 +73,20 @@ public class Material {
         this.kS = kS;
         return this;
     }
-    
+
+    /**
+     * Sets the transmission coefficient.
+     *
+     * @param kT the transmission coefficient
+     * @return the current Material instance for chaining
+     */
+    public Material setKt(Double kT) {
+        if (kT < 0 || kT > 1)
+            throw new IllegalArgumentException("Transparency  Attenuation coefficient  must be between [0,1]");
+        this.kT = new Double3(kT);
+        return this;
+    }
+
     /**
      * Sets the transmission coefficient.
      *
@@ -103,6 +94,8 @@ public class Material {
      * @return the current Material instance for chaining
      */
     public Material setKt(Double3 kT) {
+        if (!kT.lowerThan(Double3.ONE) || kT.lowerThan(Double3.ZERO))
+            throw new IllegalArgumentException("Transparency  Attenuation coefficient  must be between [0,1]");
         this.kT = kT;
         return this;
     }
@@ -113,7 +106,22 @@ public class Material {
      * @param kR the reflection coefficient
      * @return the current Material instance for chaining
      */
+    public Material setKr(Double kR) {
+        if (kR < 0 || kR > 1)
+            throw new IllegalArgumentException("Reflection Attenuation coefficient  must be between [0,1]");
+        this.kR = new Double3(kR);
+        return this;
+    }
+
+    /**
+     * Sets the reflection coefficient.
+     *
+     * @param kR the reflection coefficient
+     * @return the current Material instance for chaining
+     */
     public Material setKr(Double3 kR) {
+        if (!kR.lowerThan(Double3.ONE) || kR.lowerThan(Double3.ZERO))
+            throw new IllegalArgumentException("Reflection Attenuation coefficient must be between [0,1]");
         this.kR = kR;
         return this;
     }
@@ -128,4 +136,5 @@ public class Material {
         this.shininess = nShininess;
         return this;
     }
+
 }

@@ -21,6 +21,30 @@ import static java.awt.Color.WHITE;
  */
 public class LightsTests {
     /**
+     * Shininess value for most of the geometries in the tests
+     */
+    private static final int SHININESS = 301;
+    /**
+     * Diffusion attenuation factor for some of the geometries in the tests
+     */
+    private static final double KD = 0.5;
+    /**
+     * Diffusion attenuation factor for some of the geometries in the tests
+     */
+    private static final Double3 KD3 = new Double3(0.2, 0.6, 0.4);
+    /**
+     * Specular attenuation factor for some of the geometries in the tests
+     */
+    private static final double KS = 0.5;
+    /**
+     * Specular attenuation factor for some of the geometries in the tests
+     */
+    private static final Double3 KS3 = new Double3(0.2, 0.4, 0.3);
+    /**
+     * Radius of the sphere
+     */
+    private static final double SPHERE_RADIUS = 50d;
+    /**
      * First scene for some of the tests
      */
     private final Scene scene1 = new Scene("Test scene");
@@ -29,7 +53,6 @@ public class LightsTests {
      */
     private final Scene scene2 = new Scene("Test scene")
             .setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.15)));
-
     /**
      * First camera builder for some of the tests
      */
@@ -46,29 +69,6 @@ public class LightsTests {
             .setLocation(new Point(0, 0, 1000))
             .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))// TODO: CHANGED
             .setVpSize(200, 200).setVpDistance(1000);
-
-    /**
-     * Shininess value for most of the geometries in the tests
-     */
-    private static final int SHININESS = 301;
-    /**
-     * Diffusion attenuation factor for some of the geometries in the tests
-     */
-    private static final double KD = 0.5;
-    /**
-     * Diffusion attenuation factor for some of the geometries in the tests
-     */
-    private static final Double3 KD3 = new Double3(0.2, 0.6, 0.4);
-
-    /**
-     * Specular attenuation factor for some of the geometries in the tests
-     */
-    private static final double KS = 0.5;
-    /**
-     * Specular attenuation factor for some of the geometries in the tests
-     */
-    private static final Double3 KS3 = new Double3(0.2, 0.4, 0.3);
-
     /**
      * Material for some of the geometries in the tests
      */
@@ -85,16 +85,10 @@ public class LightsTests {
      * Color of the sphere
      */
     private final Color sphereColor = new Color(BLUE).reduce(2);
-
     /**
      * Center of the sphere
      */
     private final Point sphereCenter = new Point(0, 0, -50);
-    /**
-     * Radius of the sphere
-     */
-    private static final double SPHERE_RADIUS = 50d;
-
     /**
      * The triangles' vertices for the tests with triangles
      */
