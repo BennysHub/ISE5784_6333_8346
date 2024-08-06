@@ -129,10 +129,10 @@ public class RenderTests {
     }
 
     /**
-     * Test for XML based scene - for bonus
+     * Test for JSON based scene - for bonus
      */
     @Test
-    public void basicRenderXml() {
+    public void basicRenderJson() {
         JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/twoColorJson.json");
         final Scene scene1 = jsp.scene;
         //final Scene scene1 = Scene.loadFromJson("src/unittests/renderer/twoColorJson.json");
@@ -143,7 +143,7 @@ public class RenderTests {
                 .setVpDistance(100)
                 .setVpSize(500, 500);
 
-        camera.setImageWriter(new ImageWriter("xml render test", 1000, 1000))
+        camera.setImageWriter(new ImageWriter("json render test", 1000, 1000))
                 .build()
                 .renderImage()
                 .printGrid(100, new Color(YELLOW))

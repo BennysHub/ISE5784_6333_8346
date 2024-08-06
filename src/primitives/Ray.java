@@ -35,6 +35,14 @@ public class Ray {
         direction = vector.normalize();
     }
 
+    /**
+     * Constructs a new Ray with the specified starting point, direction, and normal.
+     * Adjusts the starting point to avoid precision issues in geometric calculations.
+     *
+     * @param head      The starting point of the ray.
+     * @param direction The direction vector of the ray.
+     * @param normal    The normal vector at the starting point.
+     */
     public Ray(Point head, Vector direction, Vector normal) {
         this.direction = direction.normalize();
         double dn = direction.dotProduct(normal);

@@ -4,12 +4,15 @@ import geometries.Intersectable;
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;
+import lighting.DirectionalLight;
+import lighting.PointLight;
 import lighting.SpotLight;
 import org.junit.jupiter.api.Test;
 import primitives.Color;
 import primitives.Material;
 import primitives.Point;
 import primitives.Vector;
+import scene.JsonSceneParser;
 import scene.Scene;
 
 import static java.awt.Color.BLUE;
@@ -141,6 +144,53 @@ public class ShadowTests {
                 .build()
                 .renderImage()
                 .writeToImage();
+    }
+
+    /**
+     * test the rendering from json file that contain a path to a stl file
+     */
+    @Test
+    public void stl_shadow() {
+        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/stlJson.json");
+        Scene scene = jsp.scene;
+        scene.geometries.add(
+                new Triangle(new Point(-600, 0, 600), new Point(600, 0, 600),
+                        new Point(600, 0, -600))
+                        .setMaterial(new Material().setKs(0.8).setKd(0.8).setShininess(60))
+                        .setEmission(new Color(144, 238, 144).reduce(5)),
+                new Triangle(new Point(600, 0, -600), new Point(-600, 0, -600), new Point(-600, 0, 600))
+                        .setMaterial(new Material().setKs(0.8).setKd(0.8).setShininess(60))
+                        .setEmission(new Color(89, 230, 89).reduce(5))
+        );
+//        scene.lights.add(new DirectionalLight(new Color(0, 0, 100), new Vector(0.3, -0.3, 0)));
+        scene.lights.add(new PointLight(new Color(255, 255, 255).scale(5), new Point(20, 15, 300)));
+        scene.lights.add(new DirectionalLight(new Color(100, 0, 0).reduce(2), new Vector(-0.3, -0.3, 0)));
+
+
+        Camera.Builder camera = Camera.getBuilder()
+                .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
+                .setLocation(new Point(0, 0, 1000)).setVpDistance(1000)
+                .setVpSize(200, 200)
+                .setRayTracer(new SimpleRayTracer(scene));
+        // disabled test. set steps something and remove the // in the angleStep line to use this test
+        Point center = new Point(0, 15, 0); // Center of the circular path
+        double radius = 900.0; // Radius of the circular path
+        int steps = 0; // Number of steps for one complete revolution
+        double angleStep = 2 * Math.PI;// / steps ;
+
+        for (int i = 0; i < steps; i++) {
+            double angle = i * angleStep;
+
+            // Update the point's position
+            double x = center.getX() + radius * Math.cos(angle);
+            double y = center.getY() + radius * Math.sin(angle);
+            camera.setLocation(new Point(x, 100, y)).setTarget(center);
+
+            camera.setImageWriter(new ImageWriter("stlTurnaround/stlShadow" + i, 600, 600))
+                    .build()
+                    .renderImage()
+                    .writeToImage();
+        }
     }
 
 }

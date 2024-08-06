@@ -95,6 +95,8 @@ public abstract class Intersectable {
         }
 
         /**
+         * return the normal vector at the geometry in the current gp point
+         *
          * @return the normal vector at the geometry in the current gp point
          */
         public Vector getNormal() {

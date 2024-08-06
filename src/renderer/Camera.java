@@ -175,7 +175,8 @@ public class Camera implements Cloneable {
             camera.to = target.subtract(camera.location).normalize();
 
             camera.up = new Vector(0, 1, 0); // The y-axis is up
-            if (!isZero(camera.to.dotProduct(camera.up))) {
+//            if (!isZero(camera.to.dotProduct(camera.up))) {
+            if (camera.up.equals(camera.to) || camera.up.equals(camera.to.scale(-1))) {
                 camera.up = new Vector(0, 0, 1); // Switch to Z-axis if Vector to is (0, 1, 0)
             }
             camera.right = camera.to.crossProduct(camera.up).normalize();
