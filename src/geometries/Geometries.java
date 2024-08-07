@@ -45,7 +45,7 @@ public class Geometries extends Intersectable {
         List<GeoPoint> combinedIntersections = null;
 
         for (Intersectable intersectable : geometries) {
-            var intersections = intersectable.findGeoIntersectionsHelper(ray, maxDistance);
+            var intersections = intersectable.findGeoIntersections(ray, maxDistance);
             if (intersections != null) {
                 if (combinedIntersections == null)
                     combinedIntersections = new LinkedList<>(intersections);

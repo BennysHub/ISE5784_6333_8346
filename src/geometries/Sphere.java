@@ -55,24 +55,26 @@ public class Sphere extends RadialGeometry {
 
         // Compute intersection parameters t1 and t2
         double sqrtDiscriminant = Math.sqrt(discriminant);
-        double t2 = (-b + sqrtDiscriminant);
+        double t2 = alignZero(-b + sqrtDiscriminant);
 
         // If t2 <= 0 so t1, it indicates that the ray is moving away from the sphere.
         // There are no intersection points in this case.
-        if (alignZero(t2) <= 0)
+        if (t2 <= 0)
             return null;
 
         Point p2 = ray.getPoint(t2);
-        double t1 = (-b - sqrtDiscriminant);
+        double t1 = alignZero(-b - sqrtDiscriminant);
 
         //if t1 >= max distance (so is t2) even if its valid intersection it still out of boundary
         if (alignZero(t1 - maxDistance) >= 0)
             return null;
 
         // If t1 > 0 so t2, It means the ray enters the sphere and exits from the other side (two intersection points)
-        return (alignZero(t1) > 0 && alignZero(t2 - maxDistance) < 0) ? List.of(new GeoPoint(this, ray.getPoint(t1)), new GeoPoint(this, p2)) // Two valid in range intersection points
-                //If t2 is positive and t2 is negative, it means the ray starts inside the sphere.
-                : (alignZero(t1) > 0) ? List.of(new GeoPoint(this, ray.getPoint(t1)))
-                : (alignZero(t2 - maxDistance) < 0) ? List.of(new GeoPoint(this, p2)) : null; // Only t2 is positive
+        if (alignZero(t2 - maxDistance) < 0)
+            return t1 > 0 ?
+                    List.of(new GeoPoint(this, ray.getPoint(t1)), new GeoPoint(this, p2))
+                    : List.of(new GeoPoint(this, p2));
+        else
+            return t1 > 0 ? List.of(new GeoPoint(this, ray.getPoint(t1))) : null;
     }
 }

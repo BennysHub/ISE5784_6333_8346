@@ -1,7 +1,6 @@
 package renderer;
 
 import geometries.Intersectable;
-import geometries.Plane;
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;
@@ -150,7 +149,7 @@ public class ShadowTests {
      * test the rendering from json file that contain a path to a stl file
      */
     @Test
-    public void stl_shadow() {
+    public void stlShadow() {
         JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/stlJson.json");
         Scene scene = jsp.scene;
         scene.geometries.add(
@@ -160,11 +159,7 @@ public class ShadowTests {
                 //.setEmission(new Color(blue)),
                 , new Triangle(new Point(600, 0, -600), new Point(-600, 0, -600), new Point(-600, 0, 600))
                         .setMaterial(new Material().setKs(0.2).setKd(0.8).setShininess(30))
-                //.setEmission(new Color(magenta))
-//                , new Plane(new Point(0,0,-100), new Vector(0,0,1))
-//                        .setMaterial(new Material().setKt(1d).setKs(0.2).setKd(0.8))
         );
-        // scene.lights.add(new DirectionalLight(new Color(0, 0, 100), new Vector(0.3, -0.3, 0)));
         scene.lights.add(new PointLight(new Color(255, 255, 255).reduce(2), new Point(20, 15, 300)));
         scene.lights.add(new DirectionalLight(new Color(100, 0, 0).reduce(2), new Vector(-0.3, -0.3, 0)));
         scene.lights.add(new SpotLight(new Color(YELLOW), new Point(0, 100, 0), new Vector(0, -1, 0)).setNarrowBeam(3));

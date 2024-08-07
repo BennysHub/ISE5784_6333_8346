@@ -2,7 +2,6 @@ package geometries;
 
 import primitives.Point;
 import primitives.Ray;
-import primitives.Vector;
 
 import java.util.List;
 
@@ -94,15 +93,6 @@ public abstract class Intersectable {
             this.point = point;
         }
 
-        /**
-         * return the normal vector at the geometry in the current gp point
-         *
-         * @return the normal vector at the geometry in the current gp point
-         */
-        public Vector getNormal() {
-            return geometry.getNormal(point);
-        }
-
         @Override
         public String toString() {
             return String.format("GeoPoint{geometry=%s, point=%s}", geometry.getClass().getName(), point);
@@ -115,6 +105,5 @@ public abstract class Intersectable {
             return other.geometry == geometry && other.point.equals(point);
         }
     }
-
 
 }

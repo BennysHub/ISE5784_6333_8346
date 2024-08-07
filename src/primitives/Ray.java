@@ -4,8 +4,6 @@ import geometries.Intersectable.GeoPoint;
 
 import java.util.List;
 
-import static primitives.Util.isZero;
-
 /**
  * Represents a ray in 3D space, defined by a starting point (head) and a direction vector.
  * The direction vector is normalized to ensure it is a unit vector.
@@ -40,14 +38,13 @@ public class Ray {
      * Adjusts the starting point to avoid precision issues in geometric calculations.
      *
      * @param head      The starting point of the ray.
-     * @param direction The direction vector of the ray.
+     * @param direction The direction vector of the ray. <b>Must be normalized</b>
      * @param normal    The normal vector at the starting point.
      */
     public Ray(Point head, Vector direction, Vector normal) {
-        this.direction = direction.normalize();
-        double dn = direction.dotProduct(normal);
-        Vector epsVector = normal.scale(dn > 0 ? DELTA : -DELTA);
-        this.head = isZero(dn) ? head : head.add(epsVector);
+        this.direction = direction;
+        Vector epsVector = normal.scale(direction.dotProduct(normal) > 0 ? DELTA : -DELTA);
+        this.head = head.add(epsVector);
     }
 
     /**
@@ -75,8 +72,11 @@ public class Ray {
      * @return a point on the ray at the specified distance
      */
     public Point getPoint(double t) {
-        return direction.xyz.scale(t).equals(Double3.ZERO) ? head : head.add(direction.scale(t));
-        //TODO: if t is not zero (!isZero(t)) but the scaling of t with ray vector direction is zero a vector zero exception will emerge there for we compare the scaling and not just t
+        try {
+            return head.add(direction.scale(t));
+        } catch (IllegalArgumentException ignore) {
+            return head;
+        }
     }
 
     /**

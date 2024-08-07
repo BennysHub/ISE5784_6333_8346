@@ -251,11 +251,11 @@ public class LightsTests {
     public void sphereAllLights() {
         scene1.geometries.add(sphere);
         scene1.setBackground(new Color(DARK_GRAY))
-            .setAmbientLight(new AmbientLight(new Color(RED), 0.05))
+                .setAmbientLight(new AmbientLight(new Color(RED), 0.05))
                 .setLights(List.of(
-                        new SpotLight(sphereLightColor, sphereLightPosition.subtract(new Point(-100,0,0)), new Vector(-1, 0.5, -2)).setKl(0.001).setKq(0.0001),
-                        new DirectionalLight(sphereLightColor.reduce(2), sphereLightDirection.subtract(new Point(0.5,0,0))),
-                        new PointLight(sphereLightColor.reduce(2), sphereLightPosition.subtract(new Point(-120,-75,0 )))
+                        new SpotLight(sphereLightColor, sphereLightPosition.subtract(new Point(-100, 0, 0)), new Vector(-1, 0.5, -2)).setKl(0.001).setKq(0.0001),
+                        new DirectionalLight(sphereLightColor.reduce(2), sphereLightDirection.subtract(new Point(0.5, 0, 0))),
+                        new PointLight(sphereLightColor.reduce(2), sphereLightPosition.subtract(new Point(-120, -75, 0)))
                 ));
 
         camera1.setImageWriter(new ImageWriter("allLightsSphere", 500, 500))

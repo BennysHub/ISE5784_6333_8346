@@ -4,7 +4,7 @@ import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
 
-import static java.lang.Math.max;
+import static primitives.Util.alignZero;
 
 /**
  * Class representing a spotlight in a 3D scene.
@@ -27,24 +27,23 @@ public class SpotLight extends PointLight {
         this.direction = direction.normalize();
     }
 
+    @Override
+    public SpotLight setKc(double kc) {
+        super.setKc(kc);
+        return this;
+    }
 
-//    @Override
-//    public PointLight setKc(double kc) {
-//        super.setKc(kc);
-//        return (SpotLight) this;
-//    }
-//
-//    @Override
-//    public PointLight setKl(double kl) {
-//        super.setKl(kl);
-//        return (SpotLight) this;
-//    }
-//
-//    @Override
-//    public PointLight setKq(double kq) {
-//        super.setKq(kq);
-//        return (SpotLight) this;
-//    }
+    @Override
+    public SpotLight setKl(double kl) {
+        super.setKl(kl);
+        return this;
+    }
+
+    @Override
+    public SpotLight setKq(double kq) {
+        super.setKq(kq);
+        return this;
+    }
 
     /**
      * Sets the beamFocus for the spotLight direction
@@ -52,14 +51,14 @@ public class SpotLight extends PointLight {
      * @param beamFocus the strength of the beam will be more focus
      * @return the current PointLight instance for chaining
      */
-    public PointLight setNarrowBeam(int beamFocus){
+    public PointLight setNarrowBeam(int beamFocus) {
         this.beamFocus = beamFocus;
         return this;
     }
 
     @Override
     public Color getIntensity(Point p) {
-        double DirectionStrength =  direction.dotProduct(getL(p));
-        return super.getIntensity(p).scale(DirectionStrength <= 0 ? 0 : Math.pow(DirectionStrength, beamFocus));
+        double directionStrength = alignZero(direction.dotProduct(getL(p)));
+        return super.getIntensity(p).scale(directionStrength <= 0 ? 0 : Math.pow(directionStrength, beamFocus));
     }
 }

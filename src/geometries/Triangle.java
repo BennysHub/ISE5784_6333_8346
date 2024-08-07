@@ -54,12 +54,12 @@ public class Triangle extends Polygon {
 
         // Calculate the determinant (used for inverse determinant later)
         double det = rayCrossEdge2.dotProduct(edge1);
-        double inv_det = 1d / det; // Inverse determinant
+        double invDet = 1d / det; // Inverse determinant
 
         // Compute vector 's' from ray origin to vertex0
         Vector s = rayOrigin.subtract(vertex0);
         // Calculate barycentric coordinate 'u'
-        double u = inv_det * s.dotProduct(rayCrossEdge2);
+        double u = invDet * s.dotProduct(rayCrossEdge2);
 
         // Check if 'u' is within valid range (0, 1)
         if (alignZero(u) <= 0 || alignZero(u - 1d) >= 0)
@@ -69,7 +69,7 @@ public class Triangle extends Polygon {
         // Compute vector 'q' (cross product of 's' and edge1)
         Vector q = s.crossProduct(edge1);//TODO possible vector zero?
         // Calculate barycentric coordinate 'v'
-        double v = inv_det * rayDirection.dotProduct(q);
+        double v = invDet * rayDirection.dotProduct(q);
 
         // Check if 'v' is within valid range (0, 1) and u + v < 1
         if (alignZero(v) <= 0 || alignZero(u + v - 1d) >= 0)
@@ -77,7 +77,7 @@ public class Triangle extends Polygon {
             return null;
 
         // Compute parameter "t" to find the intersection point on the line
-        double t = inv_det * edge2.dotProduct(q);
+        double t = invDet * edge2.dotProduct(q);
         return alignZero(t) > 0 && alignZero(t - maxDistance) < 0
                 // Ray intersection: Compute the actual intersection point
                 ? List.of(new GeoPoint(this, ray.getPoint(t)))
