@@ -157,27 +157,27 @@ public class ShadowTests {
                 new Triangle(new Point(-600, 0, 600), new Point(600, 0, 600),
                         new Point(600, 0, -600))
                         .setMaterial(new Material().setKs(0.2).setKd(0.8).setShininess(30))
-                        //.setEmission(new Color(blue)),
-                ,new Triangle(new Point(600, 0, -600), new Point(-600, 0, -600), new Point(-600, 0, 600))
+                //.setEmission(new Color(blue)),
+                , new Triangle(new Point(600, 0, -600), new Point(-600, 0, -600), new Point(-600, 0, 600))
                         .setMaterial(new Material().setKs(0.2).setKd(0.8).setShininess(30))
-                        //.setEmission(new Color(magenta))
+                //.setEmission(new Color(magenta))
 //                , new Plane(new Point(0,0,-100), new Vector(0,0,1))
 //                        .setMaterial(new Material().setKt(1d).setKs(0.2).setKd(0.8))
         );
-           // scene.lights.add(new DirectionalLight(new Color(0, 0, 100), new Vector(0.3, -0.3, 0)));
-       scene.lights.add(new PointLight(new Color(255, 255, 255).reduce(2), new Point(20, 15, 300)));
-       scene.lights.add(new DirectionalLight(new Color(100, 0, 0).reduce(2), new Vector(-0.3, -0.3, 0)));
-       scene.lights.add(new SpotLight(new Color(YELLOW), new Point(0,100,0), new Vector(0,-1,0)).setNarrowBeam(3));
-       //scene.setAmbientLight(new AmbientLight(new Color(WHITE), 0.05));
+        // scene.lights.add(new DirectionalLight(new Color(0, 0, 100), new Vector(0.3, -0.3, 0)));
+        scene.lights.add(new PointLight(new Color(255, 255, 255).reduce(2), new Point(20, 15, 300)));
+        scene.lights.add(new DirectionalLight(new Color(100, 0, 0).reduce(2), new Vector(-0.3, -0.3, 0)));
+        scene.lights.add(new SpotLight(new Color(YELLOW), new Point(0, 100, 0), new Vector(0, -1, 0)).setNarrowBeam(3));
+        //scene.setAmbientLight(new AmbientLight(new Color(WHITE), 0.05));
 
 
         Camera.Builder camera = Camera.getBuilder()
                 .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
                 .setLocation(new Point(0, 220, 1000)).setVpDistance(1000)
-                .setVpSize(16*16, 9*16)
+                .setVpSize(200, 200)
                 .setRayTracer(new SimpleRayTracer(scene));
 
-        camera.setImageWriter(new ImageWriter("stlTurnaround/stlShadow", 1920, 1080))
+        camera.setImageWriter(new ImageWriter("stlTurnaround/stlShadow", 600, 600))
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -186,7 +186,7 @@ public class ShadowTests {
         Point center = new Point(0, 15, 0); // Center of the circular path
         double radius = 900.0; // Radius of the circular path
         int steps = 0; // Number of steps for one complete revolution
-        double angleStep =  Math.PI/4;// / steps ;
+        double angleStep = Math.PI / 4;// / steps ;
 
         for (int i = 0; i < steps; i++) {
             double angle = i * angleStep;
