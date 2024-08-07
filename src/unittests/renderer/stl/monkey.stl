@@ -6775,4 +6775,4 @@ facet normal -0.06868395 -0.994282 0.08176661
   vertex 0.7734375 -0.140625 0.125
  endloop
 endfacet
-endsolid 
+end solid

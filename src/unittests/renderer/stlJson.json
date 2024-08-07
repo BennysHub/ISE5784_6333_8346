@@ -9,40 +9,40 @@
         {
           "center": "0 10 -50",
           "radius": "10",
-          "emission": "72 209 204",
+          "no-emission": "72 209 204",
           "material": {
-            "kD": 0.1,
-            "kS": 1,
+            "kD": 0.2,
+            "kS": 0.8,
             "shininess": 30
           }
         },
         {
           "center": "0 10 50",
           "radius": "11",
-          "emission": "72 209 204",
+          "no-emission": "72 209 204",
           "material": {
-            "kD": 0.5,
-            "kS": 1,
+            "kD": 0.2,
+            "kS": 0.8,
             "shininess": 30
           }
         },
         {
           "center": "50 10 -50",
           "radius": "12",
-          "emission": "72 209 204",
+          "no-emission": "72 209 204",
           "material": {
-            "kD": 0.5,
-            "kS": 0.1,
+            "kD": 0.2,
+            "kS": 0.8,
             "shininess": 30
           }
         },
         {
           "center": "50 10 0",
           "radius": "13",
-          "emission": "72 209 204",
+          "no-emission": "72 209 204",
           "material": {
-            "kD": 1,
-            "kS": 1,
+            "kD": 0.2,
+            "kS": 0.8,
             "kT": 0,
             "kR": 0,
             "shininess": 30
@@ -51,10 +51,10 @@
         {
           "center": "50 10 50",
           "radius": "14",
-          "emission": "72 209 204",
+          "no-emission": "72 209 204",
           "material": {
-            "kD": 1,
-            "kS": 1,
+            "kD": 0.2,
+            "kS": 0.8,
             "kT": 0.5,
             "kR": 0.5,
             "shininess": 30
@@ -65,20 +65,18 @@
           "radius": "15",
           "no-emission": "72 209 204",
           "material": {
-            "kD": 1,
-            "kS": 1,
-            "kT": 1,
-            "kR": 1,
+            "kD": 0.2,
+            "kS": 0.8,
             "shininess": 30
           }
         },
         {
           "center": "-50 10 0",
           "radius": "16",
-          "emission": "72 209 204",
+          "no-emission": "72 209 204",
           "material": {
-            "kD": 1,
-            "kS": 1,
+            "kD": 0.2,
+            "kS": 0.8,
             "kT": 1,
             "kR": 0,
             "shininess": 30
@@ -87,10 +85,10 @@
         {
           "center": "-50 10 50",
           "radius": "17",
-          "emission": "72 209 204",
+          "no-emission": "72 209 204",
           "material": {
-            "kD": 1,
-            "kS": 1,
+            "kD": 0.2,
+            "kS": 0.8,
             "kT": 0,
             "kR": 1,
             "shininess": 30
@@ -100,7 +98,7 @@
           "center": "0 10 50",
           "radius": "18",
           "material": {
-            "kD": 0.1,
+            "kD": 0.2,
             "kS": 0.8,
             "shininess": 30
           }
@@ -113,9 +111,9 @@
           "scale": 15,
           "emission": "255 0 0",
           "material": {
-            "kD": 0.5,
-            "kS": 0.5,
-            "shininess": 30
+            "kD": 0.2,
+            "kS": 0.9,
+            "shininess": 15
           }
         }
       ]

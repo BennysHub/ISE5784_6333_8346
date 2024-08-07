@@ -109,7 +109,7 @@ public class JsonSceneParser {
      * Parses geometries from a JSON element and adds them to the scene.
      *
      * @param geometryElement the JSON element containing the geometries
-     * @param geometryClass   the class of the geometry type (e.g., Sphere.class, Triangle.class)
+     * @param geometryClass   the class of the geometry type (e.g., Sphere. Class, Triangle. Class)
      * @param <T>             the type of the geometry
      */
     private <T> void parseGeometries(JsonElement geometryElement, Class<T> geometryClass) {

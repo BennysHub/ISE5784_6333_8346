@@ -13,6 +13,8 @@ import static java.lang.Math.max;
 public class SpotLight extends PointLight {
     private final Vector direction;
 
+    private int beamFocus = 1;
+
     /**
      * Constructs a spotlight with the specified intensity, position, and direction.
      *
@@ -25,8 +27,39 @@ public class SpotLight extends PointLight {
         this.direction = direction.normalize();
     }
 
+
+//    @Override
+//    public PointLight setKc(double kc) {
+//        super.setKc(kc);
+//        return (SpotLight) this;
+//    }
+//
+//    @Override
+//    public PointLight setKl(double kl) {
+//        super.setKl(kl);
+//        return (SpotLight) this;
+//    }
+//
+//    @Override
+//    public PointLight setKq(double kq) {
+//        super.setKq(kq);
+//        return (SpotLight) this;
+//    }
+
+    /**
+     * Sets the beamFocus for the spotLight direction
+     *
+     * @param beamFocus the strength of the beam will be more focus
+     * @return the current PointLight instance for chaining
+     */
+    public PointLight setNarrowBeam(int beamFocus){
+        this.beamFocus = beamFocus;
+        return this;
+    }
+
     @Override
     public Color getIntensity(Point p) {
-        return super.getIntensity(p).scale(max(0, direction.dotProduct(getL(p))));
+        double DirectionStrength =  direction.dotProduct(getL(p));
+        return super.getIntensity(p).scale(DirectionStrength <= 0 ? 0 : Math.pow(DirectionStrength, beamFocus));
     }
 }
