@@ -76,18 +76,37 @@ public class JsonSceneParser {
     }
 
     /**
-     * Parses a color from a string in the format "R G B".
+     * Parses a Double3 from a string in the format "D D D".
      *
-     * @param colorString the color string
+     * @param doubleString the json string
+     * @return the parsed Double3 object
+     */
+    private Double3 parseDouble3(String doubleString) {
+        String[] components = doubleString.split(" ");
+        if (components.length == 3)
+            return new Double3(
+                    Double.parseDouble(components[0]),
+                    Double.parseDouble(components[1]),
+                    Double.parseDouble(components[2]));
+        else if (components.length == 1)
+            return new Double3(Double.parseDouble(components[0]));
+        throw new IllegalArgumentException("the Double3 input must be double or a double3");
+    }
+
+    /**
+     * Parses a Double3 from a string in the format "R G B".
+     *
+     * @param colorString the json string
      * @return the parsed Color object
      */
     private Color parseColor(String colorString) {
         String[] components = colorString.split(" ");
-        return new Color(
-                Integer.parseInt(components[0]),
-                Integer.parseInt(components[1]),
-                Integer.parseInt(components[2])
-        );
+        if (components.length == 3)
+            return new Color(
+                    Double.parseDouble(components[0]),
+                    Double.parseDouble(components[1]),
+                    Double.parseDouble(components[2]));
+        throw new IllegalArgumentException("the Color input must be 3 numbers");
     }
 
     /**
@@ -268,16 +287,16 @@ public class JsonSceneParser {
      */
     private Material parseMaterial(JsonObject materialJson) {
         Material material = new Material();
-        double kD = materialJson.has("kD") ? materialJson.get("kD").getAsDouble() : -1;
-        if (kD != -1) material.setKd(kD);
-        double kS = materialJson.has("kS") ? materialJson.get("kS").getAsDouble() : -1;
-        if (kS != -1) material.setKs(kS);
-        double kT = materialJson.has("kT") ? materialJson.get("kT").getAsDouble() : -1;
-        if (kT != -1) material.setKt(kT);
-        double kR = materialJson.has("kR") ? materialJson.get("kR").getAsDouble() : -1;
-        if (kR != -1) material.setKr(kR);
-        int shininess = materialJson.has("shininess") ? materialJson.get("shininess").getAsInt() : 0;
-        if (shininess != -1) material.setShininess(shininess);
+        if (materialJson.has("kD"))
+            material.setKd(parseDouble3(materialJson.get("kD").getAsString()));
+        if (materialJson.has("kS"))
+            material.setKs(parseDouble3(materialJson.get("kS").getAsString()));
+        if (materialJson.has("kT"))
+            material.setKt(parseDouble3(materialJson.get("kT").getAsString()));
+        if (materialJson.has("kR"))
+            material.setKr(parseDouble3(materialJson.get("kR").getAsString()));
+        material.setShininess(materialJson.has("shininess") ? materialJson.get("shininess").getAsInt() : 0);
+
         return material;
     }
 }

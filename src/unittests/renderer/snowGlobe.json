@@ -1,0 +1,76 @@
+{
+  "scene": {
+    "background-color": "50 50 50",
+    "ambient-light": {
+      "color": "255 255 255",
+      "kA": 0
+    },
+    "geometries": {
+      "sphere": [
+        {
+          "center": "0 40 0",
+          "radius": "60",
+          "material": {
+            "kD": 0,
+            "kS": 0.9,
+            "kT": 0.9,
+            "kR": 0.2,
+            "shininess": 30
+          }
+        }
+      ],
+      "mesh": [
+        {
+          "path": "src/unittests/renderer/snowGlobeStl/snowGlobeBase.stl",
+          "scale": 10,
+          "no-emission": "0 216 230",
+          "material": {
+            "kD": "0.271 0.184 0.027",
+            "kS": 0.1,
+            "shininess": 15
+          }
+        },
+        {
+          "path": "src/unittests/renderer/snowGlobeStl/snowGlobeHouse.stl",
+          "scale": 10,
+          "no-emission": "0 216 230",
+          "material": {
+            "kD": "0.961 0.945 0.925",
+            "kS": 0.1,
+            "shininess": 15
+          }
+        },
+        {
+          "path": "src/unittests/renderer/snowGlobeStl/snowGlobeRoof.stl",
+          "scale": 10,
+          "no-emission": "0 216 230",
+          "material": {
+            "kD": "0.8 0.263 0.145",
+            "kS": 0.1,
+            "shininess": 15
+          }
+        },
+        {
+          "path": "src/unittests/renderer/snowGlobeStl/snowGlobeTreeTop.stl",
+          "scale": 10,
+          "no-emission": "0 216 230",
+          "material": {
+            "kD": "0.216 0.471 0.071",
+            "kS": 0.1,
+            "shininess": 15
+          }
+        },
+        {
+          "path": "src/unittests/renderer/snowGlobeStl/snowGlobeTreeTrunk.stl",
+          "scale": 10,
+          "no-emission": "0 216 230",
+          "material": {
+            "kD": "0.4 0.271 0.031",
+            "kS": 0.1,
+            "shininess": 15
+          }
+        }
+      ]
+    }
+  }
+}
