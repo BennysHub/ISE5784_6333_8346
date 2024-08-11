@@ -1,0 +1,93 @@
+{
+  "scene (format)": {
+    "background-color": "optional, contain three 0-255 numbers separated by a space representing color",
+    "ambient-light": {
+      "description": "optional, contain 'color' and Double3 'Ka'",
+      "color (Color)": "173 216 230",
+      "kA (Double3)": 0.15
+    },
+    "lights": {
+      "spotLight": [
+        {
+          "intensity (color)": "the color of the light in R G B [scale] format",
+          "position  (Point)": "the position of the light",
+          "direction (Vector)": "the direction of the light",
+          "narrowBeam (int)": "set narrowBeam parameter"
+        },
+        {
+          "intensity": "255 255 255 2",
+          "position": "0 10 50",
+          "direction": "1 -1 0",
+          "narrowBeam": 2
+        }
+      ],
+      "PointLight": [
+        {
+          "intensity (color)": "the color of the light in R G B [scale] format",
+          "position  (Point)": "the position of the light"
+        },
+        {
+          "intensity (color)": "255 255 255",
+          "position  (Point)": "0 10 50"
+        }
+      ],
+      "directionalLight": [
+        {
+          "intensity (color)": "the color of the light in R G B [scale] format",
+          "direction (Vector)": "the direction of the light"
+        },
+        {
+          "intensity (color)": "255 255 255",
+          "direction  (Vector)": "1 -1 0"
+        }
+      ]
+    },
+    "geometries": {
+      "description": {
+        "d1": "all geometries can have a emission and a material, both optional",
+        "emission (Color)": "0 127 255",
+        "material(all fields are optional)": {
+          "kD (Double3)": 0.2,
+          "kS (Double3)": "0.8",
+          "kT (Double3)": "0.9 0.1 0",
+          "kR (Double3)": "must be greater than 0",
+          "shininess (int)": 30
+        }
+      },
+      "triangle": [
+        {
+          "p0 (Point)": "three numbers separated by a space representing xyz triangle coordinates",
+          "p1 (Point)": "three numbers separated by a space representing xyz triangle coordinates",
+          "p2 (Point)": "three numbers separated by a space representing xyz triangle coordinates"
+        },
+        {
+          "p0": "600 0 -600",
+          "p1": "-600 -20 -600",
+          "p2": "-600 0 600"
+        }
+      ],
+      "sphere": [
+        {
+          "center (Point)": "three numbers separated by a space representing xyz sphere center coordinates",
+          "radius (double)": "double representing the sphere radius"
+        },
+        {
+          "center": "0 10 50",
+          "radius": "11"
+        }
+      ],
+      "mesh": [
+        {
+          "path (Path)": "the path from the root dir",
+          "offset (Point)": "will move the mesh be the offset",
+          "scale (double)": "the scale of the mesh"
+        },
+        {
+          "path": "src/unittests/renderer/stl/box.stl",
+          "offset": "0 20 1",
+          "scale": 15
+        }
+      ]
+    }
+  }
+}

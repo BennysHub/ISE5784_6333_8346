@@ -71,6 +71,24 @@
           }
         }
       ]
+    },
+    "lights": {
+      "PointLight": [
+        {
+          "intensity": "255 255 255 4",
+          "position": "-28.5 27 -3"
+        },
+        {
+          "intensity": "255 255 255 1",
+          "position": "3 27 -33"
+        }
+      ],
+      "directionalLight": [
+        {
+          "intensity": "255 255 255 2",
+          "direction": "-1 -1 0"
+        }
+      ]
     }
   }
 }

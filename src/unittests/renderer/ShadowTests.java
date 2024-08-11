@@ -150,7 +150,7 @@ public class ShadowTests {
      */
     @Test
     public void stlShadow() {
-        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/stlJson.json");
+        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/stlJson.json");
         Scene scene = jsp.scene;
 
         scene.lights.add(new PointLight(new Color(255, 255, 255).reduce(2), new Point(20, 15, 300)));
@@ -174,31 +174,26 @@ public class ShadowTests {
      */
     @Test
     public void snowGlobe() {
-        int distanceScale = 3;
-        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/snowGlobe.json");
+        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json");
         Scene scene = jsp.scene;
 
-        scene.lights.add(new PointLight(new Color(255, 255, 255).scale(4), new Point(-9.5 * distanceScale, 9 * distanceScale, -1 * distanceScale)));
-        scene.lights.add(new PointLight(new Color(255, 255, 255).scale(1), new Point(1 * distanceScale, 9 * distanceScale, -11 * distanceScale)));
-        scene.lights.add(new DirectionalLight(new Color(255, 255, 255).scale(2), new Vector(-1, -1, 0)));
-
         Camera.Builder camera = Camera.getBuilder()
-                .setLocation(new Point(-25 * distanceScale, 20 * distanceScale, -30 * distanceScale))
+                .setLocation(new Point(-75, 60, -90))
                 .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
-                .setTarget(new Point(0 * distanceScale, 10 * distanceScale, 0 * distanceScale))
+                .setTarget(new Point(0, 30, 0))
                 .setVpDistance(150)
                 .setVpSize(300, 300)
                 .setRayTracer(new SimpleRayTracer(scene));
-//        //run once
-//        camera.setImageWriter(new ImageWriter("snowGlobe/turnaround_", 600, 600))
-//                .build()
-//                .renderImage()
-//                .writeToImage();
+//        run once
+        camera.setImageWriter(new ImageWriter("snowGlobe/turnaround_", 600, 600))
+                .build()
+                .renderImage()
+                .writeToImage();
 
-        //disabled test. set steps something and remove the // in the angleStep line to use this test
-        Point center = new Point(0, 10 * distanceScale, 0); // Center of the circular path
+//      set steps to more than 0 to use this test
+        Point center = new Point(0, 30, 0); // Center of the circular path
         double radius = 35; // Radius of the circular path
-        int steps = 48; // Number of steps for one complete revolution
+        int steps = 0; // Number of steps for one complete revolution
         double angleStep = Math.PI / (steps / 2d);// / steps ;
 
         for (int i = 0; i < steps; i++) {
@@ -207,7 +202,7 @@ public class ShadowTests {
             // Update the point's position
             double x = center.getX() + radius * Math.cos(angle);
             double z = center.getZ() + radius * Math.sin(angle);
-            camera.setLocation(new Point(x * distanceScale, 20 * distanceScale, z * distanceScale)).setTarget(center);
+            camera.setLocation(new Point(x * 3, 60, z * 3)).setTarget(center);
 
             camera.setImageWriter(new ImageWriter("snowGlobe/turnaround_" + i, 600, 600))
                     .build()
