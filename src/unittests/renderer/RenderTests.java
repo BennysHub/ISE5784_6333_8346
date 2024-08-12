@@ -133,7 +133,7 @@ public class RenderTests {
      */
     @Test
     public void basicRenderJson() {
-        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/twoColorJson.json");
+        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/twoColorJson.json");
         final Scene scene1 = jsp.scene;
         //final Scene scene1 = Scene.loadFromJson("src/unittests/renderer/twoColorJson.json");
 
