@@ -1,10 +1,13 @@
 package renderer;
 
 import geometries.Intersectable.GeoPoint;
+import geometries.Triangle;
 import lighting.LightSource;
+import lighting.PointLight;
 import primitives.*;
 import scene.Scene;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import static primitives.Util.alignZero;
@@ -18,7 +21,7 @@ public class SimpleRayTracer extends RayTracerBase {
     /**
      * The maximum recursion level for color calculations.
      */
-    public static final int MAX_CALC_COLOR_LEVEL = 10;
+    public static final int MAX_CALC_COLOR_LEVEL = 100;
 
     /**
      * The minimum value for the reflection/refraction coefficient in color calculations.
@@ -27,6 +30,7 @@ public class SimpleRayTracer extends RayTracerBase {
 
     private static final Double3 INITIAL_K = Double3.ONE;
 
+    private static final int SHADOW_RAYS_SAMPLE_COUNT = 100;
     /**
      * Constructs a SimpleRayTracer with the specified scene.
      *
@@ -208,11 +212,48 @@ public class SimpleRayTracer extends RayTracerBase {
      * @param n     the normal vector at the point
      * @return the transparency factor at the point
      */
-    private Double3 transparency(GeoPoint gp, LightSource light, Vector l, Vector n) {
-        Vector lightDirection = l.scale(-1); // from point to light source
-        Ray lightRay = new Ray(gp.point, lightDirection, n);
+//    private Double3 transparency(GeoPoint gp, LightSource light, Vector l, Vector n) {
+//        Vector lightDirection = l.scale(-1); // from point to light source
+//        Ray lightRay = new Ray(gp.point, lightDirection, n);
+//        List<GeoPoint> intersections = scene.geometries.findGeoIntersections(lightRay, light.getDistance(gp.point));
+//        Double3 ktr = Double3.ONE;
+//        if (intersections == null) return ktr;
+//        for (GeoPoint p : intersections)
+//            ktr = ktr.product(p.geometry.getMaterial().kT);
+//        return ktr;
+//    }
+
+        private Double3 transparency(GeoPoint gp, LightSource light, Vector l, Vector n) {
+
+        Double3 ktr = Double3.ZERO;
+        if (light instanceof PointLight temp){//. && gp.geometry instanceof Triangle
+            var multipleVectorsFromDifferenceAreaOfLight = temp.multipleVectorsFromLights(gp.point, SHADOW_RAYS_SAMPLE_COUNT);
+            List<Ray> shadowRays = new LinkedList<>();
+            for (Vector vector: multipleVectorsFromDifferenceAreaOfLight)
+                shadowRays.add(new Ray(gp.point, vector.scale(-1), n));
+
+            List<GeoPoint> intersections;
+            Double3 ktrHelper = Double3.ONE;
+            for (Ray ray : shadowRays) {
+                intersections = scene.geometries.findGeoIntersections(ray, light.getDistance(gp.point));
+                if (intersections == null) {
+                    ktr = ktr.add(ktrHelper);
+                } else {
+
+                    for (GeoPoint p : intersections)
+                        ktrHelper = ktrHelper.product(p.geometry.getMaterial().kT);
+
+                    ktr = ktr.add(ktrHelper);
+                    ktrHelper = Double3.ONE;
+                }
+            }
+            return ktr.reduce(shadowRays.size());
+        }
+
+
+        Ray lightRay = new Ray(gp.point, l.scale(-1), n);
         List<GeoPoint> intersections = scene.geometries.findGeoIntersections(lightRay, light.getDistance(gp.point));
-        Double3 ktr = Double3.ONE;
+        ktr = Double3.ONE;
         if (intersections == null) return ktr;
         for (GeoPoint p : intersections)
             ktr = ktr.product(p.geometry.getMaterial().kT);

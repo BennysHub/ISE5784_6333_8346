@@ -94,7 +94,7 @@ public class Material {
      * @return the current Material instance for chaining
      */
     public Material setKt(Double3 kT) {
-        if (!kT.lowerThan(Double3.ONE) || kT.lowerThan(Double3.ZERO))
+        if (Double3.ONE.lowerThan(kT) || kT.lowerThan(Double3.ZERO))
             throw new IllegalArgumentException("Transparency  Attenuation coefficient  must be between [0,1]");
         this.kT = kT;
         return this;
@@ -120,7 +120,7 @@ public class Material {
      * @return the current Material instance for chaining
      */
     public Material setKr(Double3 kR) {
-        if (!kR.lowerThan(Double3.ONE) || kR.lowerThan(Double3.ZERO))
+        if (Double3.ONE.lowerThan(kR) || kR.lowerThan(Double3.ZERO))
             throw new IllegalArgumentException("Reflection Attenuation coefficient must be between [0,1]");
         this.kR = kR;
         return this;
