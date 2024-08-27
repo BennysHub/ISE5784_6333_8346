@@ -8,6 +8,7 @@ import primitives.Vector;
 import java.util.LinkedList;
 import java.util.List;
 
+import static java.lang.Math.sqrt;
 import static primitives.Util.isZero;
 import static primitives.Util.random;
 
@@ -99,31 +100,55 @@ public class PointLight extends Light implements LightSource {
     }
 
     //return multiple vector from the circle defined in sphere by center = position, plane containing = normal witch is getL(p) and a center point, and radius = size
-    public List<Vector> multipleVectorsFromLights(Point p, int numOfVectors)
-    {
+    public List<Vector> multipleVectorsFromLights(Point p, int numOfVectors) {
         Vector normal = getL(p);
-        if (isZero(size))
+        if (isZero(size) || numOfVectors == 0)
             return List.of(normal);
 
         //make sure Vector(0,0,1) is not parallel to normal
         Vector orthogonalToNormal;
         try {
-            orthogonalToNormal = new Vector(0,0,1).crossProduct(normal).normalize();
+            orthogonalToNormal = new Vector(0, 0, 1).crossProduct(normal).normalize();
         } catch (IllegalArgumentException ignore) {
-            orthogonalToNormal = new Vector(0,1,0).crossProduct(normal).normalize();
+            orthogonalToNormal = new Vector(0, 1, 0).crossProduct(normal).normalize();
         }
         Vector orthogonalToBoth = orthogonalToNormal.crossProduct(normal);//already normalized
 
         List<Vector> VectorsFromDifferentParts = new LinkedList<>();
         //VectorsFromDifferentParts.add(normal);
 
+//        jittered grid
+        int dotsPerAxis = (int) sqrt(numOfVectors);
+        double gridDistance = size * 2 / dotsPerAxis;
+
+        for (int i = 0; i < dotsPerAxis; i++) {
+            for (int j = 0; j < dotsPerAxis; j++) {
+                double x = i * gridDistance;
+                double y = j * gridDistance;
+
+//                x += random(-gridDistance, gridDistance);
+//                y += random(-gridDistance, gridDistance);
+                double distance = sqrt(x * x + y * y);
+
+//                System.out.print("(" + x + "," + y + ") ");
+
+                if (distance <= size)
+                    VectorsFromDifferentParts.add(p.subtract(
+                            position.add(orthogonalToNormal.scale(x))
+                                    .add(orthogonalToBoth.scale(y))));
+            }
+//            System.out.println();
+        }
+
         //return only the edges can be adjusted by size = radius,
         for (int i = 0; i < numOfVectors; i++) {
             double theta = 2 * Math.PI * i / numOfVectors;
             Point pointOnTheCircle = position;//.add(orthogonalToNormal.scale(size * Math.cos(theta)).add(orthogonalToBoth.scale(size * Math.sin(theta))));
             double radius = size;//(size/10,size);
-            if (!isZero(radius * Math.cos(theta))) pointOnTheCircle = pointOnTheCircle.add(orthogonalToNormal.scale(radius * Math.cos(theta)));
-            if (!isZero(radius * Math.sin(theta))) pointOnTheCircle = pointOnTheCircle.add(orthogonalToBoth.scale(radius * Math.sin(theta)));
+            if (!isZero(radius * Math.cos(theta)))
+                pointOnTheCircle = pointOnTheCircle.add(orthogonalToNormal.scale(radius * Math.cos(theta)));
+            if (!isZero(radius * Math.sin(theta)))
+                pointOnTheCircle = pointOnTheCircle.add(orthogonalToBoth.scale(radius * Math.sin(theta)));
 
             VectorsFromDifferentParts.add(p.subtract(pointOnTheCircle).normalize());//normalized?
         }

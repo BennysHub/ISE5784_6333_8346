@@ -31,6 +31,7 @@ public class SimpleRayTracer extends RayTracerBase {
     private static final Double3 INITIAL_K = Double3.ONE;
 
     private static final int SHADOW_RAYS_SAMPLE_COUNT = 100;
+
     /**
      * Constructs a SimpleRayTracer with the specified scene.
      *
@@ -222,29 +223,28 @@ public class SimpleRayTracer extends RayTracerBase {
 //            ktr = ktr.product(p.geometry.getMaterial().kT);
 //        return ktr;
 //    }
-
-        private Double3 transparency(GeoPoint gp, LightSource light, Vector l, Vector n) {
+    private Double3 transparency(GeoPoint gp, LightSource light, Vector l, Vector n) {
 
         Double3 ktr = Double3.ZERO;
-        if (light instanceof PointLight temp){//. && gp.geometry instanceof Triangle
+        if (light instanceof PointLight temp) {//. && gp.geometry instanceof Triangle
             var multipleVectorsFromDifferenceAreaOfLight = temp.multipleVectorsFromLights(gp.point, SHADOW_RAYS_SAMPLE_COUNT);
             List<Ray> shadowRays = new LinkedList<>();
-            for (Vector vector: multipleVectorsFromDifferenceAreaOfLight)
+            for (Vector vector : multipleVectorsFromDifferenceAreaOfLight)
                 shadowRays.add(new Ray(gp.point, vector.scale(-1), n));
 
             List<GeoPoint> intersections;
-            Double3 ktrHelper = Double3.ONE;
+            Double3 ktrProduct = Double3.ONE;
             for (Ray ray : shadowRays) {
                 intersections = scene.geometries.findGeoIntersections(ray, light.getDistance(gp.point));
                 if (intersections == null) {
-                    ktr = ktr.add(ktrHelper);
+                    ktr = ktr.add(ktrProduct);
                 } else {
 
                     for (GeoPoint p : intersections)
-                        ktrHelper = ktrHelper.product(p.geometry.getMaterial().kT);
+                        ktrProduct = ktrProduct.product(p.geometry.getMaterial().kT);
 
-                    ktr = ktr.add(ktrHelper);
-                    ktrHelper = Double3.ONE;
+                    ktr = ktr.add(ktrProduct);
+                    ktrProduct = Double3.ONE;
                 }
             }
             return ktr.reduce(shadowRays.size());
