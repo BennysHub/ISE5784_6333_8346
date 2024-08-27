@@ -1,9 +1,6 @@
 package lighting;
 
-import primitives.Color;
-import primitives.Double3;
-import primitives.Point;
-import primitives.Vector;
+import primitives.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -117,17 +114,17 @@ public class PointLight extends Light implements LightSource {
         List<Vector> VectorsFromDifferentParts = new LinkedList<>();
         //VectorsFromDifferentParts.add(normal);
 
-//        jittered grid
+
         int dotsPerAxis = (int) sqrt(numOfVectors);
         double gridDistance = size * 2 / dotsPerAxis;
 
         for (int i = 0; i < dotsPerAxis; i++) {
             for (int j = 0; j < dotsPerAxis; j++) {
-                double x = i * gridDistance;
-                double y = j * gridDistance;
+                 double x = -(i - (dotsPerAxis - 1) / 2d) * gridDistance;
+                 double y = (j - (dotsPerAxis - 1) / 2d) * gridDistance;
 
-//                x += random(-gridDistance, gridDistance);
-//                y += random(-gridDistance, gridDistance);
+                x += random(-gridDistance/2, gridDistance/2);
+                y += random(-gridDistance/2, gridDistance/2);
                 double distance = sqrt(x * x + y * y);
 
 //                System.out.print("(" + x + "," + y + ") ");
@@ -137,21 +134,65 @@ public class PointLight extends Light implements LightSource {
                             position.add(orthogonalToNormal.scale(x))
                                     .add(orthogonalToBoth.scale(y))));
             }
+
+
+//        jittered grid
+//        int dotsPerAxis = (int) sqrt(numOfVectors);
+//        double gridDistance = size * 2 / dotsPerAxis;
+//
+//        for (int i = 0; i < dotsPerAxis; i++) {
+//            for (int j = 0; j < dotsPerAxis; j++) {
+//                double x = i * gridDistance;
+//                double y = j * gridDistance;
+//
+////                x += random(-gridDistance, gridDistance);
+////                y += random(-gridDistance, gridDistance);
+//                double distance = sqrt(x * x + y * y);
+//
+////                System.out.print("(" + x + "," + y + ") ");
+//
+//                if (distance <= size)
+//                    VectorsFromDifferentParts.add(p.subtract(
+//                            position.add(orthogonalToNormal.scale(x))
+//                                    .add(orthogonalToBoth.scale(y))));
+//            }
 //            System.out.println();
         }
 
-        //return only the edges can be adjusted by size = radius,
-        for (int i = 0; i < numOfVectors; i++) {
-            double theta = 2 * Math.PI * i / numOfVectors;
-            Point pointOnTheCircle = position;//.add(orthogonalToNormal.scale(size * Math.cos(theta)).add(orthogonalToBoth.scale(size * Math.sin(theta))));
-            double radius = size;//(size/10,size);
-            if (!isZero(radius * Math.cos(theta)))
-                pointOnTheCircle = pointOnTheCircle.add(orthogonalToNormal.scale(radius * Math.cos(theta)));
-            if (!isZero(radius * Math.sin(theta)))
-                pointOnTheCircle = pointOnTheCircle.add(orthogonalToBoth.scale(radius * Math.sin(theta)));
 
-            VectorsFromDifferentParts.add(p.subtract(pointOnTheCircle).normalize());//normalized?
-        }
+//        public Ray constructRay(int nX, int nY, int j, int i) {
+//
+//            // Calculate the width and height ratios of a pixel
+//            final double ratioY = vpHeight / nY;
+//            final double ratioX = vpWidth / nX;
+//
+//            // Calculate the pixel's position on the view plane
+//            final double yI = -(i - (nY - 1) / 2d) * ratioY;
+//            final double xJ = (j - (nX - 1) / 2d) * ratioX;
+//
+//            // Starting from the center, move to the pixel's position
+//            Point pIJ = center;
+//            if (xJ != 0) pIJ = pIJ.add(right.scale(xJ));
+//            if (yI != 0) pIJ = pIJ.add(up.scale(yI));
+//
+//            // Create the ray from the camera location to the pixel's position
+//            return new Ray(location, pIJ.subtract(location));
+//        }
+//
+//        //return only the edges can be adjusted by size = radius,
+//        for (int i = 0; i < numOfVectors; i++) {
+//            double theta = 2 * Math.PI * i / numOfVectors;
+//            Point pointOnTheCircle = position;//.add(orthogonalToNormal.scale(size * Math.cos(theta)).add(orthogonalToBoth.scale(size * Math.sin(theta))));
+//            double radius = size;//(size/10,size);
+//            if (!isZero(radius * Math.cos(theta)))
+//                pointOnTheCircle = pointOnTheCircle.add(orthogonalToNormal.scale(radius * Math.cos(theta)));
+//            if (!isZero(radius * Math.sin(theta)))
+//                pointOnTheCircle = pointOnTheCircle.add(orthogonalToBoth.scale(radius * Math.sin(theta)));
+//
+//            VectorsFromDifferentParts.add(p.subtract(pointOnTheCircle).normalize());//normalized?
+//        }
         return VectorsFromDifferentParts;
     }
+
+
 }
