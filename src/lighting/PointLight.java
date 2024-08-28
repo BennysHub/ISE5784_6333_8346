@@ -114,71 +114,22 @@ public class PointLight extends Light implements LightSource {
         List<Vector> VectorsFromDifferentParts = new LinkedList<>();
         //VectorsFromDifferentParts.add(normal);
 
-
         int dotsPerAxis = (int) sqrt(numOfVectors);
-        double gridDistance = size * 2 / dotsPerAxis;
+        double halfGridDistance = size / dotsPerAxis;
+        for (double i = -size; i < size; i += halfGridDistance * 2) {
+            for (double j = -size; j < size; j += halfGridDistance * 2) {
+                double x = i;
+                double y = j;
 
-        for (int i = 0; i < dotsPerAxis; i++) {
-            for (int j = 0; j < dotsPerAxis; j++) {
-                 double x = -(i - (dotsPerAxis - 1) / 2d) * gridDistance;
-                 double y = (j - (dotsPerAxis - 1) / 2d) * gridDistance;
-
-                x += random(-gridDistance/2, gridDistance/2);
-                y += random(-gridDistance/2, gridDistance/2);
+                x += random(-halfGridDistance, halfGridDistance);
+                y += random(-halfGridDistance, halfGridDistance);
                 double distance = sqrt(x * x + y * y);
-
-//                System.out.print("(" + x + "," + y + ") ");
-
                 if (distance <= size)
                     VectorsFromDifferentParts.add(p.subtract(
-                            position.add(orthogonalToNormal.scale(x))
-                                    .add(orthogonalToBoth.scale(y))));
+                            position.add(!isZero(x) ? orthogonalToNormal.scale(x) : orthogonalToNormal)
+                                    .add(!isZero(y) ? orthogonalToBoth.scale(y) : orthogonalToBoth)).normalize());
             }
-
-
-//        jittered grid
-//        int dotsPerAxis = (int) sqrt(numOfVectors);
-//        double gridDistance = size * 2 / dotsPerAxis;
-//
-//        for (int i = 0; i < dotsPerAxis; i++) {
-//            for (int j = 0; j < dotsPerAxis; j++) {
-//                double x = i * gridDistance;
-//                double y = j * gridDistance;
-//
-////                x += random(-gridDistance, gridDistance);
-////                y += random(-gridDistance, gridDistance);
-//                double distance = sqrt(x * x + y * y);
-//
-////                System.out.print("(" + x + "," + y + ") ");
-//
-//                if (distance <= size)
-//                    VectorsFromDifferentParts.add(p.subtract(
-//                            position.add(orthogonalToNormal.scale(x))
-//                                    .add(orthogonalToBoth.scale(y))));
-//            }
-//            System.out.println();
         }
-
-
-//        public Ray constructRay(int nX, int nY, int j, int i) {
-//
-//            // Calculate the width and height ratios of a pixel
-//            final double ratioY = vpHeight / nY;
-//            final double ratioX = vpWidth / nX;
-//
-//            // Calculate the pixel's position on the view plane
-//            final double yI = -(i - (nY - 1) / 2d) * ratioY;
-//            final double xJ = (j - (nX - 1) / 2d) * ratioX;
-//
-//            // Starting from the center, move to the pixel's position
-//            Point pIJ = center;
-//            if (xJ != 0) pIJ = pIJ.add(right.scale(xJ));
-//            if (yI != 0) pIJ = pIJ.add(up.scale(yI));
-//
-//            // Create the ray from the camera location to the pixel's position
-//            return new Ray(location, pIJ.subtract(location));
-//        }
-//
 //        //return only the edges can be adjusted by size = radius,
 //        for (int i = 0; i < numOfVectors; i++) {
 //            double theta = 2 * Math.PI * i / numOfVectors;
@@ -189,7 +140,7 @@ public class PointLight extends Light implements LightSource {
 //            if (!isZero(radius * Math.sin(theta)))
 //                pointOnTheCircle = pointOnTheCircle.add(orthogonalToBoth.scale(radius * Math.sin(theta)));
 //
-//            VectorsFromDifferentParts.add(p.subtract(pointOnTheCircle).normalize());//normalized?
+//            VectorsFromDifferentParts.add(p.subtract(pointOnTheCircle).normalize());//normalized!
 //        }
         return VectorsFromDifferentParts;
     }
