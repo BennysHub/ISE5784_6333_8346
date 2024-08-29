@@ -7,8 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static java.lang.Math.sqrt;
-import static primitives.Util.alignZero;
-import static primitives.Util.random;
+import static primitives.Util.*;
 
 /**
  * The {@code Blackboard} class provides utility methods for generating random points within geometric shapes.
@@ -39,20 +38,24 @@ public final class Blackboard {
         }
         up = right.crossProduct(normal).normalize();//already normalized
 
-
-        int cellsInRow = (int) sqrt(numOfPoints);
-        double cellVertexSize = radius * 2 / cellsInRow;
         LinkedList<Point> pointsOnArea = new LinkedList<>();
-
 //        int dotsPerAxis = (int) sqrt(numOfVectors);
 //        double halfGridDistance = size / dotsPerAxis;
 //        for (double i = -size ; i < size; i += halfGridDistance * 2) {
 //            for (double j = -size; j < size; j += halfGridDistance * 2) {
+//                double x = i;
+//                double y = j;
+//                System.out.println(x + " " + y);
+//        x += random(-halfGridDistance, halfGridDistance);
+//        y += random(-halfGridDistance, halfGridDistance);
 
+        int cellsInRow = (int) sqrt(numOfPoints);
+        double cellVertexSize = radius * 2 / cellsInRow;
         for (int i = 0; i < cellsInRow; i++) {
             for (int j = 0; j < cellsInRow; j++) {
                 double x = -(i - (cellsInRow - 1) / 2d) * cellVertexSize;
                 double y = (j - (cellsInRow - 1) / 2d) * cellVertexSize;
+                System.out.println(x + " " + y);
 
                 x += random(-cellVertexSize / 2, cellVertexSize / 2);
                 y += random(-cellVertexSize / 2, cellVertexSize / 2);
@@ -60,8 +63,8 @@ public final class Blackboard {
                 double distanceSquared = x * x + y * y;
                 Point point = center;
                 if (distanceSquared <= radius * radius) {
-                    if (x != 0) point = point.add(right.scale(x));
-                    if (y != 0) point = point.add(up.scale(y));
+                    if (!isZero(x)) point = point.add(right.scale(x));
+                    if (!isZero(y)) point = point.add(up.scale(y));
                     pointsOnArea.add(point);
                 }
             }
