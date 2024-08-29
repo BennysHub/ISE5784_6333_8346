@@ -18,7 +18,6 @@ public class SimpleRayTracer extends RayTracerBase {
 
     private static final Double3 INITIAL_K = Double3.ONE;
 
-    private SoftShadowsRayTracer softShadowsRayTracer;
     /**
      * Constructs a SimpleRayTracer with the specified scene.
      *
@@ -201,16 +200,23 @@ public class SimpleRayTracer extends RayTracerBase {
      * @return the transparency factor at the point
      */
     protected Double3 transparency(GeoPoint gp, LightSource light, Vector l, Vector n) {
-        Vector lightDirection = l.scale(-1); // from point to light source
+        Vector lightDirection = l.scale(-1); // from point to lightSource
         Ray lightRay = new Ray(gp.point, lightDirection, n);
         return cumulativeTransparencyIntersection(scene.geometries.findGeoIntersections(lightRay, light.getDistance(gp.point)));
     }
 
-    protected Double3 cumulativeTransparencyIntersection(Collection<GeoPoint> intersections){
+    /**
+     * Calculates the cumulative transparency factor for a collection of intersections.
+     *
+     * @param intersections the collection of GeoPoint intersections
+     * @return the cumulative transparency factor as a Double3
+     */
+    protected Double3 cumulativeTransparencyIntersection(Collection<GeoPoint> intersections) {
         Double3 ktr = Double3.ONE;
         if (intersections == null) return ktr;
         for (GeoPoint p : intersections)
             ktr = ktr.product(p.geometry.getMaterial().kT);
         return ktr;
     }
+
 }

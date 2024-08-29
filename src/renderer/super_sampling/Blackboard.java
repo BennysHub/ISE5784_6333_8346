@@ -12,8 +12,7 @@ import static primitives.Util.random;
 
 public final class Blackboard {
 
-    public static List<Point> getPointsOnCircle
-            (Vector normal, Point center, double radius, int numOfPoints) {
+    public static List<Point> getPointsOnCircle (Vector normal, Point center, double radius, int numOfPoints) {
 
         if (alignZero(radius) <= 0)
             return List.of(center);
@@ -34,7 +33,7 @@ public final class Blackboard {
 
 //        int dotsPerAxis = (int) sqrt(numOfVectors);
 //        double halfGridDistance = size / dotsPerAxis;
-//        for (double i = -size; i < size; i += halfGridDistance * 2) {
+//        for (double i = -size ; i < size; i += halfGridDistance * 2) {
 //            for (double j = -size; j < size; j += halfGridDistance * 2) {
 
         for (int i = 0; i < cellsInRow; i++) {
@@ -42,8 +41,8 @@ public final class Blackboard {
                 double x = -(i - (cellsInRow - 1) / 2d) * cellVertexSize;
                 double y = (j - (cellsInRow - 1) / 2d) * cellVertexSize;
 
-                x += random(-cellVertexSize/2, cellVertexSize/2);
-                y += random(-cellVertexSize/2, cellVertexSize/2);
+                x += random(-cellVertexSize / 2, cellVertexSize / 2);
+                y += random(-cellVertexSize / 2, cellVertexSize / 2);
 
                 double distanceSquared = x * x + y * y;
                 Point point = center;

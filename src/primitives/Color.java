@@ -123,7 +123,7 @@ public class Color {
      * @return new Color object which is the result of the operation
      */
     public Color reduce(double k) {//TODO: CHANGED FROM INT K TO DOUBLE K
-      //  if (k < 1) throw new IllegalArgumentException("Can't scale a color by a by a number lower than 1");
+        //  if (k < 1) throw new IllegalArgumentException("Can't scale a color by a by a number lower than 1");
         return new Color(rgb.reduce(k));
     }
 

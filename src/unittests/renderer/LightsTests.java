@@ -26,19 +26,19 @@ public class LightsTests {
      */
     private static final int SHININESS = 301;
     /**
-     * Diffusion attenuation factor for some of the geometries in the tests
+     * Diffusion attenuation factor for some geometries in the tests
      */
     private static final double KD = 0.5;
     /**
-     * Diffusion attenuation factor for some of the geometries in the tests
+     * Diffusion attenuation factor for some geometries in the tests
      */
     private static final Double3 KD3 = new Double3(0.2, 0.6, 0.4);
     /**
-     * Specular attenuation factor for some of the geometries in the tests
+     * Specular attenuation factor for some geometries in the tests
      */
     private static final double KS = 0.5;
     /**
-     * Specular attenuation factor for some of the geometries in the tests
+     * Specular attenuation factor for some geometries in the tests
      */
     private static final Double3 KS3 = new Double3(0.2, 0.4, 0.3);
     /**
@@ -46,16 +46,16 @@ public class LightsTests {
      */
     private static final double SPHERE_RADIUS = 50d;
     /**
-     * First scene for some of the tests
+     * First scene for some tests
      */
     private final Scene scene1 = new Scene("Test scene");
     /**
-     * Second scene for some of the tests
+     * Second scene for some tests
      */
     private final Scene scene2 = new Scene("Test scene")
             .setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.15)));
     /**
-     * First camera builder for some of the tests
+     * First camera builder for some tests
      */
     private final Camera.Builder camera1 = Camera.getBuilder()
             .setRayTracer(new SimpleRayTracer(scene1))
@@ -63,7 +63,7 @@ public class LightsTests {
             .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
             .setVpSize(150, 150).setVpDistance(1000);
     /**
-     * Second camera builder for some of the tests
+     * Second camera builder for some tests
      */
     private final Camera.Builder camera2 = Camera.getBuilder()
             .setRayTracer(new SimpleRayTracer(scene2))
@@ -71,7 +71,7 @@ public class LightsTests {
             .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
             .setVpSize(200, 200).setVpDistance(1000);
     /**
-     * Material for some of the geometries in the tests
+     * Material for some geometries in the tests
      */
     private final Material material = new Material().setKd(KD3).setKs(KS3).setShininess(SHININESS);
     /**
@@ -79,7 +79,7 @@ public class LightsTests {
      */
     private final Color trianglesLightColor = new Color(800, 500, 250);
     /**
-     * Light color for tests with sphere
+     * Light color for tests with a sphere
      */
     private final Color sphereLightColor = new Color(800, 500, 0);
     /**
@@ -105,11 +105,11 @@ public class LightsTests {
                     new Point(-75, 78, 100)
             };
     /**
-     * Position of the light in tests with sphere
+     * Position of the light in tests with a sphere
      */
     private final Point sphereLightPosition = new Point(-50, -50, 25);
     /**
-     * Light direction (directional and spot) in tests with sphere
+     * Light direction (directional and spot) in tests with a sphere
      */
     private final Vector sphereLightDirection = new Vector(1, 1, -0.5);
     /**

@@ -4,18 +4,16 @@ import geometries.Intersectable;
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;
-import lighting.DirectionalLight;
-import lighting.PointLight;
 import lighting.SpotLight;
 import org.junit.jupiter.api.Test;
 import primitives.Color;
 import primitives.Material;
 import primitives.Point;
 import primitives.Vector;
-import scene.JsonSceneParser;
 import scene.Scene;
 
-import static java.awt.Color.*;
+import static java.awt.Color.BLUE;
+import static java.awt.Color.WHITE;
 
 /**
  * Testing basic shadows
@@ -76,7 +74,7 @@ public class ShadowTests {
     }
 
     /**
-     * Sphere-Triangle shading - move triangle up-right
+     * Sphere-Triangle shading - move triangle upright
      */
     @Test
     public void sphereTriangleMove1() {
@@ -108,7 +106,7 @@ public class ShadowTests {
     }
 
     /**
-     * Sphere-Triangle shading - move spot even more close
+     * Sphere-Triangle shading - move spot even more closes
      */
     @Test
     public void sphereTriangleSpot2() {

@@ -15,26 +15,24 @@ import scene.Scene;
 import static java.awt.Color.BLUE;
 import static java.awt.Color.WHITE;
 
+/**
+ * The SoftShadowsTest class contains unit tests for rendering soft shadows.
+ * It sets up various geometries and light sources to test the soft shadow rendering capabilities.
+ */
 public class SoftShadowsTest {
 
     /**
-     * Shininess value for most of the geometries in the tests
+     * Shininess value for most of the geometries in the tests.
      */
     private static final int SHININESS = 301;
+
     /**
-     * Diffusion attenuation factor for some of the geometries in the tests
-     */
-    private static final double KD = 0.5;
-    /**
-     * Diffusion attenuation factor for some of the geometries in the tests
+     * Diffusion attenuation factor for some geometries in the tests.
      */
     private static final Double3 KD3 = new Double3(0.2, 0.6, 0.4);
+
     /**
-     * Specular attenuation factor for some of the geometries in the tests
-     */
-    private static final double KS = 0.5;
-    /**
-     * Specular attenuation factor for some of the geometries in the tests
+     * Specular attenuation factor for some geometries in the tests.
      */
     private static final Double3 KS3 = new Double3(0.2, 0.4, 0.3);
 
@@ -43,8 +41,11 @@ public class SoftShadowsTest {
     private final LightSource pointLight = new PointLight(new Color(java.awt.Color.white), new Point(0, 0, 50))
             .setKl(0.02).setSize(2).setKc(0);
 
-    private final Geometry plane = new Plane(Point.ZERO, new Vector(0, 0, 1)).setMaterial(new Material().setKd(KD3).setKs(KS3).setShininess(SHININESS));
-    private final Geometry triangle = new Triangle(new Point(10, 10, 40), new Point(-10, -10, 40), new Point(-10, 10, 40)).setMaterial(new Material().setKd(KD3).setKs(KS3).setShininess(SHININESS).setKt(0.5));
+    private final Geometry plane = new Plane(Point.ZERO, new Vector(0, 0, 1))
+            .setMaterial(new Material().setKd(KD3).setKs(KS3).setShininess(SHININESS));
+
+    private final Geometry triangle = new Triangle(new Point(10, 10, 40), new Point(-10, -10, 40), new Point(-10, 10, 40))
+            .setMaterial(new Material().setKd(KD3).setKs(KS3).setShininess(SHININESS).setKt(0.5));
 
     private final Camera.Builder camera1 = Camera.getBuilder()
             .setSoftShadows(true)
@@ -53,13 +54,14 @@ public class SoftShadowsTest {
             .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
             .setVpSize(150, 150).setVpDistance(1000);
 
+    /**
+     * Tests the basic soft shadow rendering.
+     */
     @Test
     public void softShadowBase() {
-
         scene.geometries.add(plane, triangle);
         scene.lights.add(pointLight);
         //scene.setAmbientLight(new AmbientLight(new Color(255, 191, 191), new Double3(0.15,0.15,0.3)));
-
 
         camera1.setImageWriter(new ImageWriter("softShadowBase", 1440, 1440))
                 .build()
@@ -67,6 +69,9 @@ public class SoftShadowsTest {
                 .writeToImage();
     }
 
+    /**
+     * Tests soft shadow rendering with triangles and a sphere.
+     */
     @Test
     public void softShadowTrianglesSphere() {
         scene.geometries.add(

@@ -127,7 +127,7 @@ public class RenderTests {
 //    }
 
     /**
-     * Test for JSON based scene - for bonus
+     * Test for JSON-based scene - for bonus
      */
     @Test
     public void basicRenderJson() {

@@ -1,13 +1,8 @@
 package lighting;
 
-import primitives.*;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import static java.lang.Math.sqrt;
-import static primitives.Util.isZero;
-import static primitives.Util.random;
+import primitives.Color;
+import primitives.Point;
+import primitives.Vector;
 
 /**
  * Class representing a point light source in a 3D scene.
@@ -50,17 +45,6 @@ public class PointLight extends Light implements LightSource {
     }
 
     /**
-     * Sets the size/radius of the light.
-     *
-     * @param size the size/radius of the light
-     * @return the current PointLight instance for chaining
-     */
-    public PointLight setSize(double size) {
-        this.size = size;
-        return this;
-    }
-
-    /**
      * Sets the linear attenuation factor.
      *
      * @param kl the linear attenuation factor
@@ -82,10 +66,31 @@ public class PointLight extends Light implements LightSource {
         return this;
     }
 
-    public Double getSize(){
+    /**
+     * Gets the size/radius of the light.
+     *
+     * @return the size of the light
+     */
+    public Double getSize() {
         return size;
     }
 
+    /**
+     * Sets the size/radius of the light.
+     *
+     * @param size the size/radius of the light
+     * @return the current PointLight instance for chaining
+     */
+    public PointLight setSize(double size) {
+        this.size = size;
+        return this;
+    }
+
+    /**
+     * Gets the position of the light source.
+     *
+     * @return the position of the light source
+     */
     public Point getPosition() {
         return position;
     }

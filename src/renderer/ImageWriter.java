@@ -50,8 +50,8 @@ public class ImageWriter {
      * Image Writer constructor accepting image name and View Plane parameters,
      *
      * @param imageName the name of png file
-     * @param nX        amount of pixels by Width
-     * @param nY        amount of pixels by height
+     * @param nX        number of pixels by Width
+     * @param nY        number of pixels by height
      */
     public ImageWriter(String imageName, int nX, int nY) {
         this.imageName = imageName;
@@ -75,7 +75,7 @@ public class ImageWriter {
     /**
      * View Plane X axis resolution
      *
-     * @return the amount of horizontal pixels
+     * @return the number of horizontal pixels
      */
     public int getNx() {
         return nX;
