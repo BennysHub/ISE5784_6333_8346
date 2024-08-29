@@ -39,15 +39,15 @@ public final class Blackboard {
         up = right.crossProduct(normal).normalize();//already normalized
 
         LinkedList<Point> pointsOnArea = new LinkedList<>();
-//        int dotsPerAxis = (int) sqrt(numOfVectors);
-//        double halfGridDistance = size / dotsPerAxis;
-//        for (double i = -size ; i < size; i += halfGridDistance * 2) {
-//            for (double j = -size; j < size; j += halfGridDistance * 2) {
+//        int dotsPerAxis = (int) sqrt(numOfPoints);
+//        double halfGridDistance = radius / dotsPerAxis;
+//        for (double i = -radius; i < radius; i += halfGridDistance * 2) {
+//            for (double j = -radius; j < radius; j += halfGridDistance * 2) {
 //                double x = i;
 //                double y = j;
 //                System.out.println(x + " " + y);
-//        x += random(-halfGridDistance, halfGridDistance);
-//        y += random(-halfGridDistance, halfGridDistance);
+//                x += random(-halfGridDistance, halfGridDistance);
+//                y += random(-halfGridDistance, halfGridDistance);
 
         int cellsInRow = (int) sqrt(numOfPoints);
         double cellVertexSize = radius * 2 / cellsInRow;
@@ -55,7 +55,6 @@ public final class Blackboard {
             for (int j = 0; j < cellsInRow; j++) {
                 double x = -(i - (cellsInRow - 1) / 2d) * cellVertexSize;
                 double y = (j - (cellsInRow - 1) / 2d) * cellVertexSize;
-                System.out.println(x + " " + y);
 
                 x += random(-cellVertexSize / 2, cellVertexSize / 2);
                 y += random(-cellVertexSize / 2, cellVertexSize / 2);
