@@ -14,6 +14,8 @@ import static primitives.Util.random;
  * A point light has a position and its intensity decreases with distance.
  */
 public class PointLight extends Light implements LightSource {
+
+
     /**
      * The position of the light source.
      */
@@ -80,6 +82,14 @@ public class PointLight extends Light implements LightSource {
         return this;
     }
 
+    public Double getSize(){
+        return size;
+    }
+
+    public Point getPosition() {
+        return position;
+    }
+
     @Override
     public Color getIntensity(Point p) {
         final double d = p.distance(position);
@@ -95,55 +105,4 @@ public class PointLight extends Light implements LightSource {
     public double getDistance(Point point) {
         return point.distance(position);
     }
-
-    //return multiple vector from the circle defined in sphere by center = position, plane containing = normal witch is getL(p) and a center point, and radius = size
-    public List<Vector> multipleVectorsFromLights(Point p, int numOfVectors) {
-        Vector normal = getL(p);
-        if (isZero(size) || numOfVectors == 0)
-            return List.of(normal);
-
-        //make sure Vector(0,0,1) is not parallel to normal
-        Vector orthogonalToNormal;
-        try {
-            orthogonalToNormal = new Vector(0, 0, 1).crossProduct(normal).normalize();
-        } catch (IllegalArgumentException ignore) {
-            orthogonalToNormal = new Vector(0, 1, 0).crossProduct(normal).normalize();
-        }
-        Vector orthogonalToBoth = orthogonalToNormal.crossProduct(normal);//already normalized
-
-        List<Vector> VectorsFromDifferentParts = new LinkedList<>();
-        //VectorsFromDifferentParts.add(normal);
-
-        int dotsPerAxis = (int) sqrt(numOfVectors);
-        double halfGridDistance = size / dotsPerAxis;
-        for (double i = -size; i < size; i += halfGridDistance * 2) {
-            for (double j = -size; j < size; j += halfGridDistance * 2) {
-                double x = i;
-                double y = j;
-
-                x += random(-halfGridDistance, halfGridDistance);
-                y += random(-halfGridDistance, halfGridDistance);
-                double distance = sqrt(x * x + y * y);
-                if (distance <= size)
-                    VectorsFromDifferentParts.add(p.subtract(
-                            position.add(!isZero(x) ? orthogonalToNormal.scale(x) : orthogonalToNormal)
-                                    .add(!isZero(y) ? orthogonalToBoth.scale(y) : orthogonalToBoth)).normalize());
-            }
-        }
-//        //return only the edges can be adjusted by size = radius,
-//        for (int i = 0; i < numOfVectors; i++) {
-//            double theta = 2 * Math.PI * i / numOfVectors;
-//            Point pointOnTheCircle = position;//.add(orthogonalToNormal.scale(size * Math.cos(theta)).add(orthogonalToBoth.scale(size * Math.sin(theta))));
-//            double radius = size;//(size/10,size);
-//            if (!isZero(radius * Math.cos(theta)))
-//                pointOnTheCircle = pointOnTheCircle.add(orthogonalToNormal.scale(radius * Math.cos(theta)));
-//            if (!isZero(radius * Math.sin(theta)))
-//                pointOnTheCircle = pointOnTheCircle.add(orthogonalToBoth.scale(radius * Math.sin(theta)));
-//
-//            VectorsFromDifferentParts.add(p.subtract(pointOnTheCircle).normalize());//normalized!
-//        }
-        return VectorsFromDifferentParts;
-    }
-
-
 }

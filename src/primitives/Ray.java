@@ -42,7 +42,7 @@ public class Ray {
      * @param normal    The normal vector at the starting point.
      */
     public Ray(Point head, Vector direction, Vector normal) {
-        this.direction = direction;
+        this.direction = direction.normalize();
         Vector epsVector = normal.scale(direction.dotProduct(normal) > 0 ? DELTA : -DELTA);
         this.head = head.add(epsVector);
     }

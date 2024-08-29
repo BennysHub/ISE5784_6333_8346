@@ -261,14 +261,16 @@ public class Camera implements Cloneable {
             return this;
         }
 
-        /**
-         * Sets the RayTracerBase for the camera.
-         *
-         * @param rayTracer the RayTracerBase to be set
-         * @return the Builder instance for method chaining
-         */
+        public Builder setSoftShadows(Boolean flag) {
+            RenderSettings.softShadowsEnabled = flag;
+            return this;
+        }
+
         public Builder setRayTracer(RayTracerBase rayTracer) {
-            camera.rayTracerBase = rayTracer;
+            if (RenderSettings.softShadowsEnabled)
+                camera.rayTracerBase = new SoftShadowsRayTracer(rayTracer.scene);
+            else
+                camera.rayTracerBase = rayTracer;
             return this;
         }
 
@@ -311,7 +313,6 @@ public class Camera implements Cloneable {
 
             if (camera.center == null)
                 throw new MissingResourceException("Missing camera center", Camera.class.getName(), "center");
-
             try {
                 return (Camera) camera.clone();
             } catch (CloneNotSupportedException e) {

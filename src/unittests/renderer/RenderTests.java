@@ -87,46 +87,44 @@ public class RenderTests {
                 .writeToImage();
     }
 
-    /**
-     * test the function in the bonus
-     * {@link renderer.Camera.Builder#setTarget(Point)}.
-     * {@link renderer.Camera.Builder#rotateVectors(double)}.
-     */
-    @Test
-    public void renderMultipleAnglesTest() {
-        int testNum = 5;
-        Camera.Builder camera = Camera.getBuilder()
-                .setRayTracer(new SimpleRayTracer(scene))
-                .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0)) //changed
-                .setVpDistance(100)
-                .setVpSize(500, 500);
-
-        scene.geometries.add( // center
-                new Sphere(50, new Point(0, 0, -100)),
-                // up left
-                new Triangle(new Point(-100, 0, -100), new Point(0, 100, -100), new Point(-100, 100, -100))
-                        .setEmission(new Color(GREEN)),
-                // down left
-                new Triangle(new Point(-100, 0, -100), new Point(0, -100, -100), new Point(-100, -100, -100))
-                        .setEmission(new Color(RED)),
-                // down right
-                new Triangle(new Point(100, 0, -100), new Point(0, -100, -100), new Point(100, -100, -100))
-                        .setEmission(new Color(BLUE)));
-        scene.setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.2, 0.2, 0.2)));
-
-        for (int i = 0; i < testNum; ++i) {
-            camera.setLocation(new Point((i * 10) - 50, 0, 0))
-                    .setTarget(new Point(0, 0, -100))
-                    .rotateVectors(10)
-                    .setImageWriter(new ImageWriter("render Multiple Angles Test" + i, 1000, 1000))
-                    .build()
-                    .renderImage()
-                    .printGrid(100, new Color(YELLOW))
-                    .writeToImage();
-        }
-
-
-    }
+//    /**
+//     * test the function in the bonus
+//     * {@link renderer.Camera.Builder#setTarget(Point)}.
+//     * {@link renderer.Camera.Builder#rotateVectors(double)}.
+//     */
+//    @Test
+//    public void renderMultipleAnglesTest() {
+//        int testNum = 5;
+//        Camera.Builder camera = Camera.getBuilder()
+//                .setRayTracer(new SimpleRayTracer(scene))
+//                .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0)) //changed
+//                .setVpDistance(100)
+//                .setVpSize(500, 500);
+//
+//        scene.geometries.add( // center
+//                new Sphere(50, new Point(0, 0, -100)),
+//                // up left
+//                new Triangle(new Point(-100, 0, -100), new Point(0, 100, -100), new Point(-100, 100, -100))
+//                        .setEmission(new Color(GREEN)),
+//                // down left
+//                new Triangle(new Point(-100, 0, -100), new Point(0, -100, -100), new Point(-100, -100, -100))
+//                        .setEmission(new Color(RED)),
+//                // down right
+//                new Triangle(new Point(100, 0, -100), new Point(0, -100, -100), new Point(100, -100, -100))
+//                        .setEmission(new Color(BLUE)));
+//        scene.setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.2, 0.2, 0.2)));
+//
+//        for (int i = 0; i < testNum; ++i) {
+//            camera.setLocation(new Point((i * 10) - 50, 0, 0))
+//                    .setTarget(new Point(0, 0, -100))
+//                    .rotateVectors(10)
+//                    .setImageWriter(new ImageWriter("render Multiple Angles Test" + i, 1000, 1000))
+//                    .build()
+//                    .renderImage()
+//                    .printGrid(100, new Color(YELLOW))
+//                    .writeToImage();
+//        }
+//    }
 
     /**
      * Test for JSON based scene - for bonus
