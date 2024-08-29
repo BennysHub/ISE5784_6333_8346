@@ -49,7 +49,7 @@ public class SoftShadowsTest {
 
     private final Camera.Builder camera1 = Camera.getBuilder()
             .setSoftShadows(true)
-            .setRayTracer(new SimpleRayTracer(scene))
+            .setRayTracer(new SoftShadowsRayTracer(scene))
             .setLocation(new Point(0, 0, 1000))
             .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
             .setVpSize(150, 150).setVpDistance(1000);
@@ -95,6 +95,9 @@ public class SoftShadowsTest {
                 .writeToImage();
     }
 
+    /**
+     * test the case when the light source is under a plane but part of the light is above
+     */
     @Test
     void underTheHorizon() {
         Material ground = new Material().setKd(KD3).setKs(KS3).setShininess(SHININESS);
@@ -111,7 +114,7 @@ public class SoftShadowsTest {
 
         final Camera.Builder camera2 = Camera.getBuilder()
                 .setSoftShadows(true)
-                .setRayTracer(new SimpleRayTracer(scene))
+                .setRayTracer(new SoftShadowsRayTracer(scene))
                 .setLocation(new Point(-1, 6, -1))
                 .setTarget(Point.ZERO)
                 .setVpSize(150, 150).setVpDistance(30);

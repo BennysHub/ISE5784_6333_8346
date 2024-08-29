@@ -10,9 +10,22 @@ import static java.lang.Math.sqrt;
 import static primitives.Util.alignZero;
 import static primitives.Util.random;
 
+/**
+ * The {@code Blackboard} class provides utility methods for generating random points within geometric shapes.
+ */
 public final class Blackboard {
-
-    public static List<Point> getPointsOnCircle (Vector normal, Point center, double radius, int numOfPoints) {
+    /**
+     * Generates a list of points distributed randomly within a circular area on a plane defined by a normal vector.
+     * The points are generated within a square grid of cells, with each point randomly jittered within its cell.
+     *
+     * @param normal      the normal vector defining the plane on which the circle lies.
+     * @param center      the center point of the circle.
+     * @param radius      the radius of the circle.
+     * @param numOfPoints the number of points to generate.
+     * @return a list of points distributed within the circle. If the radius is non-positive, a list containing only the center is returned.
+     * @throws IllegalArgumentException if the normal vector is invalid.
+     */
+    public static List<Point> getPointsOnCircle(Vector normal, Point center, double radius, int numOfPoints) {
 
         if (alignZero(radius) <= 0)
             return List.of(center);

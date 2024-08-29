@@ -261,16 +261,28 @@ public class Camera implements Cloneable {
             return this;
         }
 
+        /**
+         * Enables or disables soft shadows in the render.
+         *
+         * @param flag a boolean indicating whether soft shadows should be enabled (true) or disabled (false).
+         * @return the current Builder object for chaining method calls.
+         */
         public Builder setSoftShadows(Boolean flag) {
             RenderSettings.softShadowsEnabled = flag;
             return this;
         }
 
+        /**
+         * Sets the RayTracer for the camera. If soft shadows are enabled, a {@code SoftShadowsRayTracer} is used.
+         *
+         * @param rayTracer the RayTracer to be set.
+         * @return the Builder instance for method chaining.
+         */
         public Builder setRayTracer(RayTracerBase rayTracer) {
-            if (RenderSettings.softShadowsEnabled)
-                camera.rayTracerBase = new SoftShadowsRayTracer(rayTracer.scene);
-            else
-                camera.rayTracerBase = rayTracer;
+//            if (RenderSettings.softShadowsEnabled)
+//                camera.rayTracerBase = new SoftShadowsRayTracer(rayTracer.scene);
+//            else
+            camera.rayTracerBase = rayTracer;
             return this;
         }
 
