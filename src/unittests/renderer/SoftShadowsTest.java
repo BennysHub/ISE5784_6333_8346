@@ -49,7 +49,7 @@ public class SoftShadowsTest {
 
     private final Camera.Builder camera1 = Camera.getBuilder()
             .setSoftShadows(true)
-            .setRayTracer(new SoftShadowsRayTracer(scene))
+            .setRayTracer(new SimpleRayTracer(scene))
             .setLocation(new Point(0, 0, 1000))
             .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
             .setVpSize(150, 150).setVpDistance(1000);
@@ -114,7 +114,7 @@ public class SoftShadowsTest {
 
         final Camera.Builder camera2 = Camera.getBuilder()
                 .setSoftShadows(true)
-                .setRayTracer(new SoftShadowsRayTracer(scene))
+                .setRayTracer(new SimpleRayTracer(scene))
                 .setLocation(new Point(-1, 6, -1))
                 .setTarget(Point.ZERO)
                 .setVpSize(150, 150).setVpDistance(30);

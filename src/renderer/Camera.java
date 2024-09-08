@@ -279,9 +279,6 @@ public class Camera implements Cloneable {
          * @return the Builder instance for method chaining.
          */
         public Builder setRayTracer(RayTracerBase rayTracer) {
-//            if (RenderSettings.softShadowsEnabled)
-//                camera.rayTracerBase = new SoftShadowsRayTracer(rayTracer.scene);
-//            else
             camera.rayTracerBase = rayTracer;
             return this;
         }

@@ -2,7 +2,11 @@ package lighting;
 
 import primitives.Color;
 import primitives.Point;
+import primitives.Ray;
 import primitives.Vector;
+import renderer.super_sampling.Blackboard;
+
+import java.util.List;
 
 /**
  * Class representing a point light source in a 3D scene.
@@ -16,7 +20,10 @@ public class PointLight extends Light implements LightSource {
      */
     protected final Point position;
 
-    private double size = 0d;
+    /**
+     * The size of the light. use for soft shadows
+     */
+    protected double size = 0d;
 
     private double kC = 1;
     private double kL = 0;
@@ -104,6 +111,11 @@ public class PointLight extends Light implements LightSource {
     @Override
     public Vector getL(Point p) {
         return p.subtract(position).normalize();
+    }
+
+    @Override
+    public List<Ray> getRaysBeam(Point p, Vector n, int numOfRays) {
+        return Blackboard.constructRays(position, p, n, size, numOfRays);
     }
 
     @Override

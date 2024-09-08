@@ -55,6 +55,17 @@ public class Vector extends Point {
     }
 
     /**
+     * Returns a unit vector perpendicular to this vector.
+     * The calculation varies based on the comparison of the X and Y components.
+     *
+     * @return A normalized perpendicular vector.
+     */
+    public Vector perpendicular() {
+        return (this.getY() != this.getX()) ?
+                new Vector(this.getY(), -this.getX(), 0).normalize() : new Vector(this.getZ(), 0, -this.getX()).normalize();
+    }
+
+    /**
      * Computes the dot product of this vector with the given vector.
      *
      * @param vector The vector to compute the dot product with.

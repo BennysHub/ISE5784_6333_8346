@@ -2,7 +2,10 @@ package lighting;
 
 import primitives.Color;
 import primitives.Point;
+import primitives.Ray;
 import primitives.Vector;
+
+import java.util.List;
 
 /**
  * Interface representing a light source in a 3D scene.
@@ -25,6 +28,16 @@ public interface LightSource {
      * @return the vector from the light source to the given point
      */
     Vector getL(Point p);
+
+    /**
+     * Generates a beam of rays from the given point and normal.
+     *
+     * @param p         The target point.
+     * @param n         The normal vector at the target point.
+     * @param numOfRays The number of rays to generate.
+     * @return A list of rays forming a beam.
+     */
+    List<Ray> getRaysBeam(Point p, Vector n, int numOfRays);
 
     /**
      * Calculate the distance between the light source and a point

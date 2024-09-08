@@ -2,7 +2,11 @@ package lighting;
 
 import primitives.Color;
 import primitives.Point;
+import primitives.Ray;
 import primitives.Vector;
+import renderer.super_sampling.Blackboard;
+
+import java.util.List;
 
 import static primitives.Util.alignZero;
 
@@ -60,5 +64,10 @@ public class SpotLight extends PointLight {
     public Color getIntensity(Point p) {
         double directionStrength = alignZero(direction.dotProduct(getL(p)));
         return super.getIntensity(p).scale(directionStrength <= 0 ? 0 : Math.pow(directionStrength, beamFocus));
+    }
+
+    @Override
+    public List<Ray> getRaysBeam(Point p, Vector n, int numOfRays) {
+        return Blackboard.constructRays(position, p, direction, size, numOfRays);
     }
 }

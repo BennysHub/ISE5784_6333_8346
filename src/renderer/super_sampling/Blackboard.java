@@ -1,6 +1,7 @@
 package renderer.super_sampling;
 
 import primitives.Point;
+import primitives.Ray;
 import primitives.Vector;
 
 import java.util.LinkedList;
@@ -24,30 +25,14 @@ public final class Blackboard {
      * @return a list of points distributed within the circle. If the radius is non-positive, a list containing only the center is returned.
      * @throws IllegalArgumentException if the normal vector is invalid.
      */
-    public static List<Point> getPointsOnCircle(Vector normal, Point center, double radius, int numOfPoints) {
-
+    private static List<Point> getPointsOnCircle(Vector normal, Point center, double radius, int numOfPoints) {
         if (alignZero(radius) <= 0)
             return List.of(center);
 
-        Vector right;
-        Vector up;
-        try {
-            right = new Vector(0, 1, 0).crossProduct(normal).normalize();
-        } catch (IllegalArgumentException ignore) {
-            right = new Vector(0, 0, 1).crossProduct(normal).normalize();
-        }
-        up = right.crossProduct(normal).normalize();//already normalized
+        Vector right = normal.perpendicular();
+        Vector up = right.crossProduct(normal);//already normalized;
 
         LinkedList<Point> pointsOnArea = new LinkedList<>();
-//        int dotsPerAxis = (int) sqrt(numOfPoints);
-//        double halfGridDistance = radius / dotsPerAxis;
-//        for (double i = -radius; i < radius; i += halfGridDistance * 2) {
-//            for (double j = -radius; j < radius; j += halfGridDistance * 2) {
-//                double x = i;
-//                double y = j;
-//                System.out.println(x + " " + y);
-//                x += random(-halfGridDistance, halfGridDistance);
-//                y += random(-halfGridDistance, halfGridDistance);
 
         int cellsInRow = (int) sqrt(numOfPoints);
         double cellVertexSize = radius * 2 / cellsInRow;
@@ -69,5 +54,24 @@ public final class Blackboard {
             }
         }
         return pointsOnArea;
+    }
+
+    /**
+     * Constructs a list of rays distributed within a circular area.
+     *
+     * @param BlackBoardPosition The position of the blackboard.
+     * @param p                  The target point.
+     * @param n                  The normal vector at the target point.
+     * @param radius             The radius of the circular area.
+     * @param numOfRays          The number of rays to generate.
+     * @return A list of rays directed from the target point towards points on the circular area.
+     */
+    public static List<Ray> constructRays(Point BlackBoardPosition, Point p, Vector n, double radius, int numOfRays) {
+        List<Point> areaPoints = Blackboard.getPointsOnCircle(BlackBoardPosition.subtract(p).normalize(), BlackBoardPosition, radius, numOfRays);
+        List<Ray> rays = new LinkedList<>();
+        for (Point areaP : areaPoints) {
+            rays.add(new Ray(p, areaP.subtract(p), n));
+        }
+        return rays;
     }
 }

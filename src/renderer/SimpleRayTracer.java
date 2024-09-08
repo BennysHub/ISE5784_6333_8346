@@ -6,6 +6,7 @@ import primitives.*;
 import scene.Scene;
 
 import java.util.Collection;
+import java.util.List;
 
 import static primitives.Util.alignZero;
 
@@ -81,8 +82,9 @@ public class SimpleRayTracer extends RayTracerBase {
         for (LightSource lightSource : scene.lights) {
             Vector l = lightSource.getL(gp.point);
             double nl = alignZero(n.dotProduct(l));
-            if ((nl * nv > 0)) { // sign(nl) == sign(nv)
-                Double3 ktr = transparency(gp, lightSource, l, n);
+            if ((nl * nv > 0) || RenderSettings.softShadowsEnabled) { // sign(nl) == sign(nv)
+                Double3 ktr = RenderSettings.softShadowsEnabled ?
+                        softTransparency(gp, lightSource, l, n) : transparency(gp, lightSource, l, n);
                 if (!ktr.product(k).lowerThan(RenderSettings.MIN_CALC_COLOR_K)) {
                     Color iL = lightSource.getIntensity(gp.point).scale(ktr);
                     color = color.add(
@@ -202,7 +204,28 @@ public class SimpleRayTracer extends RayTracerBase {
     protected Double3 transparency(GeoPoint gp, LightSource light, Vector l, Vector n) {
         Vector lightDirection = l.scale(-1); // from point to lightSource
         Ray lightRay = new Ray(gp.point, lightDirection, n);
-        return cumulativeTransparencyIntersection(scene.geometries.findGeoIntersections(lightRay, light.getDistance(gp.point)));
+        return totalTransparency(scene.geometries.findGeoIntersections(lightRay, light.getDistance(gp.point)));
+    }
+
+    /**
+     * Calculates the transparency factor for a given GeoPoint and light source.
+     *
+     * @param gp    the GeoPoint
+     * @param light the light source
+     * @param l     the light vector
+     * @param n     the normal vector at the GeoPoint
+     * @return the transparency factor as a Double3
+     */
+    protected Double3 softTransparency(GeoPoint gp, LightSource light, Vector l, Vector n) {
+        Double3 ktr = Double3.ZERO;
+        List<Ray> shadowRays = light.getRaysBeam(gp.point, n, RenderSettings.SHADOW_RAYS_SAMPLE_COUNT);
+        if (shadowRays.size() > 1) {
+            for (Ray shadowRay : shadowRays)
+                ktr = ktr.add(totalTransparency(scene.geometries.findGeoIntersections(shadowRay, light.getDistance(gp.point))));
+
+            return ktr.reduce(shadowRays.size());
+        }
+        return transparency(gp, light, l, n);
     }
 
     /**
@@ -211,12 +234,11 @@ public class SimpleRayTracer extends RayTracerBase {
      * @param intersections the collection of GeoPoint intersections
      * @return the cumulative transparency factor as a Double3
      */
-    protected Double3 cumulativeTransparencyIntersection(Collection<GeoPoint> intersections) {
+    protected Double3 totalTransparency(Collection<GeoPoint> intersections) {
         Double3 ktr = Double3.ONE;
         if (intersections == null) return ktr;
         for (GeoPoint p : intersections)
             ktr = ktr.product(p.geometry.getMaterial().kT);
         return ktr;
     }
-
 }

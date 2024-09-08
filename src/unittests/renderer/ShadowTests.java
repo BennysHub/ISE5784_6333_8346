@@ -32,6 +32,7 @@ public class ShadowTests {
             .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
             .setLocation(new Point(0, 0, 1000)).setVpDistance(1000)
             .setVpSize(200, 200)
+            .setSoftShadows(false)
             .setRayTracer(new SimpleRayTracer(scene));
 
     /**
