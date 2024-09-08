@@ -75,12 +75,12 @@ public abstract class Intersectable {
         /**
          * The geometry associated with this intersection point
          */
-        public Geometry geometry;
+        public final Geometry geometry;
 
         /**
          * The point of intersection
          */
-        public Point point;
+        public final Point point;
 
         /**
          * Constructs a GeoPoint with the specified geometry and intersection point.

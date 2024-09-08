@@ -13,7 +13,7 @@ public abstract class RayTracerBase {
     /**
      * The scene that contain all the elements for the render
      */
-    protected Scene scene;
+    protected final Scene scene;
 
     /**
      * Constructs a RayTracerBase with the specified scene.
