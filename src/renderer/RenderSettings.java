@@ -17,7 +17,7 @@ public class RenderSettings {
     /**
      * The number of sample rays used for shadow calculations.
      */
-    protected static final int SHADOW_RAYS_SAMPLE_COUNT = 9;//169;
+    protected static final int SHADOW_RAYS_SAMPLE_COUNT = 169;
     /**
      * Indicates whether soft shadows are enabled.
      */
