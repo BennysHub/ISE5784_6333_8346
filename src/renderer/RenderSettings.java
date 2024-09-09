@@ -23,6 +23,10 @@ public class RenderSettings {
      */
     static boolean softShadowsEnabled = false;
     /**
+     * Set the number of threads to use. set to 0 for no multithreading
+     */
+    static int threadsCount = 4;
+    /**
      * Indicates whether antialiasing is enabled.
      */
     static boolean antiAliasingEnabled = false;

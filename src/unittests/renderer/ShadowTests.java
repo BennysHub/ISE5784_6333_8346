@@ -10,6 +10,7 @@ import primitives.Color;
 import primitives.Material;
 import primitives.Point;
 import primitives.Vector;
+import scene.JsonSceneParser;
 import scene.Scene;
 
 import static java.awt.Color.BLUE;
@@ -142,5 +143,72 @@ public class ShadowTests {
                 .build()
                 .renderImage()
                 .writeToImage();
+    }
+
+//    /**
+//     * test the rendering from json file that contain a path to a stl file
+//     */
+//    @Test
+//    public void stlShadow() {
+//        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/stlJson.json");
+//        Scene scene = jsp.scene;
+//
+//        scene.lights.add(new PointLight(new Color(255, 255, 255).reduce(2), new Point(20, 15, 300)));
+//        scene.lights.add(new DirectionalLight(new Color(255, 255, 255).reduce(2), new Vector(-0.3, -0.3, 0)));
+//        scene.lights.add(new SpotLight(new Color(YELLOW), new Point(0, 100, 0), new Vector(0, -1, 0)).setNarrowBeam(3));
+//
+//        Camera.Builder camera = Camera.getBuilder()
+//                .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
+//                .setLocation(new Point(0, 220, 1000)).setVpDistance(1000)
+//                .setVpSize(200, 200)
+//                .setRayTracer(new SimpleRayTracer(scene));
+//
+//        camera.setImageWriter(new ImageWriter("stlTurnaround/stlShadow", 600, 600))
+//                .build()
+//                .renderImage()
+//                .writeToImage();
+//    }
+//
+
+    /**
+     * test the turnaround rendering of complex scene
+     */
+    @Test
+    public void snowGlobe() {
+        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json");
+        Scene scene = jsp.scene;
+
+        Camera.Builder camera = Camera.getBuilder()
+                .setLocation(new Point(-75, 60, -90))
+                .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
+                .setTarget(new Point(0, 30, 0))
+                .setVpDistance(150)
+                .setVpSize(300, 300)
+                .setRayTracer(new SimpleRayTracer(scene));
+//        run once
+        camera.setImageWriter(new ImageWriter("_snowGlobe", 600, 600))
+                .build()
+                .renderImage()
+                .writeToImage();
+
+//      set steps to more than 0 to use this test
+//        Point center = new Point(0, 30, 0); // Center of the circular path
+//        double radius = 35; // Radius of the circular path
+//        int steps = 0; // Number of steps for one complete revolution
+//        double angleStep = Math.PI / (steps / 2d);// / steps ;
+//
+//        for (int i = 0; i < steps; i++) {
+//            double angle = i * angleStep;
+//
+//            // Update the point's position
+//            double x = center.getX() + radius * Math.cos(angle);
+//            double z = center.getZ() + radius * Math.sin(angle);
+//            camera.setLocation(new Point(x * 3, 60, z * 3)).setTarget(center);
+//
+//            camera.setImageWriter(new ImageWriter("snowGlobe/turnaround_" + i, 600, 600))
+//                    .build()
+//                    .renderImage()
+//                    .writeToImage();
+//            System.out.println("frame - " + i);
     }
 }
