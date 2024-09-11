@@ -15,7 +15,7 @@ public class Ray {
     /**
      * The starting point of the ray.
      */
-    final private Point head;
+    final private Point origin;
     /**
      * The direction vector of the ray, normalized to be a unit vector.
      */
@@ -29,7 +29,7 @@ public class Ray {
      * @param vector The direction vector of the ray.
      */
     public Ray(Point point, Vector vector) {
-        head = point;
+        origin = point;
         direction = vector.normalize();
     }
 
@@ -37,14 +37,14 @@ public class Ray {
      * Constructs a new Ray with the specified starting point, direction, and normal.
      * Adjusts the starting point to avoid precision issues in geometric calculations.
      *
-     * @param head      The starting point of the ray.
+     * @param origin      The starting point of the ray.
      * @param direction The direction vector of the ray. <b>Must be normalized</b>
      * @param normal    The normal vector at the starting point.
      */
-    public Ray(Point head, Vector direction, Vector normal) {
+    public Ray(Point origin, Vector direction, Vector normal) {
         this.direction = direction.normalize();
         Vector epsVector = normal.scale(direction.dotProduct(normal) > 0 ? DELTA : -DELTA);
-        this.head = head.add(epsVector);
+        this.origin = origin.add(epsVector);
     }
 
     /**
@@ -52,8 +52,8 @@ public class Ray {
      *
      * @return The head point of the ray.
      */
-    public Point getHead() {
-        return head;
+    public Point getOrigin() {
+        return origin;
     }
 
     /**
@@ -73,9 +73,9 @@ public class Ray {
      */
     public Point getPoint(double t) {
         try {
-            return head.add(direction.scale(t));
+            return origin.add(direction.scale(t));
         } catch (IllegalArgumentException ignore) {
-            return head;
+            return origin;
         }
     }
 
@@ -90,7 +90,7 @@ public class Ray {
         GeoPoint closest = null;
         double shortestDistance = Double.POSITIVE_INFINITY;
         for (GeoPoint gP : geoPointList) {
-            double distance = gP.point.distanceSquared(head);
+            double distance = gP.point.distanceSquared(origin);
             if (distance < shortestDistance) {
                 closest = gP;
                 shortestDistance = distance;
@@ -112,14 +112,14 @@ public class Ray {
 
     @Override
     public String toString() {
-        return String.format("Ray ➞ %s in direction %s", head, direction);
+        return String.format("Ray ➞ %s in direction %s", origin, direction);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         return obj instanceof Ray other
-                && head.equals(other.head)
+                && origin.equals(other.origin)
                 && direction.equals(other.direction);
     }
 }

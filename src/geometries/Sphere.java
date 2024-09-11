@@ -40,11 +40,11 @@ public class Sphere extends RadialGeometry {
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
         // If the ray starts at the sphere's center, return the point on the sphere's surface
-        if (ray.getHead().equals(center))
+        if (ray.getOrigin().equals(center))
             return List.of(new GeoPoint(this, ray.getPoint(radius)));
 
         // Calculate coefficients for the quadratic equation
-        Vector oc = ray.getHead().subtract(center);
+        Vector oc = ray.getOrigin().subtract(center);
         double b = oc.dotProduct(ray.getDirection());//we don't multiply by 2 since we can ...
         double c = oc.dotProduct(oc) - radiusSquared;
         double discriminant = b * b - c;// we don't multiply c by 4a since a = dir^2 which is one, and 4 since we didn't multiply b by 2 so b^2 is 4*x.

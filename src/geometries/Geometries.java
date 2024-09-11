@@ -12,7 +12,7 @@ import java.util.List;
 public class Geometries extends Intersectable {
 
     /**
-     * A list to hold an arbitrary amount of geometric objects that implement the Intersectable interface.
+     * A list to hold an arbitrary number of geometric objects that implement the Intersectable interface.
      */
     private final List<Intersectable> geometries = new LinkedList<>();
 

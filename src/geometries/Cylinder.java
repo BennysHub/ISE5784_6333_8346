@@ -33,7 +33,7 @@ public class Cylinder extends Tube {
     @Override
     public Vector getNormal(Point p) {
         // The Point where the Ray of Tube Start
-        Point p0 = axis.getHead();
+        Point p0 = axis.getOrigin();
 
         // The dir of the ray it's also normalized
         Vector dir = axis.getDirection();

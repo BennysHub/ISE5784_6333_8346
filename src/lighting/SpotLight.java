@@ -67,7 +67,7 @@ public class SpotLight extends PointLight {
     }
 
     @Override
-    public List<Ray> getRaysBeam(Point p, Vector n, int numOfRays) {
+    public List<Ray> getRaysBeam(Point p, Vector n, int numOfRays) {//TODO: why send direction instead of normal ????
         return Blackboard.constructRays(position, p, direction, size, numOfRays);
     }
 }

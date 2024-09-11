@@ -7,7 +7,6 @@ import primitives.Vector;
 
 import java.util.LinkedList;
 import java.util.MissingResourceException;
-import java.util.stream.IntStream;
 
 import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
@@ -101,7 +100,7 @@ public class Camera implements Cloneable {
         } else { // see further... option 2
             int threadsCount = RenderSettings.threadsCount;
             var threads = new LinkedList<Thread>(); // list of threads
-            while (threadsCount-- > 0) // add appropriate number of threads
+            while (threadsCount-- > 0) // add the appropriate number of threads
                 threads.add(new Thread(() -> { // add a thread with its code
                     PixelManager.Pixel pixel; // current pixel(row,col)
                     // allocate pixel(row,col) in loop until there are no more pixels
@@ -153,8 +152,7 @@ public class Camera implements Cloneable {
         int nY = imageWriter.getNy();
         for (int x = nX - 1; x >= 0; --x)
             for (int y = nY - 1; y >= 0; --y)
-                if (x % interval == 0 || y % interval == 0)
-                    imageWriter.writePixel(x, y, color);
+                if (x % interval == 0 || y % interval == 0) imageWriter.writePixel(x, y, color);
         return this;
     }
 
@@ -248,10 +246,8 @@ public class Camera implements Cloneable {
                 camera.up = newUp.normalize();
                 return this;
             }
-            Vector newRight = camera.right.scale(cos)
-                    .add(camera.up.scale(-sin));
-            Vector newUp = camera.right.scale(sin)
-                    .add(camera.up.scale(cos));
+            Vector newRight = camera.right.scale(cos).add(camera.up.scale(-sin));
+            Vector newUp = camera.right.scale(sin).add(camera.up.scale(cos));
             camera.right = newRight.normalize();
             camera.up = newUp.normalize();
             return this;

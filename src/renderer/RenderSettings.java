@@ -9,7 +9,7 @@ public class RenderSettings {
     /**
      * The maximum recursion level for color calculations.
      */
-    static final int MAX_CALC_COLOR_LEVEL = 100;
+    static final int MAX_CALC_COLOR_LEVEL = 10;
     /**
      * The minimum value for the reflection/refraction coefficient in color calculations.
      */
@@ -19,13 +19,13 @@ public class RenderSettings {
      */
     static final int SHADOW_RAYS_SAMPLE_COUNT = 169;
     /**
+     * The number of threads to use. Set to 0 for no multithreading
+     */
+    static int threadsCount = 0;
+    /**
      * Indicates whether soft shadows are enabled.
      */
     static boolean softShadowsEnabled = false;
-    /**
-     * Set the number of threads to use. set to 0 for no multithreading
-     */
-    static int threadsCount = 4;
     /**
      * Indicates whether antialiasing is enabled.
      */

@@ -26,7 +26,7 @@ class PixelManager {
      */
     private int maxCols = 0;
     /**
-     * Total amount of pixels in the generated image
+     * Total number of pixels in the generated image
      */
     private long totalPixels = 0L;
 
@@ -39,7 +39,7 @@ class PixelManager {
      */
     private volatile int cCol = -1;
     /**
-     * Amount of pixels that have been processed
+     * Number of pixels that have been processed
      */
     private volatile long pixels = 0L;
     /**
@@ -65,7 +65,7 @@ class PixelManager {
      */
     private Object mutexNext = new Object();
     /**
-     * Mutual exclusion object for printing progress percentage in console window
+     * Mutual exclusion object for printing progress percentage in a console window
      * by different threads
      */
     private Object mutexPixels = new Object();
@@ -73,9 +73,9 @@ class PixelManager {
     /**
      * Initialize pixel manager data for multi-threading
      *
-     * @param maxRows  the amount of pixel rows
-     * @param maxCols  the amount of pixel columns
-     * @param interval print time interval in seconds, 0 if printing is not
+     * @param maxRows  the number of pixel rows
+     * @param maxCols  the number of pixel columns
+     * @param interval print time interval in seconds, zero if printing is not
      *                 required
      */
     PixelManager(int maxRows, int maxCols, double interval) {
@@ -88,11 +88,11 @@ class PixelManager {
 
     /**
      * Function for thread-safe manipulating of main follow-up Pixel object - this
-     * function is critical section for all the threads, and the pixel manager data
+     * function is a critical section for all the threads, and the pixel manager data
      * is the shared data of this critical section.<br/>
-     * The function provides next available pixel number each call.
+     * The function provides the next available pixel number for each call.
      *
-     * @return true if next pixel is allocated, false if there are no more pixels
+     * @return True if the next pixel is allocated, False if there are no more pixels
      */
     Pixel nextPixel() {
         synchronized (mutexNext) {
@@ -119,7 +119,7 @@ class PixelManager {
         synchronized (mutexPixels) {
             ++pixels;
             if (print) {
-                percentage = (int) (1000l * pixels / totalPixels);
+                percentage = (int) (1000L * pixels / totalPixels);
                 if (percentage - lastPrinted >= printInterval) {
                     lastPrinted = percentage;
                     flag = true;

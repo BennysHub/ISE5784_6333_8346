@@ -11,7 +11,7 @@ import static primitives.Util.isZero;
 
 /**
  * Represents a plane in 3D space, defined by a point on the plane and a normal vector.
- * The plane is assumed to be infinite in extent.
+ * The plane is assumed to be infinite in an extent.
  *
  * @author Benny Avrahami
  */
@@ -71,7 +71,7 @@ public class Plane extends Geometry {
 
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
-        Point p0 = ray.getHead();
+        Point p0 = ray.getOrigin();
         if (planePoint.equals(p0)) return null;
 
         Vector dir = ray.getDirection();

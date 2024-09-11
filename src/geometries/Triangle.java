@@ -33,7 +33,7 @@ public class Triangle extends Polygon {
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
         // Extract relevant information from the input
         Vector rayDirection = ray.getDirection(); // Direction vector of the ray
-        Point rayOrigin = ray.getHead(); // Origin point of the ray
+        Point rayOrigin = ray.getOrigin(); // Origin point of the ray
         Point vertex0 = vertices.getFirst(); // First vertex of the triangle
 
         // Check if the ray direction is parallel to the triangle's plane

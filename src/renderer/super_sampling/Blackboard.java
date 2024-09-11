@@ -59,15 +59,15 @@ public final class Blackboard {
     /**
      * Constructs a list of rays distributed within a circular area.
      *
-     * @param BlackBoardPosition The position of the blackboard.
+     * @param blackBoardPosition The position of the blackboard.
      * @param p                  The target point.
      * @param n                  The normal vector at the target point.
      * @param radius             The radius of the circular area.
      * @param numOfRays          The number of rays to generate.
      * @return A list of rays directed from the target point towards points on the circular area.
      */
-    public static List<Ray> constructRays(Point BlackBoardPosition, Point p, Vector n, double radius, int numOfRays) {
-        List<Point> areaPoints = Blackboard.getPointsOnCircle(BlackBoardPosition.subtract(p).normalize(), BlackBoardPosition, radius, numOfRays);
+    public static List<Ray> constructRays(Point blackBoardPosition, Point p, Vector n, double radius, int numOfRays) {
+        List<Point> areaPoints = Blackboard.getPointsOnCircle(blackBoardPosition.subtract(p).normalize(), blackBoardPosition, radius, numOfRays);
         List<Ray> rays = new LinkedList<>();
         for (Point areaP : areaPoints) {
             rays.add(new Ray(p, areaP.subtract(p), n));
