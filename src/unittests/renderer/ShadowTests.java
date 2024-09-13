@@ -1,20 +1,17 @@
 package renderer;
 
 import geometries.Intersectable;
+import geometries.Plane;
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;
 import lighting.SpotLight;
 import org.junit.jupiter.api.Test;
-import primitives.Color;
-import primitives.Material;
-import primitives.Point;
-import primitives.Vector;
+import primitives.*;
 import scene.JsonSceneParser;
 import scene.Scene;
 
-import static java.awt.Color.BLUE;
-import static java.awt.Color.WHITE;
+import static java.awt.Color.*;
 
 /**
  * Testing basic shadows
@@ -171,13 +168,13 @@ public class ShadowTests {
 //
 
     /**
-     * test the turnaround rendering of complex scene
+     * test the turnaround rendering of a complex scene
      */
     @Test
     public void snowGlobe() {
         JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json");
         Scene scene = jsp.scene;
-
+        //scene.geometries.add(new Plane(new Point(0,40,0), new Vector(1,2,4)).setEmission(new Color(RED)));
         Camera.Builder camera = Camera.getBuilder()
                 .setLocation(new Point(-75, 60, -90))
                 .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))

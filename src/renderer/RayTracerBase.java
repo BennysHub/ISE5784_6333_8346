@@ -11,7 +11,7 @@ import scene.Scene;
  */
 public abstract class RayTracerBase {
     /**
-     * The scene that contain all the elements for the render
+     * The scene that contains all the elements for the render
      */
     protected final Scene scene;
 

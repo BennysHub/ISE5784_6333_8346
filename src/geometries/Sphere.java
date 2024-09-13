@@ -29,12 +29,20 @@ public class Sphere extends RadialGeometry {
     public Sphere(double radius, Point center) {
         super(radius);
         this.center = center;
+        calculateAABB();
     }
 
     @Override
     public Vector getNormal(Point spherePoint) {
         // The normal to the sphere at a given point is the vector from the center to the point.
         return spherePoint.subtract(center).normalize();
+    }
+
+    @Override
+    void calculateAABB() {
+        Point min = new Point(center.getX() - radius, center.getY() - radius, center.getZ() - radius);
+        Point max = new Point(center.getX() + radius, center.getY() + radius, center.getZ() + radius);
+        aabb = new AABB(min, max);
     }
 
     @Override

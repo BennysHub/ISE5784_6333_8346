@@ -27,7 +27,27 @@ public class Triangle extends Polygon {
     public Triangle(Point p1, Point p2, Point p3) {
         // Call the constructor of the superclass Polygon with exactly three points
         super(p1, p2, p3);
+        calculateAABB();
     }
+
+    @Override
+    void calculateAABB() {
+        Point p1 = vertices.getFirst();
+        Point p2 = vertices.get(1);
+        Point p3 = vertices.get(2);
+        double minX = Math.min(p1.getX(), Math.min(p2.getX(), p3.getX()));
+        double minY = Math.min(p1.getY(), Math.min(p2.getY(), p3.getY()));
+        double minZ = Math.min(p1.getZ(), Math.min(p2.getZ(), p3.getZ()));
+
+        double maxX = Math.max(p1.getX(), Math.max(p2.getX(), p3.getX()));
+        double maxY = Math.max(p1.getY(), Math.max(p2.getY(), p3.getY()));
+        double maxZ = Math.max(p1.getZ(), Math.max(p2.getZ(), p3.getZ()));
+
+        Point min = new Point(minX, minY, minZ);
+        Point max = new Point(maxX, maxY, maxZ);
+        aabb = new AABB(min, max);
+    }
+
 
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {

@@ -20,28 +20,6 @@ public class AABB {
         this.max = max;
     }
 
-    // AABB for Sphere
-    public static AABB fromSphere(Point center, double radius) {
-        Point min = new Point(center.getX() - radius, center.getY() - radius, center.getZ() - radius);
-        Point max = new Point(center.getX() + radius, center.getY() + radius, center.getZ() + radius);
-        return new AABB(min, max);
-    }
-
-    // AABB for Triangle
-    public static AABB fromTriangle(Point p1, Point p2, Point p3) {
-        double minX = Math.min(p1.getX(), Math.min(p2.getX(), p3.getX()));
-        double minY = Math.min(p1.getY(), Math.min(p2.getY(), p3.getY()));
-        double minZ = Math.min(p1.getZ(), Math.min(p2.getZ(), p3.getZ()));
-
-        double maxX = Math.max(p1.getX(), Math.max(p2.getX(), p3.getX()));
-        double maxY = Math.max(p1.getY(), Math.max(p2.getY(), p3.getY()));
-        double maxZ = Math.max(p1.getZ(), Math.max(p2.getZ(), p3.getZ()));
-
-        Point min = new Point(minX, minY, minZ);
-        Point max = new Point(maxX, maxY, maxZ);
-        return new AABB(min, max);
-    }
-
     // Expands the AABB to include a given point
     public void expand(Point point) {
         min = new Point(Math.min(min.getX(), point.getX()), Math.min(min.getY(), point.getY()), Math.min(min.getZ(), point.getZ()));
@@ -77,12 +55,20 @@ public class AABB {
     }
 
     // Returns the center of the bounding box (useful for BVH splitting)
-    public Point getCenter() {
-        return new Point(
-                (min.getX() + max.getX()) / 2,
-                (min.getY() + max.getY()) / 2,
-                (min.getZ() + max.getZ()) / 2
-        );
+//    public Point getCenter() {
+//        return new Point(
+//                (min.getX() + max.getX()) / 2,
+//                (min.getY() + max.getY()) / 2,
+//                (min.getZ() + max.getZ()) / 2
+//        );
+//    }
+
+    // Returns the center of the bounding box (useful for BVH splitting)
+    public double[] getCenter() {
+        double centerX = (min.getX() + max.getX()) / 2;
+        double centerY =  (min.getY() + max.getY()) / 2;
+        double centerZ =(min.getZ() + max.getZ()) / 2;
+        return new double[]{centerX, centerY, centerZ};
     }
 
     // Getters for the min and max points

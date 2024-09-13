@@ -11,6 +11,11 @@ import java.util.List;
  */
 public abstract class Intersectable {
 
+    protected AABB aabb;
+    abstract void calculateAABB();
+
+
+
     /**
      * Finds the intersection points of a given ray with this geometric shape.
      *
@@ -35,15 +40,6 @@ public abstract class Intersectable {
         return findIntersections(ray, Double.POSITIVE_INFINITY);
     }
 
-    /**
-     * Finds the geometric intersection points of a given ray with this geometric shape.
-     * This method must be implemented by subclasses.
-     *
-     * @param ray         the ray to intersect with this geometric shape
-     * @param maxDistance the maximum distance within which to search for intersections
-     * @return a list of geometric intersection points, or null if there are no intersections
-     */
-    protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance);
 
     /**
      * Finds the geometric intersection points of a given ray with this geometric shape.
@@ -67,6 +63,16 @@ public abstract class Intersectable {
     public final List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
         return findGeoIntersectionsHelper(ray, maxDistance);
     }
+
+    /**
+     * Finds the geometric intersection points of a given ray with this geometric shape.
+     * This method must be implemented by subclasses.
+     *
+     * @param ray         the ray to intersect with this geometric shape
+     * @param maxDistance the maximum distance within which to search for intersections
+     * @return a list of geometric intersection points, or null if there are no intersections
+     */
+    protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance);
 
     /**
      * A class representing a geometric point of intersection.

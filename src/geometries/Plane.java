@@ -42,6 +42,7 @@ public class Plane extends Geometry {
         Vector vector3 = vector1.crossProduct(vector2);
         planePoint = p1;
         planeNormalizedVector = vector3.normalize();
+        calculateAABB();
     }
 
     /**
@@ -53,6 +54,7 @@ public class Plane extends Geometry {
     public Plane(Point planePoint, Vector planeNormalVector) {
         this.planePoint = planePoint;
         this.planeNormalizedVector = planeNormalVector.normalize();
+        calculateAABB();
     }
 
     /**
@@ -67,6 +69,11 @@ public class Plane extends Geometry {
     @Override
     public Vector getNormal(Point planePoint) {
         return getNormal(); // The normal is the same everywhere on an infinite plane.
+    }
+
+    @Override
+    void calculateAABB() {
+        aabb = new AABB();
     }
 
     @Override

@@ -45,7 +45,7 @@ public class JsonSceneParser {
             if (!jsonObject.has("scene"))
                 throw new IOException("no scene element found in the file");
             JsonObject sceneJson = jsonObject.getAsJsonObject("scene");
-            // Create scene
+            // Create a scene
             scene = new Scene(filePath);
 
             // Parse background color
@@ -85,7 +85,7 @@ public class JsonSceneParser {
     /**
      * Parses a Double3 from a string in the format "D D D".
      *
-     * @param doubleString the json string
+     * @param doubleString the JSON string
      * @return the parsed Double3 object
      */
     private Double3 parseDouble3(String doubleString) {

@@ -23,13 +23,13 @@ class SphereTest {
 
     /**
      * Test method for {@link geometries.Sphere#getNormal(primitives.Point)}.
-     * Verifies that the normal at a given point on the sphere is calculated correctly.
+     * Verifies that the normal at a given point in the sphere is calculated correctly.
      */
     @Test
     void getNormal() {
         // ============ Equivalence Partitions Tests ==============
 
-        // TC01: Normal at a point on the sphere with center at (1,0,0) and radius 1
+        // TC01: Normal at a point on the sphere with a center at (1,0,0) and radius 1
         assertEquals(new Vector(-1, 0, 0), sphere.getNormal(Point.ZERO),
                 "The normal to the sphere at point (0,0,0) should be (1,0,0)");
     }
@@ -74,13 +74,13 @@ class SphereTest {
 
         // Boundary Values Tests (Ray's line crosses the sphere but not the center)
 
-        // TC11: Ray starts at sphere and goes inside (1 point)
+        // TC11: Ray starts at a sphere and goes inside (1 point)
         List<Point> startAtSphereInside = sphere.findIntersections(new Ray(new Point(1, 0, -1), v001));
         assert startAtSphereInside != null;
         assertEquals(1, startAtSphereInside.size(), "Incorrect number of intersection points");
         assertEquals(new Point(1, 0, 1), startAtSphereInside.getFirst(), "Ray should start at the sphere and go inside");
 
-        // TC12: Ray starts at sphere and goes outside (0 points)
+        // TC12: Ray starts at a sphere and goes outside (0 points)
         assertNull(sphere.findIntersections(new Ray(Point.ZERO, new Vector(-1, -2, 0))), "Ray should start at the sphere and go outside");
 
         // **** Group: Ray's line goes through the center
@@ -92,7 +92,7 @@ class SphereTest {
         assertEquals(Point.ZERO, throughCenterBefore.get(0), "Ray should go through the center before the sphere");
         assertEquals(new Point(2, 0, 0), throughCenterBefore.get(1), "Ray should go through the center before the sphere");
 
-        // TC14: Ray starts at sphere and goes inside (1 point)
+        // TC14: Ray starts at a sphere and goes inside (1 point)
         List<Point> throughCenterInside = sphere.findIntersections(new Ray(Point.ZERO, v100));
         assert throughCenterInside != null;
         assertEquals(1, throughCenterInside.size(), "Incorrect number of intersection points");
@@ -110,10 +110,10 @@ class SphereTest {
         assertEquals(1, startAtCenter.size(), "Incorrect number of intersection points");
         assertEquals(new Point(1, 0, 1), startAtCenter.getFirst(), "Ray should start at the center");
 
-        // TC17: Ray starts at sphere and goes outside (0 points)
+        // TC17: Ray starts at a sphere and goes outside (0 points)
         assertNull(sphere.findIntersections(new Ray(Point.ZERO, v100.scale(-1))), "Ray should start at the sphere and go outside");
 
-        // TC18: Ray starts after sphere (0 points)
+        // TC18: Ray starts after a sphere (0 points)
         assertNull(sphere.findIntersections(new Ray(p01, v100.scale(-1))), "Ray should start after the sphere");
 
         // **** Group: Ray's line is tangent to the sphere (all tests 0 points)

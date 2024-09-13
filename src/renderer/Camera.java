@@ -1,5 +1,6 @@
 package renderer;
 
+import geometries.Geometries;
 import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
@@ -308,6 +309,17 @@ public class Camera implements Cloneable {
         }
 
         /**
+         * Enables or disables BVH in the render.
+         *
+         * @param flag a boolean indicating whether BVH should be enabled (true) or disabled (false).
+         * @return the current Builder object for chaining method calls.
+         */
+        public Builder setBVH(Boolean flag) {
+            RenderSettings.BVHIsEnabled = flag;
+            return this;
+        }
+
+        /**
          * Sets the RayTracer for the camera. If soft shadows are enabled, a {@code SoftShadowsRayTracer} is used.
          *
          * @param rayTracer the RayTracer to be set.
@@ -352,6 +364,8 @@ public class Camera implements Cloneable {
 
             if (camera.rayTracerBase == null)
                 throw new MissingResourceException("Missing camera rayTracerBase", Camera.class.getName(), "rayTracerBase");
+            else
+                camera.rayTracerBase.scene.geometries.buildBVH(0);
 
             camera.center = camera.location.add(camera.to.scale(camera.vpDistance));
 

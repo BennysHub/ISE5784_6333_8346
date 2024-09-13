@@ -21,7 +21,11 @@ public class RenderSettings {
     /**
      * The number of threads to use. Set to 0 for no multithreading
      */
-    static int threadsCount = 0;
+    static int threadsCount = 16;
+    /**
+     * Indicates whether BVH is enabled.
+     */
+    static boolean BVHIsEnabled = false;
     /**
      * Indicates whether soft shadows are enabled.
      */
@@ -42,5 +46,10 @@ public class RenderSettings {
      * Indicates whether diffused glass effect is enabled.
      */
     static boolean DiffusedGlassEnabled = false;
+
+
+    public static boolean isBVHEnabled(){
+        return BVHIsEnabled;
+    }
 }
 
