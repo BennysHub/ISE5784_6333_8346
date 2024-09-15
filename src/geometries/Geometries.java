@@ -26,7 +26,7 @@ public class Geometries extends Intersectable {
      * Flag to choose the median-split method for BVH construction.
      * If {@code true}, the BVH will use the median-split method; otherwise, it will use the SAH method.
      */
-    private static final Boolean MEDIAN_METHOD = true;
+    private static final Boolean MEDIAN_METHOD = false;
     /**
      * Flag to enable or disable BVH traversal.
      * If {@code true}, BVH traversal will be used; otherwise, the default intersection method will be used.
@@ -99,6 +99,22 @@ public class Geometries extends Intersectable {
                     intersections = new LinkedList<>(geometryIntersections);
                 else
                     intersections.addAll(geometryIntersections);
+            }
+        }
+        return intersections;
+    }
+
+    private List<GeoPoint> allGeometriesIntersectionWithBoundaryRegion(Ray ray, double maxDistance) {
+        List<GeoPoint> intersections = null;
+        for (Intersectable intersectable : geometries) {
+            if (intersectable.aabb.rayIntersects(ray)){
+                var geometryIntersections = intersectable.findGeoIntersections(ray, maxDistance);
+                if (geometryIntersections != null) {
+                    if (intersections == null)
+                        intersections = new LinkedList<>(geometryIntersections);
+                    else
+                        intersections.addAll(geometryIntersections);
+                }
             }
         }
         return intersections;

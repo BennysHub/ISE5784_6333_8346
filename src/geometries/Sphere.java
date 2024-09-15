@@ -3,6 +3,7 @@ package geometries;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
+import renderer.RenderSettings;
 
 import java.util.List;
 
@@ -29,7 +30,8 @@ public class Sphere extends RadialGeometry {
     public Sphere(double radius, Point center) {
         super(radius);
         this.center = center;
-        calculateAABB();
+        if (RenderSettings.isBVHEnabled())
+            calculateAABB();
     }
 
     @Override

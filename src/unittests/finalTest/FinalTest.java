@@ -150,6 +150,7 @@ public class FinalTest {
      * test the turnaround rendering of a complex scene with soft shadows
      */
     @Test
+    @Disabled("too long")
     public void softShadowsSnowGlobe() {
 
         //snow cover

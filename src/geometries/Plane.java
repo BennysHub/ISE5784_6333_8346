@@ -3,6 +3,7 @@ package geometries;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
+import renderer.RenderSettings;
 
 import java.util.List;
 
@@ -54,7 +55,8 @@ public class Plane extends Geometry {
     public Plane(Point planePoint, Vector planeNormalVector) {
         this.planePoint = planePoint;
         this.planeNormalizedVector = planeNormalVector.normalize();
-        calculateAABB();
+        if (RenderSettings.isBVHEnabled())
+            calculateAABB();
     }
 
     /**
