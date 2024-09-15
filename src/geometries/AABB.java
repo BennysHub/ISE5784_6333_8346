@@ -48,8 +48,10 @@ public class AABB {
      */
     public AABB(Collection<Intersectable> intersectables) {
         this();
-        for (Intersectable intersectable : intersectables)
+        for (Intersectable intersectable : intersectables) {
+            intersectable.calculateAABB();
             this.merge(intersectable.aabb);
+        }
     }
 
     /**
@@ -90,6 +92,7 @@ public class AABB {
      * @param other The other AABB to check for intersection.
      * @return {@code true} if the AABBs intersect, {@code false} otherwise.
      */
+    @SuppressWarnings("unused")
     public boolean intersects(AABB other) {
         return (this.max.getX() >= other.min.getX() && this.min.getX() <= other.max.getX()) &&
                 (this.max.getY() >= other.min.getY() && this.min.getY() <= other.max.getY()) &&
@@ -99,7 +102,7 @@ public class AABB {
     /**
      * Returns the center of the bounding box.
      *
-     * @return An array containing the x, y, and z coordinates of the center of the AABB.
+     * @return An array containing the x, y, and z coordinates of the AABB center.
      */
     public double[] getCenter() {
         double centerX = (min.getX() + max.getX()) / 2;
@@ -113,6 +116,7 @@ public class AABB {
      *
      * @return The minimum point of the AABB.
      */
+    @SuppressWarnings("unused")
     public Point getMin() {
         return min;
     }
@@ -122,6 +126,7 @@ public class AABB {
      *
      * @return The maximum point of the AABB.
      */
+    @SuppressWarnings("unused")
     public Point getMax() {
         return max;
     }
@@ -132,7 +137,7 @@ public class AABB {
      * @param ray The ray to check for intersection with the AABB.
      * @return {@code true} if the ray intersects the AABB, {@code false} otherwise.
      */
-    public boolean rayIntersects(Ray ray) {
+    public boolean intersects(Ray ray) {
         Point rayOrigin = ray.getOrigin();
         Point rayDir = ray.getDirection();
 
@@ -167,7 +172,6 @@ public class AABB {
             tZMin = tZMax;
             tZMax = temp;
         }
-
         return !((tMin > tZMax) || (tZMin > tMax));
     }
 

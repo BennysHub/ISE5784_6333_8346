@@ -21,11 +21,12 @@ public class RenderSettings {
     /**
      * The number of threads to use. Set to 0 for no multithreading
      */
-    static int threadsCount = 0;
+    static int threadsCount = 16;
     /**
      * Indicates whether BVH is enabled.
      */
-    static boolean BVHIsEnabled = false;
+    static boolean BVHIsEnabled = true;
+    static boolean CBRIsEnabled = true;
     /**
      * Indicates whether soft shadows are enabled.
      */

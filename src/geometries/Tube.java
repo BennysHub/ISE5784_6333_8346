@@ -57,11 +57,6 @@ public class Tube extends RadialGeometry {
     }
 
     @Override
-    void calculateAABB() {
-
-    }
-
-    @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
         return null;
     }

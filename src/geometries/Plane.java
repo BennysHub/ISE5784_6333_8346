@@ -3,7 +3,6 @@ package geometries;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
-import renderer.RenderSettings;
 
 import java.util.List;
 
@@ -43,7 +42,6 @@ public class Plane extends Geometry {
         Vector vector3 = vector1.crossProduct(vector2);
         planePoint = p1;
         planeNormalizedVector = vector3.normalize();
-        calculateAABB();
     }
 
     /**
@@ -55,8 +53,8 @@ public class Plane extends Geometry {
     public Plane(Point planePoint, Vector planeNormalVector) {
         this.planePoint = planePoint;
         this.planeNormalizedVector = planeNormalVector.normalize();
-        if (RenderSettings.isBVHEnabled())
-            calculateAABB();
+        //if (RenderSettings.isBVHEnabled())
+        //calculateAABBHelper();
     }
 
     /**
@@ -74,7 +72,7 @@ public class Plane extends Geometry {
     }
 
     @Override
-    void calculateAABB() {
+    protected void calculateAABBHelper() {
         aabb = new AABB();
     }
 

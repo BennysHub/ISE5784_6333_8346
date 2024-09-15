@@ -183,7 +183,7 @@ public class ShadowTests {
         JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json");
         Scene scene = jsp.scene;
 
-        //snow cover
+       // snow cover
         Vector down = new Vector(0, -1, 0);
         Material snow = new Material().setKd(1d).setKs(0.1);
         List<Point> cloud = Blackboard.getPointsOnCircle(
@@ -209,7 +209,7 @@ public class ShadowTests {
                 .setVpDistance(150)
                 .setVpSize(300, 300)
                 .setBVH(true)
-                .setSoftShadows(false)
+                //.setSoftShadows(false)
                 .setRayTracer(new SimpleRayTracer(scene));
 //        run once
         camera.setImageWriter(new ImageWriter("snowGlobe_simple", 600, 600))

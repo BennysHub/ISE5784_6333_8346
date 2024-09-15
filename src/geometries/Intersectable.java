@@ -18,8 +18,11 @@ public abstract class Intersectable {
     /**
      * build AABB for the Intersectable
      */
-    abstract void calculateAABB();
+    protected void calculateAABBHelper() {}
 
+    public void calculateAABB() {
+        if (aabb == null) calculateAABBHelper();
+    }
 
     /**
      * Finds the intersection points of a given ray with this geometric shape.
@@ -66,7 +69,7 @@ public abstract class Intersectable {
      * @return a list of geometric intersection points, or null if there are no intersections
      */
     public final List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
-        return findGeoIntersectionsHelper(ray, maxDistance);
+        return aabb != null && !aabb.intersects(ray) ? null : findGeoIntersectionsHelper(ray, maxDistance);
     }
 
     /**

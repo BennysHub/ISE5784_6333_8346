@@ -1,7 +1,6 @@
 package geometries;
 
 import primitives.Ray;
-import renderer.RenderSettings;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,12 +25,7 @@ public class Geometries extends Intersectable {
      * Flag to choose the median-split method for BVH construction.
      * If {@code true}, the BVH will use the median-split method; otherwise, it will use the SAH method.
      */
-    private static final Boolean MEDIAN_METHOD = false;
-    /**
-     * Flag to enable or disable BVH traversal.
-     * If {@code true}, BVH traversal will be used; otherwise, the default intersection method will be used.
-     */
-    private static final Boolean BVH_METHOD = false;
+    private static final Boolean MEDIAN_METHOD = true;
     /**
      * A list to hold geometric objects that implement the Intersectable interface.
      */
@@ -66,7 +60,7 @@ public class Geometries extends Intersectable {
      * This method should be called before performing BVH construction or ray intersections.
      */
     @Override
-    void calculateAABB() {
+    protected void calculateAABBHelper() {
         aabb = new AABB(geometries);
     }
 
@@ -80,17 +74,6 @@ public class Geometries extends Intersectable {
      */
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
-        return RenderSettings.isBVHEnabled() ? BVHIntersection(ray, maxDistance) : allGeometriesIntersection(ray, maxDistance);
-    }
-
-    /**
-     * Finds intersections by brute-force checking all geometries.
-     *
-     * @param ray         The ray to check for intersections.
-     * @param maxDistance The maximum distance for intersections.
-     * @return A list of GeoPoints where the ray intersects geometries within the maximum distance.
-     */
-    private List<GeoPoint> allGeometriesIntersection(Ray ray, double maxDistance) {
         List<GeoPoint> intersections = null;
         for (Intersectable intersectable : geometries) {
             var geometryIntersections = intersectable.findGeoIntersections(ray, maxDistance);
@@ -103,84 +86,6 @@ public class Geometries extends Intersectable {
         }
         return intersections;
     }
-
-    private List<GeoPoint> allGeometriesIntersectionWithBoundaryRegion(Ray ray, double maxDistance) {
-        List<GeoPoint> intersections = null;
-        for (Intersectable intersectable : geometries) {
-            if (intersectable.aabb.rayIntersects(ray)){
-                var geometryIntersections = intersectable.findGeoIntersections(ray, maxDistance);
-                if (geometryIntersections != null) {
-                    if (intersections == null)
-                        intersections = new LinkedList<>(geometryIntersections);
-                    else
-                        intersections.addAll(geometryIntersections);
-                }
-            }
-        }
-        return intersections;
-    }
-
-    /**
-     * BVH-based intersection, used when BVH is enabled.
-     *
-     * @param ray         The ray to intersect.
-     * @param maxDistance The maximum distance for intersections.
-     * @return A list of GeoPoints where the ray intersects geometries within the BVH.
-     */
-    private List<GeoPoint> BVHIntersection(Ray ray, double maxDistance) {
-        List<GeoPoint> intersections = new LinkedList<>();
-        BVHIntersectionHelper(ray, maxDistance, intersections);
-        return intersections;
-    }
-
-    /**
-     * Recursively traverses the BVH tree to find intersections.
-     *
-     * @param ray           The ray to intersect.
-     * @param maxDistance   The maximum distance for intersections.
-     * @param intersections A list to store the found intersections.
-     */
-    private void BVHIntersectionHelper(Ray ray, double maxDistance, List<GeoPoint> intersections) {
-        for (Intersectable intersectable : geometries) {
-            if (aabb.rayIntersects(ray)) {
-                if (intersectable instanceof Geometries other)
-                    other.BVHIntersectionHelper(ray, maxDistance, intersections);
-                else {
-                    var geometryIntersections = intersectable.findGeoIntersections(ray, maxDistance);
-                    if (geometryIntersections != null)
-                        intersections.addAll(geometryIntersections);
-                }
-            }
-        }
-    }
-//    private List<GeoPoint> BVHIntersectionHelper(Ray ray, double maxDistance) {
-//        // Stack to hold the nodes (Intersectables) to be processed
-//        LinkedList<Intersectable> nodesToVisit = new LinkedList<>();
-//        List<GeoPoint> intersections = new LinkedList<>();
-//        nodesToVisit.add(this); // Start with the root
-//
-//        while (!nodesToVisit.isEmpty()) {
-//            Intersectable node = nodesToVisit.poll(); // Get the next node to process
-//
-//            // Check if the node's AABB intersects the ray
-//            if (node.aabb.rayIntersects(ray)) {
-//                if (node instanceof Geometries geometriesNode) {
-//                    nodesToVisit.addAll(geometriesNode.geometries);
-//
-//                } else {
-//                    // If the node is a leaf (primitive), check for intersections
-//                    var geometryIntersections = node.findGeoIntersections(ray, maxDistance);
-//                    if (geometryIntersections != null) {
-////                        if (intersections == null)
-////                            intersections = new LinkedList<>(geometryIntersections);
-////                        else
-//                        intersections.addAll(geometryIntersections);
-//                    }
-//                }
-//            }
-//        }
-//        return intersections;
-//    }
 
     /**
      * Builds the BVH for the collection of geometries.
@@ -197,17 +102,17 @@ public class Geometries extends Intersectable {
      */
     private void recursiveBuildBVH(int depth) {
         if (geometries.size() <= MAX_PRIMITIVES_PER_LEAF) {
-            calculateAABB();
+            calculateAABBHelper();
             return;
         }
         Geometries left = new Geometries();
         Geometries right = new Geometries();
 
-        if (MEDIAN_METHOD) {
+        if (MEDIAN_METHOD)
             medianMethod(left.geometries, right.geometries, depth);
-        } else {
+        else
             SAHMethod(left.geometries, right.geometries);
-        }
+
         //geometries = List.of(left, right);
         geometries.clear(); // Clear current geometries and add sub-geometries.
         add(left, right);

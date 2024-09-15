@@ -3,7 +3,6 @@ package geometries;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
-import renderer.RenderSettings;
 
 import java.util.List;
 
@@ -28,12 +27,10 @@ public class Triangle extends Polygon {
     public Triangle(Point p1, Point p2, Point p3) {
         // Call the constructor of the superclass Polygon with exactly three points
         super(p1, p2, p3);
-        if (RenderSettings.isBVHEnabled())
-            calculateAABB();
     }
 
     @Override
-    void calculateAABB() {
+    protected void calculateAABBHelper() {
         Point p1 = vertices.getFirst();
         Point p2 = vertices.get(1);
         Point p3 = vertices.get(2);

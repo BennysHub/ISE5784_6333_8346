@@ -3,7 +3,6 @@ package geometries;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
-import renderer.RenderSettings;
 
 import java.util.List;
 
@@ -30,8 +29,8 @@ public class Sphere extends RadialGeometry {
     public Sphere(double radius, Point center) {
         super(radius);
         this.center = center;
-        if (RenderSettings.isBVHEnabled())
-            calculateAABB();
+        //if (RenderSettings.isBVHEnabled())
+        //calculateAABBHelper();
     }
 
     @Override
@@ -41,7 +40,7 @@ public class Sphere extends RadialGeometry {
     }
 
     @Override
-    void calculateAABB() {
+    protected void calculateAABBHelper() {
         Point min = new Point(center.getX() - radius, center.getY() - radius, center.getZ() - radius);
         Point max = new Point(center.getX() + radius, center.getY() + radius, center.getZ() + radius);
         aabb = new AABB(min, max);

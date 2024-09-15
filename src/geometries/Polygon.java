@@ -97,10 +97,6 @@ public class Polygon extends Geometry {
     }
 
     @Override
-    void calculateAABB() {
-    }
-
-    @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
         return null;
     }

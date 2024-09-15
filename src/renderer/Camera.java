@@ -314,7 +314,13 @@ public class Camera implements Cloneable {
          * @return the current Builder object for chaining method calls.
          */
         public Builder setBVH(Boolean flag) {
+            if (flag) setCBR(flag);
             RenderSettings.BVHIsEnabled = flag;
+            return this;
+        }
+
+        public Builder setCBR(Boolean flag) {
+            RenderSettings.CBRIsEnabled = flag;
             return this;
         }
 
@@ -364,10 +370,13 @@ public class Camera implements Cloneable {
             if (camera.rayTracerBase == null)
                 throw new MissingResourceException("Missing camera rayTracerBase", Camera.class.getName(), "rayTracerBase");
 
+            if (RenderSettings.CBRIsEnabled) {
+                camera.rayTracerBase.scene.geometries.calculateAABB();
+            }
+
             if (RenderSettings.BVHIsEnabled) {
                 camera.rayTracerBase.scene.geometries.buildBVH();
             }
-
 
             camera.center = camera.location.add(camera.to.scale(camera.vpDistance));
 
