@@ -174,13 +174,14 @@ public class ShadowTests {
     public void snowGlobe() {
         JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json");
         Scene scene = jsp.scene;
-        //scene.geometries.add(new Plane(new Point(0,40,0), new Vector(1,2,4)).setEmission(new Color(RED)));
+      //  scene.geometries.add(new Plane(new Point(0,40,0), new Vector(1,2,4)).setEmission(new Color(RED)));
         Camera.Builder camera = Camera.getBuilder()
                 .setLocation(new Point(-75, 60, -90))
                 .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
                 .setTarget(new Point(0, 30, 0))
                 .setVpDistance(150)
                 .setVpSize(300, 300)
+                .setBVH(true)
                 .setRayTracer(new SimpleRayTracer(scene));
 //        run once
         camera.setImageWriter(new ImageWriter("_snowGlobe", 600, 600))

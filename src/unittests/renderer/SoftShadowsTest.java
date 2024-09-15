@@ -38,7 +38,7 @@ public class SoftShadowsTest {
 
     private final Scene scene = new Scene("soft shadow");
 
-    private final LightSource pointLight = new PointLight(new Color(java.awt.Color.white), new Point(0, 0, 50))
+    private final LightSource pointLight = new SpotLight(new Color(java.awt.Color.white), new Point(0, 0, 50), new Vector(0,0,-1))
             .setKl(0.02).setSize(2).setKc(0);
 
     private final Geometry plane = new Plane(Point.ZERO, new Vector(0, 0, 1))

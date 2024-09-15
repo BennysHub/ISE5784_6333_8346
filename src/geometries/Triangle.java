@@ -65,11 +65,11 @@ public class Triangle extends Polygon {
         Point vertex1 = vertices.get(1);
         Point vertex2 = vertices.get(2);
 
-        // Compute edge vectors
+        // Compute-edge vectors
         Vector edge1 = vertex1.subtract(vertex0); // Edge from vertex0 to vertex1
         Vector edge2 = vertex2.subtract(vertex0); // Edge from vertex0 to vertex2
 
-        // Compute the cross product of ray direction and edge2
+        // Compute the cross-product of a ray direction and edge2
         Vector rayCrossEdge2 = rayDirection.crossProduct(edge2);
 
         // Calculate the determinant (used for inverse determinant later)

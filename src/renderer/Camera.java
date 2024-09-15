@@ -364,8 +364,11 @@ public class Camera implements Cloneable {
 
             if (camera.rayTracerBase == null)
                 throw new MissingResourceException("Missing camera rayTracerBase", Camera.class.getName(), "rayTracerBase");
-            else
-                camera.rayTracerBase.scene.geometries.buildBVH(0);
+
+            if (RenderSettings.BVHIsEnabled){
+                camera.rayTracerBase.scene.geometries.buildBVH();
+            }
+
 
             camera.center = camera.location.add(camera.to.scale(camera.vpDistance));
 

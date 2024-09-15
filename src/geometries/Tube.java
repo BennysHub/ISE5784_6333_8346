@@ -46,7 +46,7 @@ public class Tube extends RadialGeometry {
         // if projection is zero it means dir and pMinusP0 are orthogonal
         double projection = pMinusP0.dotProduct(dir);
 
-        //p1 as mention above (create a 90 degrees triangle between p, p0, p1)
+        //p1 as mention above (create a 90-degree triangle between p, p0, p1)
         //point p1 will be equal p0 if dir and pMinusP0 are orthogonal
         Point p1 = axis.getPoint(projection);
 

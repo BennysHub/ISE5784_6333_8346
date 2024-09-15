@@ -11,11 +11,11 @@
           "center": "0 40 0",
           "radius": "60",
           "material": {
-            "kD": 0,
-            "kS": 0.9,
+            "kD": 0.0,
+            "kS": 0.8,
             "kT": 0.9,
-            "kR": 0.2,
-            "shininess": 30
+            "kR": 0.17,
+            "shininess": 20
           }
         }
       ],

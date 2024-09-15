@@ -21,6 +21,9 @@ class CylinderTest {
         // Test case for the Cylinder class.
         var cylinder = new Cylinder(1, new Ray(Point.ZERO, new Vector(1, 0, 0)), 2);
 
+        double infinity = Double.POSITIVE_INFINITY;
+        System.out.println(Double.POSITIVE_INFINITY + Double.NEGATIVE_INFINITY);
+
         // ============ Equivalence Partitions Tests ==============
 
         // TC01: Normal on the curved surface of the cylinder.

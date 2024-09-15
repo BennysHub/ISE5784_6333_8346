@@ -21,7 +21,7 @@ public class RenderSettings {
     /**
      * The number of threads to use. Set to 0 for no multithreading
      */
-    static int threadsCount = 16;
+    static int threadsCount = 0;
     /**
      * Indicates whether BVH is enabled.
      */

@@ -98,7 +98,6 @@ public class Polygon extends Geometry {
 
     @Override
     void calculateAABB() {
-
     }
 
     @Override

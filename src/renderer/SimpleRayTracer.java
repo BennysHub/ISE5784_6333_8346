@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static primitives.Util.alignZero;
+import static primitives.Util.compareSign;
 
 /**
  * The SimpleRayTracer class extends the RayTracerBase and provides a simple implementation for ray tracing in a scene.
@@ -82,7 +83,7 @@ public class SimpleRayTracer extends RayTracerBase {
         for (LightSource lightSource : scene.lights) {
             Vector l = lightSource.getL(gp.point);
             double nl = alignZero(n.dotProduct(l));
-            if ((nl * nv > 0) || RenderSettings.softShadowsEnabled) { // sign(nl) == sign(nv)
+            if (compareSign(nl, nv) || RenderSettings.softShadowsEnabled) { // sign(nl) == sign(nv) both + or -
                 Double3 ktr = RenderSettings.softShadowsEnabled ?
                         softTransparency(gp, lightSource, l, n) : transparency(gp, lightSource, l, n);
                 if (!ktr.product(k).lowerThan(RenderSettings.MIN_CALC_COLOR_K)) {
