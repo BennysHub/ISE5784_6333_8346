@@ -48,7 +48,7 @@ public class RenderSettings {
     static boolean DiffusedGlassEnabled = false;
 
 
-    public static boolean isBVHEnabled(){
+    public static boolean isBVHEnabled() {
         return BVHIsEnabled;
     }
 }

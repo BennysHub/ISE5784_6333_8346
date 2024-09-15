@@ -37,7 +37,7 @@ public class Ray {
      * Constructs a new Ray with the specified starting point, direction, and normal.
      * Adjusts the starting point to avoid precision issues in geometric calculations.
      *
-     * @param origin      The starting point of the ray.
+     * @param origin    The starting point of the ray.
      * @param direction The direction vector of the ray. <b>Must be normalized</b>
      * @param normal    The normal vector at the starting point.
      */

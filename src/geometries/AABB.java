@@ -103,7 +103,7 @@ public class AABB {
      */
     public double[] getCenter() {
         double centerX = (min.getX() + max.getX()) / 2;
-        double centerY =  (min.getY() + max.getY()) / 2;
+        double centerY = (min.getY() + max.getY()) / 2;
         double centerZ = (min.getZ() + max.getZ()) / 2;
         return new double[]{centerX, centerY, centerZ};
     }

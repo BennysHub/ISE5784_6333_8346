@@ -15,31 +15,27 @@ import java.util.List;
 public class Geometries extends Intersectable {
 
     /**
-     * A list to hold geometric objects that implement the Intersectable interface.
-     */
-    private final List<Intersectable> geometries = new LinkedList<>();
-
-    /**
      * The cost of traversing a BVH node.
      */
     private static final double C_TRAVERSAL = 1;
-
     /**
      * The maximum number of primitives allowed in a leaf node of the BVH.
      */
     private static final double MAX_PRIMITIVES_PER_LEAF = 2;
-
     /**
      * Flag to choose the median-split method for BVH construction.
      * If {@code true}, the BVH will use the median-split method; otherwise, it will use the SAH method.
      */
     private static final Boolean MEDIAN_METHOD = false;
-
     /**
      * Flag to enable or disable BVH traversal.
      * If {@code true}, BVH traversal will be used; otherwise, the default intersection method will be used.
      */
     private static final Boolean BVH_METHOD = false;
+    /**
+     * A list to hold geometric objects that implement the Intersectable interface.
+     */
+    private final List<Intersectable> geometries = new LinkedList<>();
 
     /**
      * Default constructor to create an empty Geometries object.
@@ -78,7 +74,7 @@ public class Geometries extends Intersectable {
      * Finds all the intersections of a ray with the geometric objects in the collection.
      * Depending on the render settings, it uses either BVH traversal or a brute-force intersection check.
      *
-     * @param ray The ray to check intersections with.
+     * @param ray         The ray to check intersections with.
      * @param maxDistance The maximum distance for the intersection.
      * @return A list of GeoPoints where the ray intersects geometries within the maximum distance.
      */
@@ -90,7 +86,7 @@ public class Geometries extends Intersectable {
     /**
      * Finds intersections by brute-force checking all geometries.
      *
-     * @param ray The ray to check for intersections.
+     * @param ray         The ray to check for intersections.
      * @param maxDistance The maximum distance for intersections.
      * @return A list of GeoPoints where the ray intersects geometries within the maximum distance.
      */
@@ -111,12 +107,12 @@ public class Geometries extends Intersectable {
     /**
      * BVH-based intersection, used when BVH is enabled.
      *
-     * @param ray The ray to intersect.
+     * @param ray         The ray to intersect.
      * @param maxDistance The maximum distance for intersections.
      * @return A list of GeoPoints where the ray intersects geometries within the BVH.
      */
     private List<GeoPoint> BVHIntersection(Ray ray, double maxDistance) {
-        List<GeoPoint> intersections  = new LinkedList<>();
+        List<GeoPoint> intersections = new LinkedList<>();
         BVHIntersectionHelper(ray, maxDistance, intersections);
         return intersections;
     }
@@ -124,8 +120,8 @@ public class Geometries extends Intersectable {
     /**
      * Recursively traverses the BVH tree to find intersections.
      *
-     * @param ray The ray to intersect.
-     * @param maxDistance The maximum distance for intersections.
+     * @param ray           The ray to intersect.
+     * @param maxDistance   The maximum distance for intersections.
      * @param intersections A list to store the found intersections.
      */
     private void BVHIntersectionHelper(Ray ray, double maxDistance, List<GeoPoint> intersections) {
@@ -169,6 +165,7 @@ public class Geometries extends Intersectable {
 //        }
 //        return intersections;
 //    }
+
     /**
      * Builds the BVH for the collection of geometries.
      * This function organizes the geometries into a binary tree structure to optimize intersection queries.
@@ -207,9 +204,9 @@ public class Geometries extends Intersectable {
     /**
      * Splits the list of geometries into two sublist.
      *
-     * @param leftList The list to store the left sub-geometries.
+     * @param leftList  The list to store the left sub-geometries.
      * @param rightList The list to store the right sub-geometries.
-     * @param index The index at which to split the list.
+     * @param index     The index at which to split the list.
      */
     private void split(List<Intersectable> leftList, List<Intersectable> rightList, int index) {
         leftList.addAll(geometries.subList(0, index));
@@ -228,9 +225,9 @@ public class Geometries extends Intersectable {
     /**
      * Splits geometries based on the median method, where the geometries are sorted by their center along a given axis.
      *
-     * @param leftList The list to store the left sub-geometries.
+     * @param leftList  The list to store the left sub-geometries.
      * @param rightList The list to store the right sub-geometries.
-     * @param depth The current depth of the BVH tree, used to choose the split axis.
+     * @param depth     The current depth of the BVH tree, used to choose the split axis.
      */
     private void medianMethod(List<Intersectable> leftList, List<Intersectable> rightList, int depth) {
         sortByAxis(depth % 3);
@@ -241,7 +238,7 @@ public class Geometries extends Intersectable {
     /**
      * Splits geometries based on the Surface Area Heuristic (SAH) method, which minimizes the cost of the split.
      *
-     * @param leftList The list to store the left sub-geometries.
+     * @param leftList  The list to store the left sub-geometries.
      * @param rightList The list to store the right sub-geometries.
      */
     private void SAHSMethod(List<Intersectable> leftList, List<Intersectable> rightList) {
@@ -269,9 +266,9 @@ public class Geometries extends Intersectable {
     /**
      * Computes the Surface Area Heuristic (SAH) cost for a split.
      *
-     * @param leftBBox The bounding box of the left sub-geometries.
-     * @param rightBBox The bounding box of the right sub-geometries.
-     * @param leftCount The number of geometries in the left sublist.
+     * @param leftBBox   The bounding box of the left sub-geometries.
+     * @param rightBBox  The bounding box of the right sub-geometries.
+     * @param leftCount  The number of geometries in the left sublist.
      * @param rightCount The number of geometries in the right sublist.
      * @return The cost of the split based on the SAH formula.
      */

@@ -1,6 +1,5 @@
 package renderer;
 
-import geometries.Geometries;
 import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
@@ -365,7 +364,7 @@ public class Camera implements Cloneable {
             if (camera.rayTracerBase == null)
                 throw new MissingResourceException("Missing camera rayTracerBase", Camera.class.getName(), "rayTracerBase");
 
-            if (RenderSettings.BVHIsEnabled){
+            if (RenderSettings.BVHIsEnabled) {
                 camera.rayTracerBase.scene.geometries.buildBVH();
             }
 

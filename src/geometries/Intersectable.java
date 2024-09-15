@@ -12,8 +12,8 @@ import java.util.List;
 public abstract class Intersectable {
 
     protected AABB aabb;
-    abstract void calculateAABB();
 
+    abstract void calculateAABB();
 
 
     /**

@@ -11,12 +11,9 @@ package renderer;
  */
 class PixelManager {
     /**
-     * Immutable class for object containing allocated pixel (with its row and
-     * column numbers)
+     * Printing format
      */
-    record Pixel(int col, int row) {
-    }
-
+    private static final String PRINT_FORMAT = "%5.1f%%\r";
     /**
      * Maximum rows of pixels
      */
@@ -56,10 +53,6 @@ class PixelManager {
      */
     private long printInterval = 100L;
     /**
-     * Printing format
-     */
-    private static final String PRINT_FORMAT = "%5.1f%%\r";
-    /**
      * Mutual exclusion object for synchronizing next pixel allocation between
      * threads
      */
@@ -69,7 +62,6 @@ class PixelManager {
      * by different threads
      */
     private Object mutexPixels = new Object();
-
     /**
      * Initialize pixel manager data for multi-threading
      *
@@ -127,5 +119,12 @@ class PixelManager {
             }
             if (flag) System.out.printf(PRINT_FORMAT, percentage / 10d);
         }
+    }
+
+    /**
+     * Immutable class for object containing allocated pixel (with its row and
+     * column numbers)
+     */
+    record Pixel(int col, int row) {
     }
 }
