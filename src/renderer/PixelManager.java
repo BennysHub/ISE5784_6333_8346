@@ -62,6 +62,7 @@ class PixelManager {
      * by different threads
      */
     private Object mutexPixels = new Object();
+
     /**
      * Initialize pixel manager data for multi-threading
      *
@@ -122,8 +123,10 @@ class PixelManager {
     }
 
     /**
-     * Immutable class for object containing allocated pixel (with its row and
-     * column numbers)
+     * Immutable class for object containing allocated pixel
+     *
+     * @param col for the x of the pixel
+     * @param row for the y of the pixel
      */
     record Pixel(int col, int row) {
     }

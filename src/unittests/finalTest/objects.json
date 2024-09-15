@@ -1,0 +1,73 @@
+{
+  "scene": {
+    "background-color": "250 172 0",
+    "ambient-light": {
+      "description": "optional, contain 'color' and Double3 'Ka'",
+      "color": "173 216 230",
+      "kA": 0.25
+    },
+    "lights": {
+      "pointLight": [
+        {
+          "intensity": "255 255 255",
+          "position": "0 40 0"
+        }
+      ],
+      "directionalLight": [
+        {
+          "intensity": "255 255 255",
+          "direction": "1 -1 0"
+        }
+      ]
+    },
+    "geometries": {
+      "description": {
+        "d1": "all geometries can have a emission and a material, both optional",
+        "emission (Color)": "0 127 255",
+        "material(all fields are optional)": {
+          "kD (Double3)": 0.2,
+          "kS (Double3)": "0.8",
+          "kT (Double3)": "0.9 0.1 0",
+          "kR (Double3)": "must be greater than 0",
+          "shininess (int)": 30
+        }
+      },
+      "triangle": [
+      ],
+      "sphere": [
+      ],
+      "mesh": [
+        {
+          "path": "src/unittests/finalTest/minip3.stl",
+          "offset": "0 0 0.1",
+          "scale": 15,
+          "material": {
+            "kD": "0.541 0.31 0.094",
+            "kS": "0.1",
+            "shininess": 30
+          }
+        },
+        {
+          "path": "src/unittests/finalTest/trees.stl",
+          "offset": "0 0 0.1",
+          "scale": 15,
+          "material": {
+            "kD": "0.2 0.9 0",
+            "kS": "0.2",
+            "shininess": 30
+          }
+        },
+        {
+          "path": "src/unittests/finalTest/houses.stl",
+          "offset": "0.1 0 0",
+          "scale": 15,
+          "material": {
+            "kD": "0.839 0.745 0.659",
+            "kS": "0.2",
+            "shininess": 30
+          }
+        }
+      ]
+    }
+  }
+}

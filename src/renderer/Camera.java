@@ -36,7 +36,7 @@ public class Camera implements Cloneable {
      * <ul>
      * <li>multi-threading</li>
      * <li>debug print of progress percentage in Console window/tab</li>
-     * <ul>
+     * </ul>
      */
     private PixelManager pixelManager;
 

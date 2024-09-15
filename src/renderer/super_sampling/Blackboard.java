@@ -25,7 +25,7 @@ public final class Blackboard {
      * @return a list of points distributed within the circle. If the radius is non-positive, a list containing only the center is returned.
      * @throws IllegalArgumentException if the normal vector is invalid.
      */
-    private static List<Point> getPointsOnCircle(Vector normal, Point center, double radius, int numOfPoints) {
+    public static List<Point> getPointsOnCircle(Vector normal, Point center, double radius, int numOfPoints) {
         if (alignZero(radius) <= 0)
             return List.of(center);
 

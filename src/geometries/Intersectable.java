@@ -10,9 +10,14 @@ import java.util.List;
  * Implementing classes will provide the logic to find intersection points.
  */
 public abstract class Intersectable {
-
+    /**
+     * Axis-Aligned Bounding Box for BVH
+     */
     protected AABB aabb;
 
+    /**
+     * build AABB for the Intersectable
+     */
     abstract void calculateAABB();
 
 
@@ -25,7 +30,7 @@ public abstract class Intersectable {
      */
     public final List<Point> findIntersections(Ray ray, double maxDistance) {
         List<GeoPoint> geoList = findGeoIntersections(ray, maxDistance);
-        return geoList == null ? null
+        return (geoList == null || geoList.isEmpty()) ? null
                 : geoList.stream().map(gp -> gp.point).toList();
     }
 

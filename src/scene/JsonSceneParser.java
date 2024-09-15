@@ -196,6 +196,8 @@ public class JsonSceneParser {
                 Point position = parsePoint(spotLightJson.get("position").getAsString());
                 Vector direction = parseVector(spotLightJson.get("direction").getAsString());
                 SpotLight spotLight = new SpotLight(intensity, position, direction);
+                if (spotLightJson.has("size"))
+                    spotLight.setSize(spotLightJson.get("size").getAsInt());
                 if (spotLightJson.has("narrowBeam"))
                     spotLight.setNarrowBeam(spotLightJson.get("narrowBeam").getAsInt());
                 scene.lights.add(spotLight);
@@ -210,6 +212,8 @@ public class JsonSceneParser {
                 Color intensity = parseColor(pointLightJson.get("intensity").getAsString());
                 Point position = parsePoint(pointLightJson.get("position").getAsString());
                 PointLight pointLight = new PointLight(intensity, position);
+                if (pointLightJson.has("size"))
+                    pointLight.setSize(pointLightJson.get("size").getAsInt());
                 scene.lights.add(pointLight);
             }
         }
@@ -358,15 +362,20 @@ public class JsonSceneParser {
                         Point p0 = offset == null ? vertices.get(0) : vertices.get(0).add(offset);
                         Point p1 = offset == null ? vertices.get(1) : vertices.get(1).add(offset);
                         Point p2 = offset == null ? vertices.get(2) : vertices.get(2).add(offset);
-                        Triangle triangle = new Triangle(p0, p1, p2);
 
-                        if (emissionColor != null) {
-                            triangle.setEmission(emissionColor);
+                        try {
+                            Triangle triangle = new Triangle(p0, p1, p2);
+
+                            if (emissionColor != null) {
+                                triangle.setEmission(emissionColor);
+                            }
+                            if (material != null) {
+                                triangle.setMaterial(material);
+                            }
+                            scene.geometries.add(triangle);
+                        } catch (IllegalArgumentException e) {
+                            continue;
                         }
-                        if (material != null) {
-                            triangle.setMaterial(material);
-                        }
-                        scene.geometries.add(triangle);
                         vertices.clear();
                     }
                 }

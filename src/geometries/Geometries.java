@@ -26,7 +26,7 @@ public class Geometries extends Intersectable {
      * Flag to choose the median-split method for BVH construction.
      * If {@code true}, the BVH will use the median-split method; otherwise, it will use the SAH method.
      */
-    private static final Boolean MEDIAN_METHOD = false;
+    private static final Boolean MEDIAN_METHOD = true;
     /**
      * Flag to enable or disable BVH traversal.
      * If {@code true}, BVH traversal will be used; otherwise, the default intersection method will be used.
@@ -190,7 +190,7 @@ public class Geometries extends Intersectable {
         if (MEDIAN_METHOD) {
             medianMethod(left.geometries, right.geometries, depth);
         } else {
-            SAHSMethod(left.geometries, right.geometries);
+            SAHMethod(left.geometries, right.geometries);
         }
         //geometries = List.of(left, right);
         geometries.clear(); // Clear current geometries and add sub-geometries.
@@ -241,7 +241,7 @@ public class Geometries extends Intersectable {
      * @param leftList  The list to store the left sub-geometries.
      * @param rightList The list to store the right sub-geometries.
      */
-    private void SAHSMethod(List<Intersectable> leftList, List<Intersectable> rightList) {
+    private void SAHMethod(List<Intersectable> leftList, List<Intersectable> rightList) {
         double bestCost = Double.MAX_VALUE;
         int bestSplitIndex = 0;
         int bestSortingAxis = 0;

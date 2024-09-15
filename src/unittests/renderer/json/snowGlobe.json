@@ -6,24 +6,10 @@
       "kA": 0
     },
     "geometries": {
-      "sphere": [
-        {
-          "center": "0 40 0",
-          "radius": "60",
-          "material": {
-            "kD": 0.0,
-            "kS": 0.8,
-            "kT": 0.9,
-            "kR": 0.17,
-            "shininess": 20
-          }
-        }
-      ],
       "mesh": [
         {
           "path": "src/unittests/renderer/snowGlobeStl/snowGlobeBase.stl",
           "scale": 10,
-          "no-emission": "0 216 230",
           "material": {
             "kD": "0.271 0.184 0.027",
             "kS": 0.1,
@@ -35,7 +21,7 @@
           "scale": 10,
           "no-emission": "0 216 230",
           "material": {
-            "kD": "0.961 0.945 0.925",
+            "kD": "0.831 0.729 0.639",
             "kS": 0.1,
             "shininess": 15
           }
@@ -51,6 +37,7 @@
           }
         },
         {
+          "path-nh": "src/unittests/renderer/snowGlobeStl/heavyTreeTop.stl",
           "path": "src/unittests/renderer/snowGlobeStl/snowGlobeTreeTop.stl",
           "scale": 10,
           "no-emission": "0 216 230",
@@ -75,8 +62,9 @@
     "lights": {
       "PointLight": [
         {
-          "intensity": "255 255 255 4",
-          "position": "-28.5 27 -3"
+          "intensity": "255 255 255 3",
+          "position": "-28.5 27 -3",
+          "size": 2
         },
         {
           "intensity": "255 255 255 1",
@@ -85,7 +73,7 @@
       ],
       "directionalLight": [
         {
-          "intensity": "255 255 255 2",
+          "intensity": "255 255 255 1",
           "direction": "-1 -1 0"
         }
       ]

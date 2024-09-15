@@ -52,7 +52,8 @@ public class SoftShadowsTest {
             .setRayTracer(new SimpleRayTracer(scene))
             .setLocation(new Point(0, 0, 1000))
             .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
-            .setVpSize(150, 150).setVpDistance(1000);
+            .setVpSize(150, 150).setVpDistance(1000)
+            .setBVH(false);
 
     /**
      * Tests the basic soft shadow rendering.

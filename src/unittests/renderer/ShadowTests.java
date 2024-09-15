@@ -1,20 +1,24 @@
 package renderer;
 
 import geometries.Intersectable;
+import geometries.Plane;
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;
+import lighting.DirectionalLight;
+import lighting.PointLight;
 import lighting.SpotLight;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import primitives.Color;
-import primitives.Material;
-import primitives.Point;
-import primitives.Vector;
+import primitives.*;
+import renderer.super_sampling.Blackboard;
 import scene.JsonSceneParser;
 import scene.Scene;
 
-import static java.awt.Color.BLUE;
-import static java.awt.Color.WHITE;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import static java.awt.Color.*;
 
 /**
  * Testing basic shadows
@@ -145,30 +149,31 @@ public class ShadowTests {
                 .writeToImage();
     }
 
-//    /**
-//     * test the rendering from json file that contain a path to a stl file
-//     */
-//    @Test
-//    public void stlShadow() {
-//        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/stlJson.json");
-//        Scene scene = jsp.scene;
-//
-//        scene.lights.add(new PointLight(new Color(255, 255, 255).reduce(2), new Point(20, 15, 300)));
-//        scene.lights.add(new DirectionalLight(new Color(255, 255, 255).reduce(2), new Vector(-0.3, -0.3, 0)));
-//        scene.lights.add(new SpotLight(new Color(YELLOW), new Point(0, 100, 0), new Vector(0, -1, 0)).setNarrowBeam(3));
-//
-//        Camera.Builder camera = Camera.getBuilder()
-//                .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
-//                .setLocation(new Point(0, 220, 1000)).setVpDistance(1000)
-//                .setVpSize(200, 200)
-//                .setRayTracer(new SimpleRayTracer(scene));
-//
-//        camera.setImageWriter(new ImageWriter("stlTurnaround/stlShadow", 600, 600))
-//                .build()
-//                .renderImage()
-//                .writeToImage();
-//    }
-//
+    /**
+     * test the rendering from json file that contain a path to a stl file
+     */
+    @Test
+    @Disabled("take a lot of time")
+    public void stlShadow() {
+        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/stlJson.json");
+        Scene scene = jsp.scene;
+
+        scene.lights.add(new PointLight(new Color(255, 255, 255).reduce(2), new Point(20, 15, 300)));
+        scene.lights.add(new DirectionalLight(new Color(255, 255, 255).reduce(2), new Vector(-0.3, -0.3, 0)));
+        scene.lights.add(new SpotLight(new Color(YELLOW), new Point(0, 100, 0), new Vector(0, -1, 0)).setNarrowBeam(3));
+
+        Camera.Builder camera = Camera.getBuilder()
+                .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
+                .setLocation(new Point(0, 220, 1000)).setVpDistance(1000)
+                .setVpSize(200, 200)
+                .setRayTracer(new SimpleRayTracer(scene));
+
+        camera.setImageWriter(new ImageWriter("stlTurnaround/stlShadow", 600, 600))
+                .build()
+                .renderImage()
+                .writeToImage();
+    }
+
 
     /**
      * test the turnaround rendering of a complex scene
@@ -177,7 +182,26 @@ public class ShadowTests {
     public void snowGlobe() {
         JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json");
         Scene scene = jsp.scene;
-        //  scene.geometries.add(new Plane(new Point(0,40,0), new Vector(1,2,4)).setEmission(new Color(RED)));
+
+        //snow cover
+        Vector down = new Vector(0, -1, 0);
+        Material snow = new Material().setKd(1d).setKs(0.1);
+        List<Point> cloud = Blackboard.getPointsOnCircle(
+                down, new Point(0, 100, 0), 50, 10000);
+        for (Point p : cloud) {
+            try {
+                Ray r = new Ray(p, down);
+                Intersectable.GeoPoint s = r.findClosestGeoPoint(scene.geometries.findGeoIntersections(r));
+                scene.geometries.add(new Sphere(0.5, s.point).setMaterial(snow));
+            } catch (NoSuchElementException e) {
+                continue;
+            }
+        }
+        //glass cover
+        scene.geometries.add(
+                new Sphere(60, new Point(0, 40, 0))
+                        .setMaterial(new Material().setKd(0d).setKs(0.9).setKt(0.9).setKr(0.2).setShininess(30)));
+
         Camera.Builder camera = Camera.getBuilder()
                 .setLocation(new Point(-75, 60, -90))
                 .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
@@ -185,9 +209,10 @@ public class ShadowTests {
                 .setVpDistance(150)
                 .setVpSize(300, 300)
                 .setBVH(true)
+                .setSoftShadows(false)
                 .setRayTracer(new SimpleRayTracer(scene));
 //        run once
-        camera.setImageWriter(new ImageWriter("_snowGlobe", 600, 600))
+        camera.setImageWriter(new ImageWriter("snowGlobe_simple", 600, 600))
                 .build()
                 .renderImage()
                 .writeToImage();
