@@ -103,8 +103,9 @@ public class SoftShadowsTest {
     void underTheHorizon() {
         Material ground = new Material().setKd(KD3).setKs(KS3).setShininess(SHININESS);
         scene.geometries.add(
-                new Triangle(new Point(15, 0, 15), new Point(-15, 0, -15), new Point(-15, 0, 15)).setMaterial(ground),
-                new Triangle(new Point(15, 0, 15), new Point(-15, 0, -15), new Point(15, 0, -15)).setMaterial(ground),
+//                new Triangle(new Point(15, 0, 15), new Point(-15, 0, -15), new Point(-15, 0, 15)).setMaterial(ground),
+//                new Triangle(new Point(15, 0, 15), new Point(-15, 0, -15), new Point(15, 0, -15)).setMaterial(ground),
+                new Plane(new Point(15, 0, 15), new Point(-15, 0, -15), new Point(-15, 0, 15)).setMaterial(ground),
                 new Sphere(3, new Point(0, 1, 0)).setMaterial(new Material().setKd(new Double3(0.8, 0.263, 0.145)).setKs(0.1).setShininess(15))
         );
 
@@ -118,9 +119,10 @@ public class SoftShadowsTest {
                 .setRayTracer(new SimpleRayTracer(scene))
                 .setLocation(new Point(-1, 6, -1))
                 .setTarget(Point.ZERO)
+                .setMultiThreading(16)
                 .setVpSize(150, 150).setVpDistance(30);
 
-        camera2.setImageWriter(new ImageWriter("underTheHorizonTest", 1440, 1440))
+        camera2.setImageWriter(new ImageWriter("underTheHorizon", 2560, 2560))
                 .build()
                 .renderImage()
                 .writeToImage();

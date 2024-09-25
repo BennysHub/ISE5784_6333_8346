@@ -31,7 +31,7 @@ public class DirectionalLight extends Light implements LightSource {
     }
 
     @Override
-    public Vector getL(Point p) {
+    public Vector getL(Point p, Vector normal) {
         return direction;
     }
 

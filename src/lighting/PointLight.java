@@ -8,6 +8,9 @@ import renderer.super_sampling.Blackboard;
 
 import java.util.List;
 
+import static primitives.Util.alignZero;
+import static primitives.Util.compareSign;
+
 /**
  * Class representing a point light source in a 3D scene.
  * A point light has a position and its intensity decreases with distance.
@@ -109,8 +112,10 @@ public class PointLight extends Light implements LightSource {
     }
 
     @Override
-    public Vector getL(Point p) {
-        return p.subtract(position).normalize();
+    public Vector getL(Point p, Vector n) {//original return p.subtract(position).normalize();
+        Point point = position.add(n.scale(size));
+        return  p.subtract(point).normalize();
+
     }
 
     @Override
@@ -120,6 +125,6 @@ public class PointLight extends Light implements LightSource {
 
     @Override
     public double getDistance(Point point) {
-        return point.distance(position);
+        return point.distance(position) - size;
     }
 }

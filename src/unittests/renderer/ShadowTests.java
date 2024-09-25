@@ -1,7 +1,7 @@
 package renderer;
 
 import geometries.Intersectable;
-import geometries.Plane;
+
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;
@@ -36,7 +36,7 @@ public class ShadowTests {
     private final Camera.Builder camera = Camera.getBuilder()
             .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
             .setLocation(new Point(0, 0, 1000)).setVpDistance(1000)
-            .setVpSize(200, 200)
+            .setVpSize(162, 288)
             .setSoftShadows(false)
             .setRayTracer(new SimpleRayTracer(scene));
 
@@ -63,7 +63,7 @@ public class ShadowTests {
         scene.lights.add(
                 new SpotLight(new Color(400, 240, 0), spotLocation, new Vector(1, 1, -3))
                         .setKl(1E-5).setKq(1.5E-7).setSize(2));
-        camera.setImageWriter(new ImageWriter(pictName, 1080, 1080))
+        camera.setImageWriter(new ImageWriter(pictName, 1920, 1080))
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -153,7 +153,7 @@ public class ShadowTests {
      * test the rendering from json file that contain a path to a stl file
      */
     @Test
-    @Disabled("take a lot of time")
+    @Disabled("not good")
     public void stlShadow() {
         JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/stlJson.json");
         Scene scene = jsp.scene;
@@ -172,69 +172,5 @@ public class ShadowTests {
                 .build()
                 .renderImage()
                 .writeToImage();
-    }
-
-
-    /**
-     * test the turnaround rendering of a complex scene
-     */
-    @Test
-    public void snowGlobe() {
-        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json");
-        Scene scene = jsp.scene;
-
-       // snow cover
-        Vector down = new Vector(0, -1, 0);
-        Material snow = new Material().setKd(1d).setKs(0.1);
-        List<Point> cloud = Blackboard.getPointsOnCircle(
-                down, new Point(0, 100, 0), 50, 10000);
-        for (Point p : cloud) {
-            try {
-                Ray r = new Ray(p, down);
-                Intersectable.GeoPoint s = r.findClosestGeoPoint(scene.geometries.findGeoIntersections(r));
-                scene.geometries.add(new Sphere(0.5, s.point).setMaterial(snow));
-            } catch (NoSuchElementException e) {
-                continue;
-            }
-        }
-        //glass cover
-        scene.geometries.add(
-                new Sphere(60, new Point(0, 40, 0))
-                        .setMaterial(new Material().setKd(0d).setKs(0.9).setKt(0.9).setKr(0.2).setShininess(30)));
-
-        Camera.Builder camera = Camera.getBuilder()
-                .setLocation(new Point(-75, 60, -90))
-                .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
-                .setTarget(new Point(0, 30, 0))
-                .setVpDistance(150)
-                .setVpSize(300, 300)
-                .setBVH(true)
-                //.setSoftShadows(false)
-                .setRayTracer(new SimpleRayTracer(scene));
-//        run once
-        camera.setImageWriter(new ImageWriter("snowGlobe_simple", 600, 600))
-                .build()
-                .renderImage()
-                .writeToImage();
-
-//      set steps to more than 0 to use this test
-//        Point center = new Point(0, 30, 0); // Center of the circular path
-//        double radius = 35; // Radius of the circular path
-//        int steps = 0; // Number of steps for one complete revolution
-//        double angleStep = Math.PI / (steps / 2d);// / steps ;
-//
-//        for (int i = 0; i < steps; i++) {
-//            double angle = i * angleStep;
-//
-//            // Update the point's position
-//            double x = center.getX() + radius * Math.cos(angle);
-//            double z = center.getZ() + radius * Math.sin(angle);
-//            camera.setLocation(new Point(x * 3, 60, z * 3)).setTarget(center);
-//
-//            camera.setImageWriter(new ImageWriter("snowGlobe/turnaround_" + i, 600, 600))
-//                    .build()
-//                    .renderImage()
-//                    .writeToImage();
-//            System.out.println("frame - " + i);
     }
 }

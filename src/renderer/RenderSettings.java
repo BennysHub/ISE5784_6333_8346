@@ -9,7 +9,7 @@ public class RenderSettings {
     /**
      * The maximum recursion level for color calculations.
      */
-    static final int MAX_CALC_COLOR_LEVEL = 10;
+    static final int MAX_CALC_COLOR_LEVEL = 5;
     /**
      * The minimum value for the reflection/refraction coefficient in color calculations.
      */
@@ -17,16 +17,17 @@ public class RenderSettings {
     /**
      * The number of sample rays used for shadow calculations.
      */
-    static final int SHADOW_RAYS_SAMPLE_COUNT = 169;
+    static final int SHADOW_RAYS_SAMPLE_COUNT = 100;
     /**
      * The number of threads to use. Set to 0 for no multithreading
      */
-    static int threadsCount = 16;
+    static int threadsCount = 0;
     /**
      * Indicates whether BVH is enabled.
      */
-    static boolean BVHIsEnabled = true;
-    static boolean CBRIsEnabled = true;
+    static boolean BVHIsEnabled = false;
+    static boolean SAHIsEnabled = false;
+    static boolean CBRIsEnabled = false;
     /**
      * Indicates whether soft shadows are enabled.
      */
@@ -56,5 +57,6 @@ public class RenderSettings {
     public static boolean isBVHEnabled() {
         return BVHIsEnabled;
     }
+    public static boolean isSAHIsEnabled(){return BVHIsEnabled; }
 }
 

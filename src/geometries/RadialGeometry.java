@@ -1,5 +1,7 @@
 package geometries;
 
+import primitives.Vector;
+
 /**
  * An abstract class for geometric objects that have a radial dimension.
  * This class serves as a base for all geometries that are defined by a radius.
@@ -24,6 +26,11 @@ public abstract class RadialGeometry extends Geometry {
     public RadialGeometry(double radius) {
         this.radius = radius;
         this.radiusSquared = radius * radius;
+    }
+
+    @Override
+    protected Intersectable duplicateObjectHelper(Vector vector){
+        return null;
     }
 
 }

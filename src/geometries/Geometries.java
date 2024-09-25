@@ -1,11 +1,10 @@
 package geometries;
 
+import primitives.Point;
 import primitives.Ray;
+import primitives.Vector;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents a collection of geometric objects that can be intersected by a ray.
@@ -13,65 +12,41 @@ import java.util.List;
  */
 public class Geometries extends Intersectable {
 
-    /**
-     * The cost of traversing a BVH node.
-     */
-    private static final double C_TRAVERSAL = 1;
-    /**
-     * The maximum number of primitives allowed in a leaf node of the BVH.
-     */
-    private static final double MAX_PRIMITIVES_PER_LEAF = 2;
-    /**
-     * Flag to choose the median-split method for BVH construction.
-     * If {@code true}, the BVH will use the median-split method; otherwise, it will use the SAH method.
-     */
-    private static final Boolean MEDIAN_METHOD = true;
-    /**
-     * A list to hold geometric objects that implement the Intersectable interface.
-     */
-    private final List<Intersectable> geometries = new LinkedList<>();
 
-    /**
-     * Default constructor to create an empty Geometries object.
-     */
+    private static final double MAX_PRIMITIVES_PER_LEAF = 1;
+
+
+    private List<Intersectable> geometries;
+
+
     public Geometries() {
     }
 
-    /**
-     * Constructor to create a Geometries object with an initial set of geometric objects.
-     *
-     * @param geometries Varargs of geometric objects that implement the Intersectable interface.
-     */
+
     public Geometries(Intersectable... geometries) {
         add(geometries);
     }
 
-    /**
-     * Adds geometric objects to the collection.
-     *
-     * @param geometries Varargs of geometric objects that implement the Intersectable interface.
-     */
+
     public void add(Intersectable... geometries) {
+        if (this.geometries == null)
+            this.geometries = new ArrayList<>();
         Collections.addAll(this.geometries, geometries);
     }
 
-    /**
-     * Calculates the axis-aligned bounding box (AABB) for the set of geometries.
-     * This method should be called before performing BVH construction or ray intersections.
-     */
+    public void add(Geometries geometries){
+        if (this.geometries == null)
+            this.geometries = new ArrayList<>();
+        this.geometries.addAll(geometries.geometries);
+    }
+
+
     @Override
     protected void calculateAABBHelper() {
         aabb = new AABB(geometries);
     }
 
-    /**
-     * Finds all the intersections of a ray with the geometric objects in the collection.
-     * Depending on the render settings, it uses either BVH traversal or a brute-force intersection check.
-     *
-     * @param ray         The ray to check intersections with.
-     * @param maxDistance The maximum distance for the intersection.
-     * @return A list of GeoPoints where the ray intersects geometries within the maximum distance.
-     */
+
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
         List<GeoPoint> intersections = null;
@@ -87,91 +62,44 @@ public class Geometries extends Intersectable {
         return intersections;
     }
 
-    /**
-     * Builds the BVH for the collection of geometries.
-     * This function organizes the geometries into a binary tree structure to optimize intersection queries.
-     */
-    public void buildBVH() {
-        recursiveBuildBVH(0);
+    @Override
+    protected Intersectable duplicateObjectHelper(Vector vector) {
+        Geometries duplicate = new Geometries();
+        for (Intersectable intersectable : geometries)
+            duplicate.add(intersectable.duplicateObject(vector));
+        return duplicate;
     }
 
-    /**
-     * Recursively builds the BVH tree by splitting the geometries based on the specified method.
-     *
-     * @param depth The current depth of recursion, used for alternating between split axes.
-     */
-    private void recursiveBuildBVH(int depth) {
-        if (geometries.size() <= MAX_PRIMITIVES_PER_LEAF) {
-            calculateAABBHelper();
+
+    private void buildBVHUsingSAH(List<Intersectable> geometries, int listSize) {
+        if (listSize <= MAX_PRIMITIVES_PER_LEAF) {
+            this.geometries = geometries;
+            calculateAABB();
             return;
         }
+
+
+      int bestSplitIndex = findBestSplitAndSort(geometries, listSize);
+
         Geometries left = new Geometries();
         Geometries right = new Geometries();
 
-        if (MEDIAN_METHOD)
-            medianMethod(left.geometries, right.geometries, depth);
-        else
-            SAHMethod(left.geometries, right.geometries);
-
-        //geometries = List.of(left, right);
-        geometries.clear(); // Clear current geometries and add sub-geometries.
-        add(left, right);
-        left.recursiveBuildBVH(depth + 1);
-        right.recursiveBuildBVH(depth + 1);
-        aabb = new AABB(left.aabb);
-        aabb.merge(right.aabb);
+        left.buildBVHUsingSAH(geometries.subList(0, bestSplitIndex), bestSplitIndex);
+        right.buildBVHUsingSAH(geometries.subList(bestSplitIndex, listSize), listSize - bestSplitIndex);
+        this.geometries = List.of(left, right);
+        aabb = new AABB(left.aabb, right.aabb);
     }
 
-    /**
-     * Splits the list of geometries into two sublist.
-     *
-     * @param leftList  The list to store the left sub-geometries.
-     * @param rightList The list to store the right sub-geometries.
-     * @param index     The index at which to split the list.
-     */
-    private void split(List<Intersectable> leftList, List<Intersectable> rightList, int index) {
-        leftList.addAll(geometries.subList(0, index));
-        rightList.addAll(geometries.subList(index, geometries.size()));
-    }
-
-    /**
-     * Sorts the geometries by their center along a given axis.
-     *
-     * @param axis The axis along which to sort (0 = X, 1 = Y, 2 = Z).
-     */
-    private void sortByAxis(int axis) {
-        geometries.sort(Comparator.comparingDouble(a -> a.aabb.getCenter()[axis]));
-    }
-
-    /**
-     * Splits geometries based on the median method, where the geometries are sorted by their center along a given axis.
-     *
-     * @param leftList  The list to store the left sub-geometries.
-     * @param rightList The list to store the right sub-geometries.
-     * @param depth     The current depth of the BVH tree, used to choose the split axis.
-     */
-    private void medianMethod(List<Intersectable> leftList, List<Intersectable> rightList, int depth) {
-        sortByAxis(depth % 3);
-        split(leftList, rightList, geometries.size() / 2);
-    }
-
-
-    /**
-     * Splits geometries based on the Surface Area Heuristic (SAH) method, which minimizes the cost of the split.
-     *
-     * @param leftList  The list to store the left sub-geometries.
-     * @param rightList The list to store the right sub-geometries.
-     */
-    private void SAHMethod(List<Intersectable> leftList, List<Intersectable> rightList) {
+    int findBestSplitAndSort(List<Intersectable> geometries, int listSize){
         double bestCost = Double.MAX_VALUE;
         int bestSplitIndex = 0;
         int bestSortingAxis = 0;
         for (int axis = 0; axis < 3; axis++) {
-            sortByAxis(axis);
-            for (int index = 0; index < geometries.size(); index++) {
+            sortByAxis(geometries, axis);
+            for (int index = 0; index < listSize; index++) {
                 AABB leftBoundingBox = new AABB(geometries.subList(0, index));
-                AABB rightBoundingBox = new AABB(geometries.subList(index, geometries.size()));
-                double cost = computeSAHCost(leftBoundingBox, rightBoundingBox, index, geometries.size() - index);
+                AABB rightBoundingBox = new AABB(geometries.subList(index, listSize));
+                double cost = simpleCost(leftBoundingBox, rightBoundingBox, index, listSize - index);
                 if (cost < bestCost) {
                     bestCost = cost;
                     bestSplitIndex = index;
@@ -180,25 +108,51 @@ public class Geometries extends Intersectable {
             }
         }
         if (bestSortingAxis != 2)
-            sortByAxis(bestSortingAxis);
-        split(leftList, rightList, bestSplitIndex);
+            sortByAxis(geometries, bestSortingAxis);
+        return bestSplitIndex;
     }
 
-    /**
-     * Computes the Surface Area Heuristic (SAH) cost for a split.
-     *
-     * @param leftBBox   The bounding box of the left sub-geometries.
-     * @param rightBBox  The bounding box of the right sub-geometries.
-     * @param leftCount  The number of geometries in the left sublist.
-     * @param rightCount The number of geometries in the right sublist.
-     * @return The cost of the split based on the SAH formula.
-     */
-    private double computeSAHCost(AABB leftBBox, AABB rightBBox, int leftCount, int rightCount) {
-        AABB parentBBox = new AABB(leftBBox);
-        parentBBox.merge(rightBBox);
-        double parentArea = parentBBox.surfaceArea();
+
+    private void buildBVHUsingMedianSplit(int depth, int listSize, int medianIndex, List<Intersectable> geometries) {
+        // Base case: If the list size is small enough, treat this node as a leaf node
+        if (listSize <= MAX_PRIMITIVES_PER_LEAF) {
+            this.geometries = geometries;  // Capture the primitives in this node
+            calculateAABB();  // Calculate the bounding box
+            return;
+        }
+
+        sortByAxis(geometries, depth);
+
+        // Initialize child nodes
+        Geometries left = new Geometries();
+        Geometries right = new Geometries();
+
+        // Recursively build left and right BVH using portions of the list
+        left.buildBVHUsingMedianSplit(depth + 1, medianIndex, medianIndex / 2, geometries.subList(0, medianIndex));
+        right.buildBVHUsingMedianSplit(depth + 1, listSize - medianIndex, (listSize - medianIndex) / 2, geometries.subList(medianIndex, listSize));
+
+        // Store the children nodes in this geometry
+        this.geometries = List.of(left, right);
+
+        // Merge the bounding boxes from left and right child nodes
+        aabb = new AABB(left.aabb, right.aabb);
+    }
+
+
+
+    private void sortByAxis(List<Intersectable> geometries, int axis) {
+        geometries.sort(Comparator.comparingDouble(a -> a.aabb.getCenter()[axis%3]));
+    }
+
+    private double simpleCost(AABB leftBBox, AABB rightBBox, int leftCount, int rightCount) {
         double leftArea = leftBBox.surfaceArea();
         double rightArea = rightBBox.surfaceArea();
-        return C_TRAVERSAL + (leftArea / parentArea) * leftCount + (rightArea / parentArea) * rightCount;
+        return (leftArea) * leftCount + (rightArea) * rightCount;
     }
+
+    public void buildBVH() {
+      // buildBVHUsingSAH(geometries, geometries.size());
+       buildBVHUsingMedianSplit(0, geometries.size(), geometries.size() / 2, geometries);
+    }
+
 }

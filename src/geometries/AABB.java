@@ -11,6 +11,11 @@ import java.util.Collection;
 public class AABB {
     private Point min;
     private Point max;
+    /**
+     * the first Geometry center is only updated in the AABB(Point min, Point max) constructor after marge or
+     */
+    private double[] center;
+    private boolean isCenterValid = false;
 
     /**
      * Default constructor to initialize an empty AABB with maximum possible values.
@@ -29,17 +34,22 @@ public class AABB {
     public AABB(Point min, Point max) {
         this.min = min;
         this.max = max;
+        center = getCenter();
+        isCenterValid = true;
     }
 
     /**
      * Copy constructor to initialize a new AABB as a copy of another AABB.
      *
-     * @param other The AABB to copy.
+     * @param other1 The AABB to copy.
      */
-    public AABB(AABB other) {
-        this.min = other.min;
-        this.max = other.max;
+    public AABB(AABB other1, AABB other2) {
+        this.min = other1.min;
+        this.max = other1.max;
+        this.merge(other2);
     }
+
+
 
     /**
      * Constructor to initialize an AABB that encompasses all intersectables in the given collection.
@@ -62,6 +72,7 @@ public class AABB {
     public void expand(Point point) {
         min = new Point(Math.min(min.getX(), point.getX()), Math.min(min.getY(), point.getY()), Math.min(min.getZ(), point.getZ()));
         max = new Point(Math.max(max.getX(), point.getX()), Math.max(max.getY(), point.getY()), Math.max(max.getZ(), point.getZ()));
+        //center = getCenter();
     }
 
     /**
@@ -105,6 +116,8 @@ public class AABB {
      * @return An array containing the x, y, and z coordinates of the AABB center.
      */
     public double[] getCenter() {
+        if (isCenterValid)
+            return center;//can improve if after update center again/
         double centerX = (min.getX() + max.getX()) / 2;
         double centerY = (min.getY() + max.getY()) / 2;
         double centerZ = (min.getZ() + max.getZ()) / 2;

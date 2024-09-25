@@ -29,6 +29,12 @@ public class Triangle extends Polygon {
         super(p1, p2, p3);
     }
 
+
+    @Override
+    protected Intersectable duplicateObjectHelper(Vector vector){
+        return new Triangle(vertices.getFirst().add(vector), vertices.get(1).add(vector), vertices.get(2).add(vector)).setMaterial(this.getMaterial()).setEmission(this.getEmission());
+    }
+
     @Override
     protected void calculateAABBHelper() {
         Point p1 = vertices.getFirst();

@@ -37,7 +37,6 @@
           }
         },
         {
-          "path-nh": "src/unittests/renderer/snowGlobeStl/heavyTreeTop.stl",
           "path": "src/unittests/renderer/snowGlobeStl/snowGlobeTreeTop.stl",
           "scale": 10,
           "no-emission": "0 216 230",

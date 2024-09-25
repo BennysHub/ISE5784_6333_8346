@@ -7,6 +7,7 @@ import primitives.Vector;
 import java.util.List;
 
 import static primitives.Util.alignZero;
+import static primitives.Util.random;
 
 /**
  * Represents a sphere in 3D space, defined by its center point and radius.
@@ -29,8 +30,6 @@ public class Sphere extends RadialGeometry {
     public Sphere(double radius, Point center) {
         super(radius);
         this.center = center;
-        //if (RenderSettings.isBVHEnabled())
-        //calculateAABBHelper();
     }
 
     @Override
@@ -85,5 +84,10 @@ public class Sphere extends RadialGeometry {
                     : List.of(new GeoPoint(this, p2));
         else
             return t1 > 0 ? List.of(new GeoPoint(this, ray.getPoint(t1))) : null;
+    }
+
+    @Override
+    protected Intersectable duplicateObjectHelper(Vector vector) {
+        return new Sphere(radius, center.add(vector)).setMaterial(this.getMaterial()).setEmission(this.getEmission());
     }
 }

@@ -67,6 +67,11 @@ public class Plane extends Geometry {
     }
 
     @Override
+    protected Intersectable duplicateObjectHelper(Vector vector){
+        return new Plane(planePoint.add(vector), planeNormalizedVector).setMaterial(this.getMaterial()).setEmission(this.getEmission());
+    }
+
+    @Override
     public Vector getNormal(Point planePoint) {
         return getNormal(); // The normal is the same everywhere on an infinite plane.
     }

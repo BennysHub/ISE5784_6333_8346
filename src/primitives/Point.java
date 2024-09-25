@@ -5,7 +5,7 @@ package primitives;
  *
  * @author Benny Avrahami
  */
-public class Point {
+public class  Point {
     /**
      * A constant representing the origin point (0,0,0).
      */

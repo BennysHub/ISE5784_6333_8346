@@ -2,6 +2,7 @@ package geometries;
 
 import primitives.Point;
 import primitives.Ray;
+import primitives.Vector;
 
 import java.util.List;
 
@@ -57,7 +58,7 @@ public abstract class Intersectable {
      * @return a list of geometric intersection points, or null if there are no intersections
      */
     public final List<GeoPoint> findGeoIntersections(Ray ray) {
-        return findGeoIntersectionsHelper(ray, Double.POSITIVE_INFINITY);
+        return findGeoIntersections(ray, Double.POSITIVE_INFINITY);
     }
 
     /**
@@ -81,6 +82,24 @@ public abstract class Intersectable {
      * @return a list of geometric intersection points, or null if there are no intersections
      */
     protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance);
+
+
+
+    public Intersectable duplicateObject(Vector vector){
+        return duplicateObjectHelper(vector);
+    }
+
+    protected abstract Intersectable duplicateObjectHelper(Vector vector);
+
+
+
+
+
+
+
+
+
+
 
     /**
      * A class representing a geometric point of intersection.
@@ -106,6 +125,10 @@ public abstract class Intersectable {
             this.geometry = geometry;
             this.point = point;
         }
+
+
+
+
 
         @Override
         public String toString() {

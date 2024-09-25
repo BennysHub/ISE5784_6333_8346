@@ -27,7 +27,7 @@ public interface LightSource {
      * @param p the point at which the vector is to be calculated
      * @return the vector from the light source to the given point
      */
-    Vector getL(Point p);
+    Vector getL(Point p, Vector normal);
 
     /**
      * Generates a beam of rays from the given point and normal.

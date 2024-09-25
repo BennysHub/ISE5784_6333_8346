@@ -4,7 +4,10 @@ import geometries.Intersectable;
 import geometries.Sphere;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import primitives.*;
+import primitives.Material;
+import primitives.Point;
+import primitives.Ray;
+import primitives.Vector;
 import renderer.Camera;
 import renderer.ImageWriter;
 import renderer.SimpleRayTracer;
@@ -13,55 +16,15 @@ import scene.JsonSceneParser;
 import scene.Scene;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 
 public class FinalTest {
-    int SNOW_AMOUNT = 10000;
+    int SNOW_AMOUNT = 100000;// 400000;
+    private static int SNOW_GLOBE_FRAMES = 1;
 
     JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json");
     Scene scene = jsp.scene;
 
-
-    /**
-     * test the turnaround rendering of a complex scene
-     */
-    @Test
-    public void simpleSnowGlobe() {
-        //snow cover
-        Vector down = new Vector(0, -1, 0);
-        Material snow = new Material().setKd(1d).setKs(0.1);
-        List<Point> cloud = Blackboard.getPointsOnCircle(
-                down, new Point(0, 100, 0), 50, 0);
-        for (Point p : cloud) {
-            try {
-                Ray r = new Ray(p, down);
-                Intersectable.GeoPoint s = r.findClosestGeoPoint(scene.geometries.findGeoIntersections(r));
-                scene.geometries.add(new Sphere(0.5, s.point).setMaterial(snow));
-            } catch (NoSuchElementException e) {
-                continue;
-            }
-        }
-        //glass cover
-        scene.geometries.add(
-                new Sphere(60, new Point(0, 40, 0))
-                        .setMaterial(new Material().setKd(0d).setKs(0.9).setKt(0.9).setKr(0.2).setShininess(30)));
-
-        Camera.Builder camera = Camera.getBuilder()
-                .setLocation(new Point(-75, 60, -90))
-                .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
-                .setTarget(new Point(0, 30, 0))
-                .setVpDistance(150)
-                .setVpSize(300, 300)
-                .setBVH(false)
-                .setSoftShadows(false)
-                .setRayTracer(new SimpleRayTracer(scene));
-
-        camera.setImageWriter(new ImageWriter("snowGlobe_simple", 600, 600))
-                .build()
-                .renderImage()
-                .writeToImage();
-    }
 
     /**
      * test the turnaround rendering of a complex scene with BVH and soft shadows
@@ -74,14 +37,11 @@ public class FinalTest {
         Material snow = new Material().setKd(1d).setKs(0.1);
         List<Point> cloud = Blackboard.getPointsOnCircle(
                 down, new Point(0, 100, 0), 50, SNOW_AMOUNT);
+
         for (Point p : cloud) {
-            try {
-                Ray r = new Ray(p, down);
-                Intersectable.GeoPoint s = r.findClosestGeoPoint(scene.geometries.findGeoIntersections(r));
-                scene.geometries.add(new Sphere(0.5, s.point).setMaterial(snow));
-            } catch (NoSuchElementException e) {
-                continue;
-            }
+            Ray r = new Ray(p, down);
+            Intersectable.GeoPoint s = r.findClosestGeoPoint(scene.geometries.findGeoIntersections(r));
+            scene.geometries.add(new Sphere(0.2, s.point).setMaterial(snow));
         }
         //glass cover
         scene.geometries.add(
@@ -93,100 +53,41 @@ public class FinalTest {
                 .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
                 .setTarget(new Point(0, 30, 0))
                 .setVpDistance(150)
-                .setVpSize(300, 300);
+                .setVpSize(300, 300)
 
+                //.setMultiThreading(8)
+                //.setSoftShadows(true)
+                .setRayTracer(new SimpleRayTracer(scene))
+                .setBVH(true)
+                .setImageWriter(new ImageWriter("snowGlobe_both", 600, 600));
 
-        camera.setBVH(true)
-                .setSoftShadows(true)
-                .setRayTracer(new SimpleRayTracer(scene));
-        camera.setImageWriter(new ImageWriter("snowGlobe_both", 600, 600))
-                .build()
+        camera.build()
                 .renderImage()
                 .writeToImage();
-    }
 
-    /**
-     * test the turnaround rendering of a complex scene with BVH
-     */
-    @Test
-    public void BVHSnowGlobe() {
+        //set steps to more than 0 to use this test
+        if (SNOW_GLOBE_FRAMES == 0) return;
+        Point center = new Point(0, 30, 0); // Center of the circular path
+        double radius = 35; // Radius of the circular path
+        int steps = SNOW_GLOBE_FRAMES; // Number of steps for one complete revolution
+        double angleStep = Math.PI / (steps / 2d);// / steps ;
 
-        //snow cover
-        Vector down = new Vector(0, -1, 0);
-        Material snow = new Material().setKd(1d).setKs(0.1);
-        List<Point> cloud = Blackboard.getPointsOnCircle(
-                down, new Point(0, 100, 0), 50, SNOW_AMOUNT);
-        for (Point p : cloud) {
-            try {
-                Ray r = new Ray(p, down);
-                Intersectable.GeoPoint s = r.findClosestGeoPoint(scene.geometries.findGeoIntersections(r));
-                scene.geometries.add(new Sphere(0.5, s.point).setMaterial(snow));
-            } catch (NoSuchElementException e) {
-                continue;
-            }
+        for (int i = 0; i < steps; i++) {
+            double angle = i * angleStep;
+
+            // Update the point's position
+            double x = center.getX() + radius * Math.cos(angle);
+            double z = center.getZ() + radius * Math.sin(angle);
+            camera.setLocation(new Point(x * 3, 60, z * 3)).setTarget(center);
+
+            camera.setImageWriter(new ImageWriter("snowGlobe/turnaround_" + i, 1920, 1080))
+                    .build()
+                    .renderImage()
+                    .writeToImage();
+            System.out.println("frame - " + i);
         }
-        //glass cover
-        scene.geometries.add(
-                new Sphere(60, new Point(0, 40, 0))
-                        .setMaterial(new Material().setKd(0d).setKs(0.9).setKt(0.9).setKr(0.2).setShininess(30)));
-
-        Camera.Builder camera = Camera.getBuilder()
-                .setLocation(new Point(-75, 60, -90))
-                .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
-                .setTarget(new Point(0, 30, 0))
-                .setVpDistance(150)
-                .setVpSize(300, 300);
-
-        camera.setBVH(true)
-                .setSoftShadows(false)
-                .setRayTracer(new SimpleRayTracer(scene));
-        camera.setImageWriter(new ImageWriter("snowGlobe_onlyBVH", 600, 600))
-                .build()
-                .renderImage()
-                .writeToImage();
     }
 
-    /**
-     * test the turnaround rendering of a complex scene with soft shadows
-     */
-    @Test
-    @Disabled("too long")
-    public void softShadowsSnowGlobe() {
-
-        //snow cover
-        Vector down = new Vector(0, -1, 0);
-        Material snow = new Material().setKd(1d).setKs(0.1);
-        List<Point> cloud = Blackboard.getPointsOnCircle(
-                down, new Point(0, 100, 0), 50, 0);
-        for (Point p : cloud) {
-            try {
-                Ray r = new Ray(p, down);
-                Intersectable.GeoPoint s = r.findClosestGeoPoint(scene.geometries.findGeoIntersections(r));
-                scene.geometries.add(new Sphere(0.5, s.point).setMaterial(snow));
-            } catch (NoSuchElementException e) {
-                continue;
-            }
-        }
-        //glass cover
-        scene.geometries.add(
-                new Sphere(60, new Point(0, 40, 0))
-                        .setMaterial(new Material().setKd(0d).setKs(0.9).setKt(0.9).setKr(0.2).setShininess(30)));
-
-        Camera.Builder camera = Camera.getBuilder()
-                .setLocation(new Point(-75, 60, -90))
-                .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
-                .setTarget(new Point(0, 30, 0))
-                .setVpDistance(150)
-                .setVpSize(300, 300);
-
-        camera.setBVH(false)
-                .setSoftShadows(true)
-                .setRayTracer(new SimpleRayTracer(scene));
-        camera.setImageWriter(new ImageWriter("snowGlobe_onlySoftShadow", 600, 600))
-                .build()
-                .renderImage()
-                .writeToImage();
-    }
 
     @Test
     @Disabled("incomplete")
@@ -208,4 +109,57 @@ public class FinalTest {
                 .renderImage()
                 .writeToImage();
     }
+
+    @Test
+    public void testExecutionTime() {
+        long startTime = System.nanoTime();
+
+        // Code block whose performance you want to measure
+        performTimeConsumingOperation();
+
+        long endTime = System.nanoTime();
+        long duration = endTime - startTime; // Duration in nanoseconds
+
+        // Convert duration to milliseconds for easier interpretation
+        double durationInMilliseconds = duration / 1_000_000.0;
+
+        // Assert that the duration is within acceptable limits
+        System.out.printf("Execution time: %.3f ms%n", durationInMilliseconds);
+        //assertTrue(durationInMilliseconds < 1000, "Execution time exceeds the limit of 1000 ms");
+    }
+
+    private void performTimeConsumingOperation() {
+        Vector down = new Vector(0, -1, 0);
+        Material snow = new Material().setKd(1d).setKs(0.1);
+        List<Point> cloud = Blackboard.getPointsOnCircle(
+                down, new Point(0, 100, 0), 50, SNOW_AMOUNT);
+
+//        for (Point p : cloud) {
+//            Ray r = new Ray(p, down);
+//            Intersectable.GeoPoint s = r.findClosestGeoPoint(scene.geometries.findGeoIntersections(r));
+//            scene.geometries.add(new Sphere(0.2, s.point).setMaterial(snow));
+//        }
+        //glass cover
+        scene.geometries.add(
+                new Sphere(60, new Point(0, 40, 0))
+                        .setMaterial(new Material().setKd(0d).setKs(0.9).setKt(0.9).setKr(0.2).setShininess(30)));
+
+        Camera.Builder camera = Camera.getBuilder()
+                .setLocation(new Point(-75, 60, -90))
+                .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
+                .setTarget(new Point(0, 30, 0))
+                .setVpDistance(150)
+                .setVpSize(300, 300)
+
+                .setMultiThreading(16)
+                .setSoftShadows(true)
+                .setRayTracer(new SimpleRayTracer(scene))
+                //.duplicateScene(new Vector(-50, 0, 50))
+                .setBVH(true)
+                .setImageWriter(new ImageWriter("snowGlobeBuildTime", 1440, 1440));
+
+        for (int i = 0; i < SNOW_GLOBE_FRAMES; ++i)
+            camera.build().renderImage().writeToImage();
+    }
 }
+

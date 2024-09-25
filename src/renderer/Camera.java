@@ -1,5 +1,6 @@
 package renderer;
 
+import geometries.Geometries;
 import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
@@ -8,8 +9,7 @@ import primitives.Vector;
 import java.util.LinkedList;
 import java.util.MissingResourceException;
 
-import static primitives.Util.alignZero;
-import static primitives.Util.isZero;
+import static primitives.Util.*;
 
 
 /**
@@ -19,17 +19,17 @@ import static primitives.Util.isZero;
  *
  * @author TzviYisrael and Benny
  */
-public class Camera implements Cloneable {
-    private Point location;
-    private Vector right;
-    private Vector up;
-    private Vector to;
+public class Camera {
+    private final Point location;
+    private final Vector right;
+    private final Vector up;
+    //private Vector to;
     private double vpHeight = 0.0;
     private double vpWidth = 0.0;
-    private double vpDistance = 0.0; //view plane distance;
-    private Point center; // viewing plane center point
-    private ImageWriter imageWriter;
-    private RayTracerBase rayTracerBase;
+    //private double vpDistance = 0.0; //view plane distance;
+    private final Point center; // viewing plane center point
+    private final ImageWriter imageWriter;
+    private final RayTracerBase rayTracerBase;
 
     /**
      * Pixel manager for supporting:
@@ -43,7 +43,17 @@ public class Camera implements Cloneable {
     /**
      * Default constructor for {@code Camera}.
      */
-    private Camera() {
+    private Camera(Builder cameraBuilder) {
+        this.location = cameraBuilder.location;
+        this.right = cameraBuilder.right;
+        this.up = cameraBuilder.up;
+        //this.to = cameraBuilder.to;
+        this.vpHeight = cameraBuilder.vpHeight;
+        this.vpWidth = cameraBuilder.vpWidth;
+        //this.vpDistance = cameraBuilder.vpDistance;
+        this.center = cameraBuilder.center;
+        this.imageWriter = cameraBuilder.imageWriter;
+        this.rayTracerBase = cameraBuilder.rayTracerBase;
     }
 
     /**
@@ -168,7 +178,16 @@ public class Camera implements Cloneable {
      * This class follows the Builder design pattern to provide a flexible solution for constructing a {@code Camera} object.
      */
     public static class Builder {
-        private final Camera camera = new Camera();
+        private Point location;
+        private Vector right;
+        private Vector up;
+        private Vector to;
+        private double vpHeight;
+        private double vpWidth;
+        private double vpDistance;
+        private Point center;
+        private ImageWriter imageWriter;
+        private RayTracerBase rayTracerBase;
 
         /**
          * Sets the location of the camera.
@@ -177,7 +196,7 @@ public class Camera implements Cloneable {
          * @return the current Builder object for chaining method calls.
          */
         public Builder setLocation(Point p) {
-            camera.location = p;
+            location = p;
             return this;
         }
 
@@ -194,10 +213,10 @@ public class Camera implements Cloneable {
             if (!isZero(to.dotProduct(up))) {
                 throw new IllegalArgumentException("the vectors are not perpendicular");
             }
-            camera.to = to.normalize();
-            camera.up = up.normalize();
+            this.to = to.normalize();
+            this.up = up.normalize();
             // Updating Vector to based on right, up vectors
-            camera.right = camera.to.crossProduct(camera.up);
+            this.right = this.to.crossProduct(this.up);
             return this;
 
         }
@@ -209,15 +228,15 @@ public class Camera implements Cloneable {
          * @return the current Builder object for chaining method calls.
          */
         public Builder setTarget(Point target) {
-            camera.to = target.subtract(camera.location).normalize();
+            this.to = target.subtract(this.location).normalize();
 
-            camera.up = new Vector(0, 1, 0); // The y-axis is up
+            this.up = new Vector(0, 1, 0); // The y-axis is up
 //            if (!isZero(camera.to.dotProduct(camera.up))) {
-            if (camera.up.equals(camera.to) || camera.up.equals(camera.to.scale(-1))) {
-                camera.up = new Vector(0, 0, 1); // Switch to Z-axis if Vector to is (0, 1, 0)
+            if (this.up.equals(this.to) || this.up.equals(this.to.scale(-1))) {
+                this.up = new Vector(0, 0, 1); // Switch to Z-axis if Vector to is (0, 1, 0)
             }
-            camera.right = camera.to.crossProduct(camera.up).normalize();
-            camera.up = camera.right.crossProduct(camera.to);
+            this.right = this.to.crossProduct(this.up).normalize();
+            this.up = this.right.crossProduct(this.to);
             return this;
         }
 
@@ -233,23 +252,23 @@ public class Camera implements Cloneable {
             double cos = Math.cos(radians);
             double sin = Math.sin(radians);
             if (isZero(cos)) {
-                Vector newRight = camera.up.scale(-sin);
-                Vector newUp = camera.right.scale(sin);
-                camera.right = newRight.normalize();
-                camera.up = newUp.normalize();
+                Vector newRight = this.up.scale(-sin);
+                Vector newUp = this.right.scale(sin);
+                this.right = newRight.normalize();
+                this.up = newUp.normalize();
                 return this;
             }
             if (isZero(sin)) {
-                Vector newRight = camera.right.scale(cos);
-                Vector newUp = camera.up.scale(cos);
-                camera.right = newRight.normalize();
-                camera.up = newUp.normalize();
+                Vector newRight = this.right.scale(cos);
+                Vector newUp = this.up.scale(cos);
+                this.right = newRight.normalize();
+                this.up = newUp.normalize();
                 return this;
             }
-            Vector newRight = camera.right.scale(cos).add(camera.up.scale(-sin));
-            Vector newUp = camera.right.scale(sin).add(camera.up.scale(cos));
-            camera.right = newRight.normalize();
-            camera.up = newUp.normalize();
+            Vector newRight = this.right.scale(cos).add(this.up.scale(-sin));
+            Vector newUp = this.right.scale(sin).add(this.up.scale(cos));
+            this.right = newRight.normalize();
+            this.up = newUp.normalize();
             return this;
         }
 
@@ -265,8 +284,8 @@ public class Camera implements Cloneable {
             if (alignZero(height) <= 0 || alignZero(width) <= 0) {
                 throw new IllegalArgumentException("the height and width must be positive");
             }
-            camera.vpHeight = height;
-            camera.vpWidth = width;
+            this.vpHeight = height;
+            this.vpWidth = width;
             return this;
         }
 
@@ -281,7 +300,7 @@ public class Camera implements Cloneable {
             if (alignZero(vpDistance) <= 0) {
                 throw new IllegalArgumentException("the view plane distance must be positive");
             }
-            camera.vpDistance = vpDistance;
+            this.vpDistance = vpDistance;
             return this;
         }
 
@@ -292,7 +311,7 @@ public class Camera implements Cloneable {
          * @return the Builder instance for method chaining
          */
         public Builder setImageWriter(ImageWriter imageWriter) {
-            camera.imageWriter = imageWriter;
+            this.imageWriter = imageWriter;
             return this;
         }
 
@@ -314,12 +333,17 @@ public class Camera implements Cloneable {
          * @return the current Builder object for chaining method calls.
          */
         public Builder setBVH(Boolean flag) {
-            if (flag) setCBR(flag);
+            if (flag){
+                setCBR(true);
+                this.rayTracerBase.scene.geometries.buildBVH();
+            }
             RenderSettings.BVHIsEnabled = flag;
             return this;
         }
 
         public Builder setCBR(Boolean flag) {
+            if (flag)
+                this.rayTracerBase.scene.geometries.calculateAABB();
             RenderSettings.CBRIsEnabled = flag;
             return this;
         }
@@ -331,7 +355,18 @@ public class Camera implements Cloneable {
          * @return the Builder instance for method chaining.
          */
         public Builder setRayTracer(RayTracerBase rayTracer) {
-            camera.rayTracerBase = rayTracer;
+            this.rayTracerBase = rayTracer;
+            return this;
+        }
+
+        public Builder setMultiThreading(int threadsCount) {
+            RenderSettings.threadsCount = threadsCount;
+            return this;
+        }
+
+        public Builder duplicateScene(Vector vector){
+            Geometries duplicate = (Geometries) this.rayTracerBase.scene.geometries.duplicateObject(vector);
+            this.rayTracerBase.scene.geometries.add(duplicate);
             return this;
         }
 
@@ -343,50 +378,39 @@ public class Camera implements Cloneable {
          * @throws MissingResourceException if any of the required fields are not set or are invalid.
          */
         public Camera build() {
-            if (camera.location == null)
+            if (this.location == null)
                 throw new MissingResourceException("Missing camera location", Camera.class.getName(), "location");
 
-            if (camera.right == null)
+            if (this.right == null)
                 throw new MissingResourceException("Missing camera right vector", Camera.class.getName(), "right");
 
-            if (camera.up == null)
+            if (this.up == null)
                 throw new MissingResourceException("Missing camera up vector", Camera.class.getName(), "up");
 
-            if (camera.to == null)
+            if (this.to == null)
                 throw new MissingResourceException("Missing camera 'to' vector", Camera.class.getName(), "to");
 
-            if (!isZero(camera.to.dotProduct(camera.up)))
+            if (!isZero(this.to.dotProduct(this.up)))
                 throw new IllegalArgumentException("the vectors are not perpendicular");
 
-            if (alignZero(camera.vpHeight) <= 0 || alignZero(camera.vpWidth) <= 0)
+            if (alignZero(this.vpHeight) <= 0 || alignZero(this.vpWidth) <= 0)
                 throw new MissingResourceException("Invalid view plane dimensions", Camera.class.getName(), "height/width");
 
-            if (alignZero(camera.vpDistance) <= 0)
+            if (alignZero(this.vpDistance) <= 0)
                 throw new MissingResourceException("Invalid view plane distance", Camera.class.getName(), "vpDistance");
 
-            if (camera.imageWriter == null)
+            if (this.imageWriter == null)
                 throw new MissingResourceException("Missing camera imageWriter", Camera.class.getName(), "imageWriter");
 
-            if (camera.rayTracerBase == null)
+            if (this.rayTracerBase == null)
                 throw new MissingResourceException("Missing camera rayTracerBase", Camera.class.getName(), "rayTracerBase");
 
-            if (RenderSettings.CBRIsEnabled) {
-                camera.rayTracerBase.scene.geometries.calculateAABB();
-            }
+            this.center = this.location.add(this.to.scale(this.vpDistance));
 
-            if (RenderSettings.BVHIsEnabled) {
-                camera.rayTracerBase.scene.geometries.buildBVH();
-            }
-
-            camera.center = camera.location.add(camera.to.scale(camera.vpDistance));
-
-            if (camera.center == null)
+            if (this.center == null)
                 throw new MissingResourceException("Missing camera center", Camera.class.getName(), "center");
-            try {
-                return (Camera) camera.clone();
-            } catch (CloneNotSupportedException e) {
-                throw new AssertionError("Failed to clone the camera object", e);
-            }
+
+            return new Camera(this);
         }
     }
 }

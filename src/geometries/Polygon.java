@@ -92,6 +92,11 @@ public class Polygon extends Geometry {
     }
 
     @Override
+    protected Intersectable duplicateObjectHelper(Vector vector){
+        return null;
+    }
+
+    @Override
     public Vector getNormal(Point point) {
         return plane.getNormal();
     }

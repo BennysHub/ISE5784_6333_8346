@@ -259,6 +259,7 @@ public class LightsTests {
                 ));
 
         camera1.setImageWriter(new ImageWriter("allLightsSphere", 500, 500))
+                .duplicateScene(new Vector(10,10,10))
                 .build()
                 .renderImage()
                 .writeToImage();
