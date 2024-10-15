@@ -56,12 +56,12 @@ class PixelManager {
      * Mutual exclusion object for synchronizing next pixel allocation between
      * threads
      */
-    private Object mutexNext = new Object();
+    private final Object mutexNext = new Object();
     /**
      * Mutual exclusion object for printing progress percentage in a console window
      * by different threads
      */
-    private Object mutexPixels = new Object();
+    private final Object mutexPixels = new Object();
 
     /**
      * Initialize pixel manager data for multi-threading

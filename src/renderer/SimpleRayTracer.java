@@ -3,10 +3,12 @@ package renderer;
 import geometries.Intersectable.GeoPoint;
 import lighting.LightSource;
 import primitives.*;
+import renderer.renderstrategies.shadowstrategies.HardShadow;
+import renderer.renderstrategies.shadowstrategies.ShadowStrategy;
+import renderer.renderstrategies.shadowstrategies.SoftShadow;
 import scene.Scene;
 
-import java.util.Collection;
-import java.util.List;
+
 
 import static primitives.Util.alignZero;
 import static primitives.Util.compareSign;
@@ -20,6 +22,8 @@ public class SimpleRayTracer extends RayTracerBase {
 
     private static final Double3 INITIAL_K = Double3.ONE;
 
+
+    private final ShadowStrategy shadowStrategy;
     /**
      * Constructs a SimpleRayTracer with the specified scene.
      *
@@ -27,6 +31,7 @@ public class SimpleRayTracer extends RayTracerBase {
      */
     public SimpleRayTracer(Scene scene) {
         super(scene);
+        shadowStrategy = RenderSettings.softShadowsEnabled ? new SoftShadow(scene) : new HardShadow(scene);
     }
 
     @Override
@@ -72,7 +77,7 @@ public class SimpleRayTracer extends RayTracerBase {
      * @param gp the point at which the local effects are to be calculated
      * @param v  the direction vector of the ray that intersects with the gp
      * @param n  the normal to the surface at the gp
-     * @param nv result of dot-product of n and v
+     * @param nv result of dot-product n and v
      * @param k  the attenuation factor
      * @return the color at the specified point including local lighting effects
      */
@@ -81,22 +86,45 @@ public class SimpleRayTracer extends RayTracerBase {
         Color color = gp.geometry.getEmission();
 
         for (LightSource lightSource : scene.lights) {
-            Vector l = lightSource.getL(gp.point, n);
+            Vector l = lightSource.getL(gp.point);
             double nl = alignZero(n.dotProduct(l));
 
-            if (compareSign(nl, nv)) {
-                Double3 ktr = RenderSettings.softShadowsEnabled ?
-                        softTransparency(gp, lightSource, l, n) : transparency(gp, lightSource, l, n);
+            if (compareSign(nl, nv) ) {
+                Double3 ktr = shadowStrategy.transparency(gp, lightSource, n);
                 if (!ktr.product(k).lowerThan(RenderSettings.MIN_CALC_COLOR_K)) {
                     Color iL = lightSource.getIntensity(gp.point).scale(ktr);
                     color = color.add(
-                            iL.scale(calcDiffusive(material, nl)
-                                    .add(calcSpecular(material, n, l, nl, v))));
+                            iL.scale(calcDiffusive(material, nl).add(calcSpecular(material, n, l, nl, v))));
                 }
             }
+
+//            if (compareSign(nl, nv)) {
+//                Double3 ktr = RenderSettings.softShadowsEnabled ?
+//                        softTransparency(gp, lightSource, n) : transparency(gp, lightSource, l, n);
+//                if (!ktr.product(k).lowerThan(RenderSettings.MIN_CALC_COLOR_K)) {
+//                    Color iL = lightSource.getIntensity(gp.point).scale(ktr);
+//                    color = color.add(
+//                            iL.scale(calcDiffusive(material, nl)
+//                                    .add(calcSpecular(material, n, l, nl, v))));
+//                }
+//            }
         }
+
         return color;
     }
+
+//    private Vector canLightReach(LightSource lightSource, GeoPoint gp , Vector v, Vector n, double nv){
+//        Vector l;
+//        double nl;
+//        var lightExtreme = lightSource.findExtreme(n);
+//        for (Point point: lightExtreme){
+//            l = gp.point.subtract(point);
+//            nl = alignZero(n.dotProduct(l));
+//            if (compareSign(nl, nv))
+//                return l.normalize();
+//        }
+//        return null;
+//    }
 
     /**
      * Calculates the global effects of lighting at the given point.
@@ -104,7 +132,7 @@ public class SimpleRayTracer extends RayTracerBase {
      * @param gp    the point at which the global effects are to be calculated
      * @param v     the direction vector of the ray that intersects with the gp
      * @param n     the normal to the surface at the gp
-     * @param nv    result of dot-product of n and v
+     * @param nv    result of dot-product n and v
      * @param level the current recursion level
      * @param k     the attenuation factor
      * @return the color at the specified point including global lighting effects
@@ -128,7 +156,7 @@ public class SimpleRayTracer extends RayTracerBase {
         Double3 kkx = kx.product(k);
         if (kkx.lowerThan(RenderSettings.MIN_CALC_COLOR_K)) return Color.BLACK;
         GeoPoint gp = findClosestIntersection(ray);
-        return (gp == null ? scene.background : calcColor(gp, ray, level - 1, kkx)).scale(kx);
+        return (gp == null ? scene.background : calcColor(gp, ray, level - 1, kkx)).scale(kx);//TODO why scale kx ?
     }
 
     /**
@@ -149,7 +177,7 @@ public class SimpleRayTracer extends RayTracerBase {
      * @param gp the point at which the ray is reflected
      * @param v  the direction vector of the ray that intersects with the gp
      * @param n  the normal to the surface at the gp
-     * @param nv result of dot-product of n and v
+     * @param nv result of dot-product n and v
      * @return the reflected ray
      */
     private Ray constructReflectedRay(GeoPoint gp, Vector v, Vector n, double nv) {
@@ -192,55 +220,5 @@ public class SimpleRayTracer extends RayTracerBase {
         double minusVR = -alignZero(v.dotProduct(r));
         return minusVR <= 0 ? Double3.ZERO :
                 material.kS.scale(Math.pow(minusVR, material.shininess));
-    }
-
-    /**
-     * Calculates the transparency of a point with respect to a light source.
-     *
-     * @param gp    the geometric point
-     * @param light the light source
-     * @param l     the vector from the light source to the point
-     * @param n     the normal vector at the point
-     * @return the transparency factor at the point
-     */
-    protected Double3 transparency(GeoPoint gp, LightSource light, Vector l, Vector n) {
-        Vector lightDirection = l.scale(-1); // from point to lightSource
-        Ray lightRay = new Ray(gp.point, lightDirection, n);
-        return totalTransparency(scene.geometries.findGeoIntersections(lightRay, light.getDistance(gp.point)));
-    }
-
-    /**
-     * Calculates the transparency factor for a given GeoPoint and light source.
-     *
-     * @param gp    the GeoPoint
-     * @param light the light source
-     * @param l     the light vector
-     * @param n     the normal vector at the GeoPoint
-     * @return the transparency factor as a Double3
-     */
-    protected Double3 softTransparency(GeoPoint gp, LightSource light, Vector l, Vector n) {
-
-        Double3 ktr = Double3.ZERO;
-        List<Ray> shadowRays = light.getRaysBeam(gp.point, n, RenderSettings.SHADOW_RAYS_SAMPLE_COUNT);
-        if (shadowRays.size() > 1) {
-            for (Ray shadowRay : shadowRays)
-                ktr = ktr.add(totalTransparency(scene.geometries.findGeoIntersections(shadowRay, light.getDistance(gp.point))));
-            return ktr.reduce(shadowRays.size());
-        }
-        return transparency(gp, light, l, n);
-    }
-
-    /**
-     * Calculates the cumulative transparency factor for a collection of intersections.
-     *
-     * @param intersections the collection of GeoPoint intersections
-     * @return the cumulative transparency factor as a Double3
-     */
-    protected Double3 totalTransparency(List<GeoPoint> intersections) {
-        Double3 ktr = Double3.ONE;
-        if (intersections == null) return ktr;
-        for (GeoPoint p : intersections)
-            ktr = ktr.product(p.geometry.getMaterial().kT);
-        return ktr;
     }
 }

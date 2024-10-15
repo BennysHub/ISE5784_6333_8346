@@ -116,13 +116,25 @@ public class Color {
         return new Color(rgb.scale(k));
     }
 
+    public double getR(){
+        return rgb.d1;
+    }
+
+    public double getG(){
+        return rgb.d2;
+    }
+
+    public double getB(){
+        return rgb.d3;
+    }
+
     /**
      * Scale the color by (1 / reduction factor)
      *
      * @param k reduction factor
      * @return new Color object which is the result of the operation
      */
-    public Color reduce(double k) {//TODO: CHANGED FROM INT K TO DOUBLE K
+    public Color reduce(double k) {
         //  if (k < 1) throw new IllegalArgumentException("Can't scale a color by a by a number lower than 1");
         return new Color(rgb.reduce(k));
     }

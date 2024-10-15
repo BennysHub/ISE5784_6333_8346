@@ -56,6 +56,19 @@
             "shininess": 15
           }
         }
+      ],
+      "sphere": [
+        {
+          "center": "0 40 0",
+          "radius": "60",
+          "material": {
+            "kD": 0,
+            "kS": 0.9,
+            "kT": 0.9,
+            "kR": 0.2,
+            "shininess": 30
+          }
+        }
       ]
     },
     "lights": {
@@ -63,7 +76,7 @@
         {
           "intensity": "255 255 255 3",
           "position": "-28.5 27 -3",
-          "size": 2
+          "size": 8
         },
         {
           "intensity": "255 255 255 1",

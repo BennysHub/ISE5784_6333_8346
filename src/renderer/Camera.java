@@ -3,13 +3,17 @@ package renderer;
 import geometries.Geometries;
 import primitives.Color;
 import primitives.Point;
-import primitives.Ray;
 import primitives.Vector;
-
+import renderer.renderstrategies.antialiasingstrategies.DefaultColoring;
+import renderer.renderstrategies.antialiasingstrategies.PixelColoringStrategy;
+import renderer.renderstrategies.antialiasingstrategies.SuperSamplingAntiAliasing;
+import scene.Scene;
 import java.util.LinkedList;
 import java.util.MissingResourceException;
+import java.util.stream.IntStream;
 
-import static primitives.Util.*;
+import static primitives.Util.alignZero;
+import static primitives.Util.isZero;
 
 
 /**
@@ -20,16 +24,8 @@ import static primitives.Util.*;
  * @author TzviYisrael and Benny
  */
 public class Camera {
-    private final Point location;
-    private final Vector right;
-    private final Vector up;
-    //private Vector to;
-    private double vpHeight = 0.0;
-    private double vpWidth = 0.0;
-    //private double vpDistance = 0.0; //view plane distance;
-    private final Point center; // viewing plane center point
     private final ImageWriter imageWriter;
-    private final RayTracerBase rayTracerBase;
+    private final PixelColoringStrategy pixelColoringStrategy;
 
     /**
      * Pixel manager for supporting:
@@ -44,17 +40,10 @@ public class Camera {
      * Default constructor for {@code Camera}.
      */
     private Camera(Builder cameraBuilder) {
-        this.location = cameraBuilder.location;
-        this.right = cameraBuilder.right;
-        this.up = cameraBuilder.up;
-        //this.to = cameraBuilder.to;
-        this.vpHeight = cameraBuilder.vpHeight;
-        this.vpWidth = cameraBuilder.vpWidth;
-        //this.vpDistance = cameraBuilder.vpDistance;
-        this.center = cameraBuilder.center;
         this.imageWriter = cameraBuilder.imageWriter;
-        this.rayTracerBase = cameraBuilder.rayTracerBase;
+        this.pixelColoringStrategy = cameraBuilder.pixelColoringStrategy;
     }
+
 
     /**
      * Returns a new {@code Builder} instance for {@code Camera}.
@@ -63,34 +52,6 @@ public class Camera {
      */
     public static Builder getBuilder() {
         return new Builder();
-    }
-
-    /**
-     * Constructs a ray through a specific pixel in the view plane.
-     *
-     * @param nX the number of pixels in the x-axis.
-     * @param nY the number of pixels in the y-axis.
-     * @param j  the pixel index in the x-axis.
-     * @param i  the pixel index in the y-axis.
-     * @return the constructed {@code Ray}.
-     */
-    public Ray constructRay(int nX, int nY, int j, int i) {
-
-        // Calculate the width and height ratios of a pixel
-        final double ratioY = vpHeight / nY;
-        final double ratioX = vpWidth / nX;
-
-        // Calculate the pixel's position on the view plane
-        final double yI = -(i - (nY - 1) / 2d) * ratioY;
-        final double xJ = (j - (nX - 1) / 2d) * ratioX;
-
-        // Starting from the center, move to the pixel's position
-        Point pIJ = center;
-        if (xJ != 0) pIJ = pIJ.add(right.scale(xJ));
-        if (yI != 0) pIJ = pIJ.add(up.scale(yI));
-
-        // Create the ray from the camera location to the pixel's position
-        return new Ray(location, pIJ.subtract(location));
     }
 
     /**
@@ -103,10 +64,10 @@ public class Camera {
         int nY = imageWriter.getNy();
 
         pixelManager = new PixelManager(nY, nX, 0);
-        if (RenderSettings.threadsCount == 0) {
+        if (RenderSettings.threadsCount < 2) {
             for (int x = nX - 1; x >= 0; --x)
                 for (int y = nY - 1; y >= 0; --y)
-                    castRay(nX, nY, x, y);
+                    castRay(x, y);
         } else { // see further... option 2
             int threadsCount = RenderSettings.threadsCount;
             var threads = new LinkedList<Thread>(); // list of threads
@@ -116,7 +77,7 @@ public class Camera {
                     // allocate pixel(row,col) in loop until there are no more pixels
                     while ((pixel = pixelManager.nextPixel()) != null)
                         // cast ray through pixel (and color it – inside castRay)
-                        castRay(nX, nY, pixel.col(), pixel.row());
+                        castRay(pixel.col(), pixel.row());
                 }));
             // start all the threads
             for (var thread : threads) thread.start();
@@ -129,7 +90,7 @@ public class Camera {
 //        else {
 //            IntStream.range(0, nY).parallel()
 //                    .forEach(i -> IntStream.range(0, nX).parallel() // for each row:
-//                            .forEach(j -> castRay(nX, nY, j, i))); // for each column in row
+//                            .forEach(j -> castRay(j, i))); // for each column in row
 //        }
         return this;
     }
@@ -137,16 +98,12 @@ public class Camera {
     /**
      * Casts a ray through the given pixel coordinates and writes the computed color to the image.
      *
-     * @param nX the number of pixels in the x-direction
-     * @param nY the number of pixels in the y-direction
-     * @param x  the x-coordinate of the pixel
-     * @param y  the y-coordinate of the pixel
+     * @param x the x-coordinate of the pixel
+     * @param y the y-coordinate of the pixel
      */
-    private void castRay(int nX, int nY, int x, int y) {
-        Ray ray = constructRay(nX, nY, x, y);
-        Color color = rayTracerBase.traceRay(ray);
-        imageWriter.writePixel(x, y, color);
-//        pixelManager.pixelDone();
+    private void castRay(int x, int y) {
+        Color pixelColor = pixelColoringStrategy.calcalatePixelColor(x, y);
+        imageWriter.writePixel(x, y, pixelColor);
     }
 
     /**
@@ -185,9 +142,13 @@ public class Camera {
         private double vpHeight;
         private double vpWidth;
         private double vpDistance;
-        private Point center;
         private ImageWriter imageWriter;
         private RayTracerBase rayTracerBase;
+        private PixelColoringStrategy pixelColoringStrategy;
+
+        private boolean antiAliasingFlag = false;
+        boolean rayTracerWasSet = false;
+
 
         /**
          * Sets the location of the camera.
@@ -240,37 +201,6 @@ public class Camera {
             return this;
         }
 
-        /**
-         * Rotates the 'right' and 'up' vectors of the camera by a given angle in degrees
-         * in a clockwise direction.
-         *
-         * @param angle the angle by which to rotate the vectors, in degrees.
-         * @return the current Builder object for chaining method calls.
-         */
-        public Builder rotateVectors(double angle) {
-            double radians = Math.toRadians(angle); //convert to radians
-            double cos = Math.cos(radians);
-            double sin = Math.sin(radians);
-            if (isZero(cos)) {
-                Vector newRight = this.up.scale(-sin);
-                Vector newUp = this.right.scale(sin);
-                this.right = newRight.normalize();
-                this.up = newUp.normalize();
-                return this;
-            }
-            if (isZero(sin)) {
-                Vector newRight = this.right.scale(cos);
-                Vector newUp = this.up.scale(cos);
-                this.right = newRight.normalize();
-                this.up = newUp.normalize();
-                return this;
-            }
-            Vector newRight = this.right.scale(cos).add(this.up.scale(-sin));
-            Vector newUp = this.right.scale(sin).add(this.up.scale(cos));
-            this.right = newRight.normalize();
-            this.up = newUp.normalize();
-            return this;
-        }
 
         /**
          * Sets the view plane size of the camera.
@@ -304,14 +234,9 @@ public class Camera {
             return this;
         }
 
-        /**
-         * Sets the ImageWriter for the camera.
-         *
-         * @param imageWriter the ImageWriter to be set
-         * @return the Builder instance for method chaining
-         */
-        public Builder setImageWriter(ImageWriter imageWriter) {
-            this.imageWriter = imageWriter;
+
+        public Builder setResolution(String imageName, int nX, int nY) {
+            this.imageWriter = new ImageWriter(imageName, nX, nY);
             return this;
         }
 
@@ -333,7 +258,7 @@ public class Camera {
          * @return the current Builder object for chaining method calls.
          */
         public Builder setBVH(Boolean flag) {
-            if (flag){
+            if (flag) {
                 setCBR(true);
                 this.rayTracerBase.scene.geometries.buildBVH();
             }
@@ -348,14 +273,10 @@ public class Camera {
             return this;
         }
 
-        /**
-         * Sets the RayTracer for the camera. If soft shadows are enabled, a {@code SoftShadowsRayTracer} is used.
-         *
-         * @param rayTracer the RayTracer to be set.
-         * @return the Builder instance for method chaining.
-         */
-        public Builder setRayTracer(RayTracerBase rayTracer) {
-            this.rayTracerBase = rayTracer;
+
+        public Builder setScene(Scene scene) {
+            this.rayTracerBase = new SimpleRayTracer(scene);
+            rayTracerWasSet = true;
             return this;
         }
 
@@ -364,9 +285,16 @@ public class Camera {
             return this;
         }
 
-        public Builder duplicateScene(Vector vector){
+        public Builder duplicateScene(Vector vector) {
+            if (rayTracerWasSet)
+                throw new UnsupportedOperationException("there is no scene to duplicate");
             Geometries duplicate = (Geometries) this.rayTracerBase.scene.geometries.duplicateObject(vector);
             this.rayTracerBase.scene.geometries.add(duplicate);
+            return this;
+        }
+
+        public Builder setAntiAliasing(boolean flag) {
+            antiAliasingFlag = flag;
             return this;
         }
 
@@ -405,10 +333,17 @@ public class Camera {
             if (this.rayTracerBase == null)
                 throw new MissingResourceException("Missing camera rayTracerBase", Camera.class.getName(), "rayTracerBase");
 
-            this.center = this.location.add(this.to.scale(this.vpDistance));
 
-            if (this.center == null)
+            //after all, the checks above set by order!!
+            //-----------1
+            Point center = this.location.add(this.to.scale(this.vpDistance));
+            //-----------2
+            if (center == null)
                 throw new MissingResourceException("Missing camera center", Camera.class.getName(), "center");
+            //-----------3
+            ViewPlane viewPlane = new ViewPlane(right, up, vpHeight, vpWidth, center, imageWriter.getNx(), imageWriter.getNy());
+            //-----------4
+            pixelColoringStrategy = antiAliasingFlag ? new SuperSamplingAntiAliasing(viewPlane, rayTracerBase, location) : new DefaultColoring(viewPlane, rayTracerBase, location);
 
             return new Camera(this);
         }

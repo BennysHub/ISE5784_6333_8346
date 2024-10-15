@@ -23,17 +23,17 @@ public class ImageWriter {
      * directory
      */
     private static final String FOLDER_PATH = System.getProperty("user.dir") + "/images";
-    /**
-     * Horizontal resolution of the image - number of pixels in row
-     */
-    private final int nX;
-    /**
-     * Vertical resolution of the image - number of pixels in column
-     */
-    private final int nY;
-    /**
-     * Image generation buffer (the matrix of the pixels)
-     */
+    //    /**
+//     * Horizontal resolution of the image - number of pixels in row
+//     */
+//    private final int nX;
+//    /**
+//     * Vertical resolution of the image - number of pixels in column
+//     */
+//    private final int nY;
+//    /**
+//     * Image generation buffer (the matrix of the pixels)
+//     */
     private final BufferedImage image;
     /**
      * image file name, not including the file extension '.png'
@@ -53,11 +53,15 @@ public class ImageWriter {
      * @param nX        number of pixels by Width
      * @param nY        number of pixels by height
      */
+//    public ImageWriter(String imageName, int nX, int nY) {
+//        this.imageName = imageName;
+//        this.nX = nX;
+//        this.nY = nY;
+//
+//        image = new BufferedImage(nX, nY, BufferedImage.TYPE_INT_RGB);
+//    }
     public ImageWriter(String imageName, int nX, int nY) {
         this.imageName = imageName;
-        this.nX = nX;
-        this.nY = nY;
-
         image = new BufferedImage(nX, nY, BufferedImage.TYPE_INT_RGB);
     }
 
@@ -66,10 +70,10 @@ public class ImageWriter {
     /**
      * View Plane Y axis resolution
      *
-     * @return the amount of vertical pixels
+     * @return the number of vertical pixels
      */
     public int getNy() {
-        return nY;
+        return image.getHeight();
     }
 
     /**
@@ -78,13 +82,13 @@ public class ImageWriter {
      * @return the number of horizontal pixels
      */
     public int getNx() {
-        return nX;
+        return image.getWidth();
     }
 
     // ***************** Operations ******************** //
 
     /**
-     * Function writeToImage produces unoptimized png file of the image according
+     * Function writeToImage produces an unoptimized png file of the image according
      * to
      * pixel color matrix in the directory of the project
      */

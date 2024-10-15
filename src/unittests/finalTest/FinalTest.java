@@ -1,29 +1,22 @@
 package finalTest;
 
-import geometries.Intersectable;
 import geometries.Sphere;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import primitives.Material;
 import primitives.Point;
-import primitives.Ray;
 import primitives.Vector;
 import renderer.Camera;
 import renderer.ImageWriter;
-import renderer.SimpleRayTracer;
-import renderer.super_sampling.Blackboard;
 import scene.JsonSceneParser;
 import scene.Scene;
-
-import java.util.List;
 
 
 public class FinalTest {
     int SNOW_AMOUNT = 100000;// 400000;
     private static int SNOW_GLOBE_FRAMES = 1;
 
-    JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json");
-    Scene scene = jsp.scene;
+    Scene scene = new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json", "Test Scene");
 
 
     /**
@@ -33,20 +26,16 @@ public class FinalTest {
     public void bothSnowGlobe() {
 
         //snow cover
-        Vector down = new Vector(0, -1, 0);
-        Material snow = new Material().setKd(1d).setKs(0.1);
-        List<Point> cloud = Blackboard.getPointsOnCircle(
-                down, new Point(0, 100, 0), 50, SNOW_AMOUNT);
+//        Vector down = new Vector(0, -1, 0);
+//        Material snow = new Material().setKd(1d).setKs(0.1);
+//        List<Point> cloud = Blackboard.getPointsOnCircle(
+//                down, new Point(0, 100, 0), 50, SNOW_AMOUNT);
 
-        for (Point p : cloud) {
-            Ray r = new Ray(p, down);
-            Intersectable.GeoPoint s = r.findClosestGeoPoint(scene.geometries.findGeoIntersections(r));
-            scene.geometries.add(new Sphere(0.2, s.point).setMaterial(snow));
-        }
-        //glass cover
-        scene.geometries.add(
-                new Sphere(60, new Point(0, 40, 0))
-                        .setMaterial(new Material().setKd(0d).setKs(0.9).setKt(0.9).setKr(0.2).setShininess(30)));
+//        for (Point p : cloud) {
+//            Ray r = new Ray(p, down);
+//            Intersectable.GeoPoint s = r.findClosestGeoPoint(scene.geometries.findGeoIntersections(r));
+//            scene.geometries.add(new Sphere(0.2, s.point).setMaterial(snow));
+//        }
 
         Camera.Builder camera = Camera.getBuilder()
                 .setLocation(new Point(-75, 60, -90))
@@ -57,9 +46,9 @@ public class FinalTest {
 
                 //.setMultiThreading(8)
                 //.setSoftShadows(true)
-                .setRayTracer(new SimpleRayTracer(scene))
+                .setScene(scene)
                 .setBVH(true)
-                .setImageWriter(new ImageWriter("snowGlobe_both", 600, 600));
+                .setResolution("snowGlobe_both", 600, 600);
 
         camera.build()
                 .renderImage()
@@ -80,7 +69,7 @@ public class FinalTest {
             double z = center.getZ() + radius * Math.sin(angle);
             camera.setLocation(new Point(x * 3, 60, z * 3)).setTarget(center);
 
-            camera.setImageWriter(new ImageWriter("snowGlobe/turnaround_" + i, 1920, 1080))
+            camera.setResolution("snowGlobe/turnaround_" + i, 1920, 1080)
                     .build()
                     .renderImage()
                     .writeToImage();
@@ -92,8 +81,7 @@ public class FinalTest {
     @Test
     @Disabled("incomplete")
     void oneTestToRuleThemAll() {
-        JsonSceneParser jsp = new JsonSceneParser("src/unittests/finalTest/objects.json");
-        Scene scene = jsp.scene;
+        Scene scene = new JsonSceneParser("src/unittests/finalTest/objects.json", "Test Scene");
         int scale = 30;
         Camera.Builder camera = Camera.getBuilder()
                 .setLocation(new Point(-18 * scale, 6 * scale, -27 * scale))
@@ -102,9 +90,9 @@ public class FinalTest {
                 .setVpDistance(1500)
                 .setVpSize(360, 360)
                 .setBVH(true)
-                .setRayTracer(new SimpleRayTracer(scene));
+                .setScene(scene);
 
-        camera.setImageWriter(new ImageWriter("finalTest", 480 * 2, 270 * 2))
+        camera.setResolution("finalTest", 480 * 2, 270 * 2)
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -129,20 +117,6 @@ public class FinalTest {
     }
 
     private void performTimeConsumingOperation() {
-        Vector down = new Vector(0, -1, 0);
-        Material snow = new Material().setKd(1d).setKs(0.1);
-        List<Point> cloud = Blackboard.getPointsOnCircle(
-                down, new Point(0, 100, 0), 50, SNOW_AMOUNT);
-
-//        for (Point p : cloud) {
-//            Ray r = new Ray(p, down);
-//            Intersectable.GeoPoint s = r.findClosestGeoPoint(scene.geometries.findGeoIntersections(r));
-//            scene.geometries.add(new Sphere(0.2, s.point).setMaterial(snow));
-//        }
-        //glass cover
-        scene.geometries.add(
-                new Sphere(60, new Point(0, 40, 0))
-                        .setMaterial(new Material().setKd(0d).setKs(0.9).setKt(0.9).setKr(0.2).setShininess(30)));
 
         Camera.Builder camera = Camera.getBuilder()
                 .setLocation(new Point(-75, 60, -90))
@@ -150,13 +124,13 @@ public class FinalTest {
                 .setTarget(new Point(0, 30, 0))
                 .setVpDistance(150)
                 .setVpSize(300, 300)
+                .setScene(scene)
 
                 .setMultiThreading(16)
-                .setSoftShadows(true)
-                .setRayTracer(new SimpleRayTracer(scene))
-                //.duplicateScene(new Vector(-50, 0, 50))
+                .setSoftShadows(false)
+                .setAntiAliasing(true)
                 .setBVH(true)
-                .setImageWriter(new ImageWriter("snowGlobeBuildTime", 1440, 1440));
+                .setResolution("snowGlobeBuildTime", 1440, 1440);
 
         for (int i = 0; i < SNOW_GLOBE_FRAMES; ++i)
             camera.build().renderImage().writeToImage();

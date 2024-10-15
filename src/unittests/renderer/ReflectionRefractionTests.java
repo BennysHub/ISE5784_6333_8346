@@ -30,7 +30,7 @@ public class ReflectionRefractionTests {
      */
     private final Camera.Builder cameraBuilder = Camera.getBuilder()
             .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
-            .setRayTracer(new SimpleRayTracer(scene));
+            .setScene(scene);
 
     /**
      * Produce a picture of a sphere lighted by a spotlight
@@ -48,7 +48,7 @@ public class ReflectionRefractionTests {
 
         cameraBuilder.setLocation(new Point(0, 0, 1000)).setVpDistance(1000)
                 .setVpSize(150, 150)
-                .setImageWriter(new ImageWriter("refractionTwoSpheres", 500, 500))
+                .setResolution("refractionTwoSpheres", 500, 500)
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -79,7 +79,7 @@ public class ReflectionRefractionTests {
 
         cameraBuilder.setLocation(new Point(0, 0, 10000)).setVpDistance(10000)
                 .setVpSize(2500, 2500)
-                .setImageWriter(new ImageWriter("reflectionTwoSpheresMirrored", 500, 500))
+                .setResolution("reflectionTwoSpheresMirrored", 500, 500)
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -107,7 +107,7 @@ public class ReflectionRefractionTests {
 
         cameraBuilder.setLocation(new Point(0, 0, 1000)).setVpDistance(1000)
                 .setVpSize(200, 200)
-                .setImageWriter(new ImageWriter("refractionShadow", 600, 600))
+                .setResolution("refractionShadow", 600, 600)
                 .build()
                 .renderImage()
                 .writeToImage();

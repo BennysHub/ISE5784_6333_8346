@@ -69,7 +69,8 @@ public final class Util {
      * @return true if the numbers have the same sign
      */
     public static boolean compareSign(double n1, double n2) {
-        return (n1 < 0 && n2 < 0) || (n1 > 0 && n2 > 0);
+        return n1*n2 > 0;
+        //return (n1 < 0 && n2 < 0) || (n1 > 0 && n2 > 0);
     }
 
     /**

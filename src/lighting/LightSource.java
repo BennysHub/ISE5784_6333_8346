@@ -1,9 +1,6 @@
 package lighting;
 
-import primitives.Color;
-import primitives.Point;
-import primitives.Ray;
-import primitives.Vector;
+import primitives.*;
 
 import java.util.List;
 
@@ -27,7 +24,7 @@ public interface LightSource {
      * @param p the point at which the vector is to be calculated
      * @return the vector from the light source to the given point
      */
-    Vector getL(Point p, Vector normal);
+    Vector getL(Point p);
 
     /**
      * Generates a beam of rays from the given point and normal.
@@ -39,6 +36,7 @@ public interface LightSource {
      */
     List<Ray> getRaysBeam(Point p, Vector n, int numOfRays);
 
+
     /**
      * Calculate the distance between the light source and a point
      *
@@ -46,4 +44,6 @@ public interface LightSource {
      * @return the distance between the position and the given point
      */
     double getDistance(Point point);
+
+    List<Point> findExtreme(Vector vector);
 }

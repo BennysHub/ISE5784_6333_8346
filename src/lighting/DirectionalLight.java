@@ -31,7 +31,7 @@ public class DirectionalLight extends Light implements LightSource {
     }
 
     @Override
-    public Vector getL(Point p, Vector normal) {
+    public Vector getL(Point p) {
         return direction;
     }
 
@@ -43,5 +43,10 @@ public class DirectionalLight extends Light implements LightSource {
     @Override
     public double getDistance(Point point) {
         return Double.POSITIVE_INFINITY;
+    }
+
+    @Override
+    public List<Point> findExtreme(Vector vector) {
+        return null;
     }
 }

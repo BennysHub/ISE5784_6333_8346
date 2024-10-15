@@ -83,23 +83,11 @@ public abstract class Intersectable {
      */
     protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance);
 
-
-
     public Intersectable duplicateObject(Vector vector){
         return duplicateObjectHelper(vector);
     }
 
     protected abstract Intersectable duplicateObjectHelper(Vector vector);
-
-
-
-
-
-
-
-
-
-
 
     /**
      * A class representing a geometric point of intersection.
@@ -125,10 +113,6 @@ public abstract class Intersectable {
             this.geometry = geometry;
             this.point = point;
         }
-
-
-
-
 
         @Override
         public String toString() {

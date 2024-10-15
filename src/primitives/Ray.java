@@ -33,6 +33,11 @@ public class Ray {
         direction = vector.normalize();
     }
 
+    public Ray(Point p1, Point p2) {
+        origin = p1;
+        direction = p2.subtract(p1).normalize();
+    }
+
     /**
      * Constructs a new Ray with the specified starting point, direction, and normal.
      * Adjusts the starting point to avoid precision issues in geometric calculations.

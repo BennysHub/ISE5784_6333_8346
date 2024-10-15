@@ -11,13 +11,8 @@ import lighting.SpotLight;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import primitives.*;
-import renderer.super_sampling.Blackboard;
 import scene.JsonSceneParser;
 import scene.Scene;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-
 import static java.awt.Color.*;
 
 /**
@@ -38,7 +33,8 @@ public class ShadowTests {
             .setLocation(new Point(0, 0, 1000)).setVpDistance(1000)
             .setVpSize(162, 288)
             .setSoftShadows(false)
-            .setRayTracer(new SimpleRayTracer(scene));
+            .setAntiAliasing(true)
+            .setScene(scene);
 
     /**
      * The sphere in the tests
@@ -63,7 +59,7 @@ public class ShadowTests {
         scene.lights.add(
                 new SpotLight(new Color(400, 240, 0), spotLocation, new Vector(1, 1, -3))
                         .setKl(1E-5).setKq(1.5E-7).setSize(2));
-        camera.setImageWriter(new ImageWriter(pictName, 1920, 1080))
+        camera.setResolution(pictName, 1920, 1080)
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -143,20 +139,19 @@ public class ShadowTests {
                 new SpotLight(new Color(700, 400, 400), new Point(40, 40, 115), new Vector(-1, -1, -4))
                         .setKl(4E-4).setKq(2E-5).setSize(4));
 
-        camera.setImageWriter(new ImageWriter("shadowTrianglesSphere", 600, 600))
+        camera.setResolution("shadowTrianglesSphere", 600, 600)
                 .build()
                 .renderImage()
                 .writeToImage();
     }
 
     /**
-     * test the rendering from json file that contain a path to a stl file
+     * test the rendering from JSON file that contains a path to a stl file
      */
     @Test
     @Disabled("not good")
     public void stlShadow() {
-        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/stlJson.json");
-        Scene scene = jsp.scene;
+        Scene scene = new JsonSceneParser("src/unittests/renderer/json/stlJson.json", "Test Scene");
 
         scene.lights.add(new PointLight(new Color(255, 255, 255).reduce(2), new Point(20, 15, 300)));
         scene.lights.add(new DirectionalLight(new Color(255, 255, 255).reduce(2), new Vector(-0.3, -0.3, 0)));
@@ -166,9 +161,9 @@ public class ShadowTests {
                 .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
                 .setLocation(new Point(0, 220, 1000)).setVpDistance(1000)
                 .setVpSize(200, 200)
-                .setRayTracer(new SimpleRayTracer(scene));
+                .setScene(scene);
 
-        camera.setImageWriter(new ImageWriter("stlTurnaround/stlShadow", 600, 600))
+        camera.setResolution("stlTurnaround/stlShadow", 600, 600)
                 .build()
                 .renderImage()
                 .writeToImage();

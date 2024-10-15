@@ -48,13 +48,11 @@ public class Plane extends Geometry {
      * Constructs a Plane with a point on the plane and a normal vector.
      *
      * @param planePoint        A point on the plane.
-     * @param planeNormalVector The normal vector of the plane, which will be normalized.
+     * @param planeNormal The normal vector of the plane, which will be normalized.
      */
-    public Plane(Point planePoint, Vector planeNormalVector) {
+    public Plane(Point planePoint, Vector planeNormal) {
         this.planePoint = planePoint;
-        this.planeNormalizedVector = planeNormalVector.normalize();
-        //if (RenderSettings.isBVHEnabled())
-        //calculateAABBHelper();
+        this.planeNormalizedVector = planeNormal.normalize();
     }
 
     /**
@@ -63,7 +61,7 @@ public class Plane extends Geometry {
      * @return The normalized normal vector of the plane.
      */
     public Vector getNormal() {
-        return planeNormalizedVector;
+        return planeNormalizedVector.scale(1);
     }
 
     @Override

@@ -24,18 +24,15 @@ import java.util.regex.Pattern;
 /**
  * Parses a JSON file to create a scene with geometries and materials.
  */
-public class JsonSceneParser {
-    /**
-     * The scene created from the JSON file.
-     */
-    public Scene scene;
+public class JsonSceneParser extends Scene {
 
     /**
      * Constructs a JsonSceneParser instance and parses the scene from the specified file path.
      *
      * @param filePath the path to the JSON file
      */
-    public JsonSceneParser(String filePath) {
+    public JsonSceneParser(String filePath, String sceneName) {
+        super (sceneName);
         try {
             // Read the file content into a string
             String jsonString = new String(Files.readAllBytes(Paths.get(filePath)));
@@ -45,13 +42,12 @@ public class JsonSceneParser {
             if (!jsonObject.has("scene"))
                 throw new IOException("no scene element found in the file");
             JsonObject sceneJson = jsonObject.getAsJsonObject("scene");
-            // Create a scene
-            scene = new Scene(filePath);
+
 
             // Parse background color
             if (sceneJson.has("background-color")) {
                 Color backgroundColor = parseColor(sceneJson.get("background-color").getAsString());
-                scene.setBackground(backgroundColor);
+                this.setBackground(backgroundColor);
             }
 
             // Parse ambient light
@@ -63,7 +59,7 @@ public class JsonSceneParser {
                         : Double3.ONE;
 
                 AmbientLight ambientLight = new AmbientLight(ambientLightColor, kA);
-                scene.setAmbientLight(ambientLight);
+                this.setAmbientLight(ambientLight);
             }
 
             // Parse lights
@@ -200,7 +196,7 @@ public class JsonSceneParser {
                     spotLight.setSize(spotLightJson.get("size").getAsInt());
                 if (spotLightJson.has("narrowBeam"))
                     spotLight.setNarrowBeam(spotLightJson.get("narrowBeam").getAsInt());
-                scene.lights.add(spotLight);
+                this.lights.add(spotLight);
             }
         }
 
@@ -214,7 +210,7 @@ public class JsonSceneParser {
                 PointLight pointLight = new PointLight(intensity, position);
                 if (pointLightJson.has("size"))
                     pointLight.setSize(pointLightJson.get("size").getAsInt());
-                scene.lights.add(pointLight);
+                this.lights.add(pointLight);
             }
         }
 
@@ -226,7 +222,7 @@ public class JsonSceneParser {
                 Color intensity = parseColor(directionalLightJson.get("intensity").getAsString());
                 Vector direction = parseVector(directionalLightJson.get("direction").getAsString());
                 DirectionalLight directionalLight = new DirectionalLight(intensity, direction);
-                scene.lights.add(directionalLight);
+                this.lights.add(directionalLight);
             }
         }
     }
@@ -283,7 +279,7 @@ public class JsonSceneParser {
             sphere.setMaterial(parseMaterial(sphereJson.getAsJsonObject("material")));
         }
 
-        scene.geometries.add(sphere);
+        this.geometries.add(sphere);
     }
 
     /**
@@ -306,7 +302,7 @@ public class JsonSceneParser {
             triangle.setMaterial(parseMaterial(triangleJson.getAsJsonObject("material")));
         }
 
-        scene.geometries.add(triangle);
+        this.geometries.add(triangle);
     }
 
     /**
@@ -372,7 +368,7 @@ public class JsonSceneParser {
                             if (material != null) {
                                 triangle.setMaterial(material);
                             }
-                            scene.geometries.add(triangle);
+                            this.geometries.add(triangle);
                         } catch (IllegalArgumentException e) {
                             continue;
                         }

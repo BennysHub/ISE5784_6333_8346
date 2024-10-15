@@ -3,7 +3,6 @@ package renderer;
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import primitives.Color;
 import primitives.Double3;
@@ -28,7 +27,7 @@ public class RenderTests {
      * Camera builder of the tests
      */
     private final Camera.Builder camera = Camera.getBuilder()
-            .setRayTracer(new SimpleRayTracer(scene))
+            .setScene(scene)
             .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0)) //changed
             .setVpDistance(100)
             .setVpSize(500, 500);
@@ -41,25 +40,17 @@ public class RenderTests {
     public void renderTwoColorTest() {
 
         scene.geometries.add(new Sphere(50d, new Point(0, 0, -100)),
-                new Triangle(new Point(-100, 0, -100), new Point(0, 100, -100), new Point(-100, 100, -100)), // up
-                // left
-                new Triangle(new Point(-100, 0, -100), new Point(0, -100, -100),
-                        new Point(-100, -100, -100)), // down
-                // left
-                new Triangle(new Point(100, 0, -100), new Point(0, -100, -100), new Point(100, -100, -100))); // down
+                new Triangle(new Point(-100, 0, -100), new Point(0, 100, -100), new Point(-100, 100, -100)),
+                new Triangle(new Point(-100, 0, -100), new Point(0, -100, -100), new Point(-100, -100, -100)),
+                new Triangle(new Point(100, 0, -100), new Point(0, -100, -100), new Point(100, -100, -100)));
         scene.setAmbientLight(new AmbientLight(new Color(255, 191, 191), Double3.ONE))
                 .setBackground(new Color(75, 127, 90));
-
-        // right
-        //        camera
-        camera.setImageWriter(new ImageWriter("base render test", 1000, 1000))
+        camera.setResolution("base render test", 1000, 1000)
                 .build()
                 .renderImage()
                 .printGrid(100, new Color(YELLOW))
                 .writeToImage();
     }
-
-    // For stage 6 - please disregard in stage 5
 
     /**
      * Produce a scene with basic 3D model - including individual lights of the
@@ -81,7 +72,7 @@ public class RenderTests {
         scene.setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.2, 0.2, 0.2)));
 
         camera
-                .setImageWriter(new ImageWriter("color render test", 1000, 1000))
+                .setResolution("color render test", 1000, 1000)
                 .build()
                 .renderImage()
                 .printGrid(100, new Color(WHITE))
@@ -89,61 +80,19 @@ public class RenderTests {
     }
 
     /**
-     * test the function in the bonus
-     * {@link renderer.Camera.Builder#setTarget(Point)}.
-     * {@link renderer.Camera.Builder#rotateVectors(double)}.
-     */
-    @Test
-    @Disabled("take a lot of time")
-    public void renderMultipleAnglesTest() {
-        int testNum = 5;
-        Camera.Builder camera = Camera.getBuilder()
-                .setRayTracer(new SimpleRayTracer(scene))
-                .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0)) //changed
-                .setVpDistance(100)
-                .setVpSize(500, 500);
-
-        scene.geometries.add( // center
-                new Sphere(50, new Point(0, 0, -100)),
-                // up left
-                new Triangle(new Point(-100, 0, -100), new Point(0, 100, -100), new Point(-100, 100, -100))
-                        .setEmission(new Color(GREEN)),
-                // down left
-                new Triangle(new Point(-100, 0, -100), new Point(0, -100, -100), new Point(-100, -100, -100))
-                        .setEmission(new Color(RED)),
-                // down right
-                new Triangle(new Point(100, 0, -100), new Point(0, -100, -100), new Point(100, -100, -100))
-                        .setEmission(new Color(BLUE)));
-        scene.setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.2, 0.2, 0.2)));
-
-        for (int i = 0; i < testNum; ++i) {
-            camera.setLocation(new Point((i * 10) - 50, 0, 0))
-                    .setTarget(new Point(0, 0, -100))
-                    .rotateVectors(10)
-                    .setImageWriter(new ImageWriter("render Multiple Angles Test" + i, 1000, 1000))
-                    .build()
-                    .renderImage()
-                    .printGrid(100, new Color(YELLOW))
-                    .writeToImage();
-        }
-    }
-
-    /**
      * Test for JSON-based scene - for bonus
      */
     @Test
     public void basicRenderJson() {
-        JsonSceneParser jsp = new JsonSceneParser("src/unittests/renderer/json/twoColorJson.json");
-        final Scene scene1 = jsp.scene;
-        //final Scene scene1 = Scene.loadFromJson("src/unittests/renderer/twoColorJson.json");
+        final Scene scene1 = new JsonSceneParser("src/unittests/renderer/json/twoColorJson.json" , "testScene");
 
         final Camera.Builder camera = Camera.getBuilder()
-                .setRayTracer(new SimpleRayTracer(scene1))
+                .setScene(scene1)
                 .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0)) //changed
                 .setVpDistance(100)
                 .setVpSize(500, 500);
 
-        camera.setImageWriter(new ImageWriter("json render test", 1000, 1000))
+        camera.setResolution("json render test", 1000, 1000)
                 .build()
                 .renderImage()
                 .printGrid(100, new Color(YELLOW))

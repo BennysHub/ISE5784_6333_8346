@@ -9,6 +9,7 @@ import renderer.super_sampling.Blackboard;
 import java.util.List;
 
 import static primitives.Util.alignZero;
+import static primitives.Util.isZero;
 
 /**
  * Class representing a spotlight in a 3D scene.
@@ -62,12 +63,26 @@ public class SpotLight extends PointLight {
 
     @Override
     public Color getIntensity(Point p) {
-        double directionStrength = alignZero(direction.dotProduct(getL(p, null)));
+        double directionStrength = alignZero(direction.dotProduct(p.subtract(position).normalize()));
         return super.getIntensity(p).scale(directionStrength <= 0 ? 0 : Math.pow(directionStrength, beamFocus));
     }
 
     @Override
-    public List<Ray> getRaysBeam(Point p, Vector n, int numOfRays) {//TODO: need to go over
-        return Blackboard.constructRays(position, p, direction, size, numOfRays);
+    public List<Ray> getRaysBeam(Point p, Vector n, int numOfRays) {
+
+        //return null;
+        //return Blackboard.constructRays(position, p, direction, size, numOfRays);
+        return Blackboard.constructRays(Blackboard.getPointsOnSphere(n, position, size, numOfRays), p);
+    }
+
+    @Override
+    public List<Point> findExtreme(Vector vector) {
+        if (isZero(size))
+            return List.of(position);
+        Vector projection = vector.projection(direction);
+        Vector spotLightDiskVector = vector.subtract(projection);
+        Vector normalizeSpotLightVector = spotLightDiskVector.normalize();
+        return List.of(position.add(normalizeSpotLightVector.scale(size)));
+
     }
 }

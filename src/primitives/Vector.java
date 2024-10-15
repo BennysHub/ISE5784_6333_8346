@@ -2,7 +2,7 @@ package primitives;
 
 /**
  * Represents a vector in 3D space, extending the Point class with additional vector operations.
- * Vectors can be added, scaled, and normalized, and their dot and cross products can be computed.
+ * Vectors can be added, scaled, and normalized, and their dot- and cross-products can be computed.
  *
  * @author Benny Avrahami
  */
@@ -76,10 +76,10 @@ public class Vector extends Point {
     }
 
     /**
-     * Computes the cross product of this vector with the given vector.
+     * Computes the cross-product of this vector with the given vector.
      *
-     * @param vector The vector to compute the cross product with.
-     * @return A new Vector resulting from the cross product of this vector and the given vector.
+     * @param vector The vector to compute the cross-product with.
+     * @return A new Vector resulting from the cross-product of this vector and the given vector.
      */
     public Vector crossProduct(Vector vector) {
         return new Vector(
@@ -87,6 +87,12 @@ public class Vector extends Point {
                 xyz.d3 * vector.xyz.d1 - xyz.d1 * vector.xyz.d3,
                 xyz.d1 * vector.xyz.d2 - xyz.d2 * vector.xyz.d1
         );
+    }
+
+    public Vector projection(Vector other){
+        double dotProduct = this.dotProduct(other);
+        double otherLengthSquared = other.lengthSquared();
+        return other.scale(dotProduct / otherLengthSquared);
     }
 
     /**
