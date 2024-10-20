@@ -4,13 +4,12 @@ import geometries.Geometries;
 import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
-import renderer.renderstrategies.antialiasingstrategies.DefaultColoring;
-import renderer.renderstrategies.antialiasingstrategies.PixelColoringStrategy;
+import renderer.renderstrategies.antialiasingstrategies.DefaultSampling;
+import renderer.renderstrategies.antialiasingstrategies.PixelSamplingStrategy;
 import renderer.renderstrategies.antialiasingstrategies.SuperSamplingAntiAliasing;
 import scene.Scene;
 import java.util.LinkedList;
 import java.util.MissingResourceException;
-import java.util.stream.IntStream;
 
 import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
@@ -25,7 +24,7 @@ import static primitives.Util.isZero;
  */
 public class Camera {
     private final ImageWriter imageWriter;
-    private final PixelColoringStrategy pixelColoringStrategy;
+    private final PixelSamplingStrategy pixelSamplingStrategy;
 
     /**
      * Pixel manager for supporting:
@@ -41,7 +40,7 @@ public class Camera {
      */
     private Camera(Builder cameraBuilder) {
         this.imageWriter = cameraBuilder.imageWriter;
-        this.pixelColoringStrategy = cameraBuilder.pixelColoringStrategy;
+        this.pixelSamplingStrategy = cameraBuilder.pixelSamplingStrategy;
     }
 
 
@@ -102,7 +101,7 @@ public class Camera {
      * @param y the y-coordinate of the pixel
      */
     private void castRay(int x, int y) {
-        Color pixelColor = pixelColoringStrategy.calcalatePixelColor(x, y);
+        Color pixelColor = pixelSamplingStrategy.calcalatePixelColor(x, y);
         imageWriter.writePixel(x, y, pixelColor);
     }
 
@@ -114,7 +113,6 @@ public class Camera {
      * @return the Camera instance for method chaining
      */
     public Camera printGrid(int interval, Color color) {
-
         int nX = imageWriter.getNx();
         int nY = imageWriter.getNy();
         for (int x = nX - 1; x >= 0; --x)
@@ -144,7 +142,7 @@ public class Camera {
         private double vpDistance;
         private ImageWriter imageWriter;
         private RayTracerBase rayTracerBase;
-        private PixelColoringStrategy pixelColoringStrategy;
+        private PixelSamplingStrategy pixelSamplingStrategy;
 
         private boolean antiAliasingFlag = false;
         boolean rayTracerWasSet = false;
@@ -343,7 +341,7 @@ public class Camera {
             //-----------3
             ViewPlane viewPlane = new ViewPlane(right, up, vpHeight, vpWidth, center, imageWriter.getNx(), imageWriter.getNy());
             //-----------4
-            pixelColoringStrategy = antiAliasingFlag ? new SuperSamplingAntiAliasing(viewPlane, rayTracerBase, location) : new DefaultColoring(viewPlane, rayTracerBase, location);
+            pixelSamplingStrategy = antiAliasingFlag ? new SuperSamplingAntiAliasing(viewPlane, rayTracerBase, location) : new DefaultSampling(viewPlane, rayTracerBase, location);
 
             return new Camera(this);
         }

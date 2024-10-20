@@ -97,34 +97,23 @@ public class SimpleRayTracer extends RayTracerBase {
                             iL.scale(calcDiffusive(material, nl).add(calcSpecular(material, n, l, nl, v))));
                 }
             }
-
-//            if (compareSign(nl, nv)) {
-//                Double3 ktr = RenderSettings.softShadowsEnabled ?
-//                        softTransparency(gp, lightSource, n) : transparency(gp, lightSource, l, n);
-//                if (!ktr.product(k).lowerThan(RenderSettings.MIN_CALC_COLOR_K)) {
-//                    Color iL = lightSource.getIntensity(gp.point).scale(ktr);
-//                    color = color.add(
-//                            iL.scale(calcDiffusive(material, nl)
-//                                    .add(calcSpecular(material, n, l, nl, v))));
-//                }
-//            }
         }
 
         return color;
     }
 
-//    private Vector canLightReach(LightSource lightSource, GeoPoint gp , Vector v, Vector n, double nv){
-//        Vector l;
-//        double nl;
-//        var lightExtreme = lightSource.findExtreme(n);
-//        for (Point point: lightExtreme){
-//            l = gp.point.subtract(point);
-//            nl = alignZero(n.dotProduct(l));
-//            if (compareSign(nl, nv))
-//                return l.normalize();
-//        }
-//        return null;
-//    }
+    private Vector canLightReach(LightSource lightSource, GeoPoint gp , Vector v, Vector n, double nv){
+        Vector l;
+        double nl;
+        var lightExtreme = lightSource.findExtreme(n);
+        for (Point point: lightExtreme){
+            l = gp.point.subtract(point);
+            nl = alignZero(n.dotProduct(l));
+            if (compareSign(nl, nv))
+                return l.normalize();
+        }
+        return null;
+    }
 
     /**
      * Calculates the global effects of lighting at the given point.

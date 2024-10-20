@@ -5,8 +5,8 @@ import primitives.Point;
 import renderer.RayTracerBase;
 import renderer.ViewPlane;
 
-public class DefaultColoring extends PixelColoringStrategy {
-    public DefaultColoring(ViewPlane viewPlane, RayTracerBase rayTracer, Point camaraLocation) {
+public class DefaultSampling extends PixelSamplingStrategy {
+    public DefaultSampling(ViewPlane viewPlane, RayTracerBase rayTracer, Point camaraLocation) {
         super(viewPlane, rayTracer, camaraLocation);
     }
 

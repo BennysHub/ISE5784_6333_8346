@@ -99,7 +99,7 @@ public class Double3 {
      * each
      * number is multiplied by the number
      *
-     * @param rhs right hand side operand for scaling
+     * @param rhs right-hand side operand for scaling
      * @return result of scale
      */
     public Double3 scale(double rhs) {
@@ -110,7 +110,7 @@ public class Double3 {
      * Reduce (divide) floating point triad by a number into a new triad where each
      * number is divided by the number
      *
-     * @param rhs right hand side operand for reducing
+     * @param rhs right-hand side operand for reducing
      * @return result of scale
      */
     public Double3 reduce(double rhs) {

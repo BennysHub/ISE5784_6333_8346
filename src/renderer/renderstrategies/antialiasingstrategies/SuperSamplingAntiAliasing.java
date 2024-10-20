@@ -4,12 +4,14 @@ import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
-import renderer.*;
+import renderer.RayTracerBase;
+import renderer.ViewPlane;
 
-public class SuperSamplingAntiAliasing extends PixelColoringStrategy {
+//SSAA, we can add MSAA, FXAA, TAA, SMAA
+public class SuperSamplingAntiAliasing extends PixelSamplingStrategy {
 
 
-    private static final int SSAA_SAMPLE_COUNT = 3;//4^x witch is 4^3 = 64
+    private static final int SSAA_SAMPLE_COUNT = 3;
 
     public SuperSamplingAntiAliasing(ViewPlane viewPlane, RayTracerBase rayTracer, Point camaraLocation) {
         super(viewPlane, rayTracer, camaraLocation);
@@ -17,15 +19,31 @@ public class SuperSamplingAntiAliasing extends PixelColoringStrategy {
 
     @Override
     public Color calcalatePixelColor(int x, int y) {
-        return superSamplingAntiAliasing(viewPlane.getPixelCenter(x, y), viewPlane.pixelWidth, viewPlane.pixelHeight, SSAA_SAMPLE_COUNT);
+        //return superSamplingAntiAliasing(viewPlane.getPixelCenter(x, y), viewPlane.pixelWidth, viewPlane.pixelHeight, 1);
+        //return superSamplingAntiAliasingCorners(viewPlane.getPixelCenter(x, y), viewPlane.pixelWidth, viewPlane.pixelHeight, 1);
+
+        Point[] pixelSamples = new Point[4];
+        Vector rightScale = viewPlane.right.scale(viewPlane.pixelWidth / 2);
+        Vector upScale = viewPlane.up.scale(viewPlane.pixelHeight / 2);
+        Point center = viewPlane.getPixelCenter(x, y);
+        pixelSamples[0] = center.add(rightScale).add(upScale);
+        pixelSamples[1] = center.add(rightScale).add(upScale.scale(-1));
+        pixelSamples[2] = center.add(rightScale.scale(-1)).add(upScale);
+        pixelSamples[3] = center.add(rightScale.scale(-1)).add(upScale.scale(-1));
+
+        Ray[] rays = new Ray[4];
+        Color[] colors = new Color[4];
+        for (int i = 0; i < 4; i++) {
+            rays[i] = new Ray(camaraLocation, pixelSamples[i]);
+            colors[i] = rayTracer.traceRay(rays[i]);
+        }
+        return newFunction(viewPlane.getPixelCenter(x, y), viewPlane.pixelWidth, viewPlane.pixelHeight, colors[2], colors[0], colors[3], colors[1], 1);
     }
 
-    //TODO: since we first sample from the center of 4 subPixels and not the absolute corners of the pixel sometime the variance will be 0 since the change in color is after the subpixel center
-    //to deal with it we can start from the absolute 4 corners and use another recursive approach so the sample be spread on all pixel area
     private Color superSamplingAntiAliasing(Point center, double pixelWidth, double pixelHeight, int depth) {
         Point[] pixelSamples = new Point[4];
-        Vector rightScale = viewPlane.right.scale(pixelWidth / 4);
-        Vector upScale = viewPlane.up.scale(pixelHeight / 4);
+        Vector rightScale = viewPlane.right.scale(pixelWidth / 3);
+        Vector upScale = viewPlane.up.scale(pixelHeight / 3);
 
         pixelSamples[0] = center.add(rightScale).add(upScale);
         pixelSamples[1] = center.add(rightScale).add(upScale.scale(-1));
@@ -39,41 +57,78 @@ public class SuperSamplingAntiAliasing extends PixelColoringStrategy {
             colors[i] = rayTracer.traceRay(rays[i]);
         }
 
-        if (depth < 3 && calculateVariance(colors) > 0.01) {
+        if (depth < SSAA_SAMPLE_COUNT ) {//&& Color.variance(colors) > 0.005
             Color accumulatedColor = Color.BLACK;
             for (int i = 0; i < 4; i++) {
-                accumulatedColor = accumulatedColor.add(superSamplingAntiAliasing(pixelSamples[i], pixelWidth / 4, pixelHeight / 4, depth + 1));
+                accumulatedColor = accumulatedColor.add(superSamplingAntiAliasing(pixelSamples[i], pixelWidth / 2, pixelHeight / 2, depth + 1));
+            }
+            return accumulatedColor.reduce(4);
+        }
+        return Color.average(colors);
+    }
+
+    private Color superSamplingAntiAliasingCorners(Point center, double pixelWidth, double pixelHeight, int depth) {
+        Point[] pixelSamples = new Point[4];
+        Vector rightScale = viewPlane.right.scale(pixelWidth / 2);
+        Vector upScale = viewPlane.up.scale(pixelHeight / 2);
+
+        pixelSamples[0] = center.add(rightScale).add(upScale);
+        pixelSamples[1] = center.add(rightScale).add(upScale.scale(-1));
+        pixelSamples[2] = center.add(rightScale.scale(-1)).add(upScale);
+        pixelSamples[3] = center.add(rightScale.scale(-1)).add(upScale.scale(-1));
+
+        Ray[] rays = new Ray[4];
+        Color[] colors = new Color[4];
+        for (int i = 0; i < 4; i++) {
+            rays[i] = new Ray(camaraLocation, pixelSamples[i]);
+            colors[i] = rayTracer.traceRay(rays[i]);
+        }
+
+        if (depth < SSAA_SAMPLE_COUNT) {//&& Color.variance(colors) > 0.001
+            Color accumulatedColor = Color.BLACK;
+            for (int i = 0; i < 4; i++) {
+                accumulatedColor = accumulatedColor.add(superSamplingAntiAliasingCorners(pixelSamples[i], pixelWidth / 2, pixelHeight / 2, depth + 1));
             }
             return accumulatedColor.reduce(4);
         }
 
-        return colors[0].add(colors[1], colors[2], colors[3]).reduce(4);
+        return Color.average(colors);
     }
 
-    public double calculateVariance(Color... colors) {
-        int n = colors.length;
-        double meanR = 0, meanG = 0, meanB = 0;
-        for (Color color : colors) {
-            meanR += color.getR();
-            meanG += color.getG();
-            meanB += color.getB();
-        }
-        meanR /= n;
-        meanG /= n;
-        meanB /= n;
 
-        double varianceR = 0, varianceG = 0, varianceB = 0;
-        for (Color color : colors) {
-            varianceR += Math.pow(color.getR() - meanR, 2);
-            varianceG += Math.pow(color.getG() - meanG, 2);
-            varianceB += Math.pow(color.getB() - meanB, 2);
-        }
-        varianceR /= n;
-        varianceG /= n;
-        varianceB /= n;
+    private Color newFunction(Point center, double pixelWidth, double pixelHeight, Color topLeft, Color topRight, Color bottomLeft, Color bottomRight, int depth) {
 
-        return (varianceR + varianceG + varianceB) / 3; // Average variance of r, g, b
+
+        if (depth < SSAA_SAMPLE_COUNT) {// && Color.variance(topLeft, topRight, bottomLeft, bottomRight) > 0.001
+            Point[] pixelSamples = new Point[5];
+            Vector rightScale = viewPlane.right.scale(pixelWidth / 2);
+            Vector upScale = viewPlane.up.scale(pixelHeight / 2);
+
+            pixelSamples[0] = center.add(upScale);
+            pixelSamples[1] = center.add(rightScale);
+            pixelSamples[2] = center.add(upScale.scale(-1));
+            pixelSamples[3] = center.add(rightScale.scale(-1));
+            pixelSamples[4] = center;
+
+            Ray[] rays = new Ray[5];
+            Color[] colors = new Color[5];
+            for (int i = 0; i < 5; i++) {
+                rays[i] = new Ray(camaraLocation, pixelSamples[i]);
+                colors[i] = rayTracer.traceRay(rays[i]);
+            }
+            rightScale = viewPlane.right.scale(pixelWidth / 4);
+            upScale = viewPlane.up.scale(pixelHeight / 4);
+
+            Color accumulatedColor = newFunction(center.add(rightScale.scale(-1)).add(upScale), pixelWidth / 2, pixelHeight / 2, topLeft, colors[0], colors[3], colors[4], depth + 1);
+            accumulatedColor = accumulatedColor.add(newFunction(center.add(rightScale).add(upScale), pixelWidth / 2, pixelHeight / 2, colors[0], topRight, colors[4], colors[1], depth + 1));
+            accumulatedColor = accumulatedColor.add(newFunction(center.add(rightScale.scale(-1)).add(upScale.scale(-1)), pixelWidth / 2, pixelHeight / 2, colors[3], colors[4], bottomLeft, colors[2], depth + 1));
+            accumulatedColor = accumulatedColor.add(newFunction(center.add(rightScale).add(upScale.scale(-1)), pixelWidth / 2, pixelHeight / 2, colors[4], colors[1], colors[2], bottomRight, depth + 1));
+            return accumulatedColor.reduce(4);
+        }
+        return Color.average(topLeft, topRight, bottomLeft, bottomRight);
     }
+
+
 
 
 }

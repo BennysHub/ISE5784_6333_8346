@@ -2,7 +2,8 @@ package primitives;
 
 /**
  * Wrapper class for java.jwt.Color The constructors operate with any
- * non-negative RGB values. The colors are maintained without upper limit of
+ * non-negative RGB values.
+ * The colors are maintained without an upper limit of
  * 255. Some additional operations are added that are useful for manipulating
  * light's colors
  *
@@ -116,27 +117,47 @@ public class Color {
         return new Color(rgb.scale(k));
     }
 
-    public double getR(){
-        return rgb.d1;
-    }
-
-    public double getG(){
-        return rgb.d2;
-    }
-
-    public double getB(){
-        return rgb.d3;
-    }
-
     /**
-     * Scale the color by (1 / reduction factor)
+     * Scale the color by (one / reduction factor)
      *
      * @param k reduction factor
      * @return new Color object which is the result of the operation
      */
     public Color reduce(double k) {
-        //  if (k < 1) throw new IllegalArgumentException("Can't scale a color by a by a number lower than 1");
+        //  if (k < 1) throw new IllegalArgumentException("Can't scale a color by a number lower than 1");
         return new Color(rgb.reduce(k));
+    }
+
+    public static Color average(Color... colors) {
+        Color averageColor = Color.BLACK;
+        averageColor = averageColor.add(colors);
+        return averageColor.reduce(colors.length);
+    }
+
+
+    public static double variance(Color... colors) {
+        int n = colors.length;
+        double meanR = 0, meanG = 0, meanB = 0;
+        for (Color color : colors) {
+            meanR += color.rgb.d1;
+            meanG += color.rgb.d2;
+            meanB += color.rgb.d3;
+        }
+        meanR /= n;
+        meanG /= n;
+        meanB /= n;
+
+        double varianceR = 0, varianceG = 0, varianceB = 0;
+        for (Color color : colors) {
+            varianceR += Math.pow(color.rgb.d1 - meanR, 2);
+            varianceG += Math.pow(color.rgb.d2 - meanG, 2);
+            varianceB += Math.pow(color.rgb.d3 - meanB, 2);
+        }
+        varianceR /= n;
+        varianceG /= n;
+        varianceB /= n;
+
+        return (varianceR + varianceG + varianceB) / 3; // Average variance of r, g, b
     }
 
     @Override
