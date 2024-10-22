@@ -30,11 +30,10 @@ public interface LightSource {
      * Generates a beam of rays from the given point and normal.
      *
      * @param p         The target point.
-     * @param n         The normal vector at the target point.
      * @param numOfRays The number of rays to generate.
      * @return A list of rays forming a beam.
      */
-    List<Ray> getRaysBeam(Point p, Vector n, int numOfRays);
+    List<Ray> getRaysBeam(Point p, int numOfRays);
 
 
     /**
@@ -44,6 +43,4 @@ public interface LightSource {
      * @return the distance between the position and the given point
      */
     double getDistance(Point point);
-
-    List<Point> findExtreme(Vector vector);
 }

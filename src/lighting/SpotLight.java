@@ -16,6 +16,7 @@ import static primitives.Util.isZero;
  * A spotlight is a point light with a specific direction and intensity that decreases with distance and angle.
  */
 public class SpotLight extends PointLight {
+
     private final Vector direction;
 
     private int beamFocus = 1;
@@ -68,21 +69,12 @@ public class SpotLight extends PointLight {
     }
 
     @Override
-    public List<Ray> getRaysBeam(Point p, Vector n, int numOfRays) {
-
-        //return null;
-        //return Blackboard.constructRays(position, p, direction, size, numOfRays);
-        return Blackboard.constructRays(Blackboard.getPointsOnSphere(n, position, size, numOfRays), p);
+    public List<Ray> getRaysBeam(Point p, int numOfRays) {
+        return Blackboard.constructRays(Blackboard.getPointsOnSphere(direction, position, size, numOfRays), p);
     }
 
     @Override
-    public List<Point> findExtreme(Vector vector) {
-        if (isZero(size))
-            return List.of(position);
-        Vector projection = vector.projection(direction);
-        Vector spotLightDiskVector = vector.subtract(projection);
-        Vector normalizeSpotLightVector = spotLightDiskVector.normalize();
-        return List.of(position.add(normalizeSpotLightVector.scale(size)));
-
-    }
+    public double getDistance(Point point) {
+        return point.distance(position) - size;
+    }//disk min distance???
 }

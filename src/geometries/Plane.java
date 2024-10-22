@@ -61,7 +61,7 @@ public class Plane extends Geometry {
      * @return The normalized normal vector of the plane.
      */
     public Vector getNormal() {
-        return planeNormalizedVector.scale(1);
+        return planeNormalizedVector.scale(-1);
     }
 
     @Override

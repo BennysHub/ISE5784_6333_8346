@@ -38,8 +38,8 @@ public final class Blackboard {
                 double x = -(i - (cellsInRow - 1) / 2d) * cellVertexSize;
                 double y = (j - (cellsInRow - 1) / 2d) * cellVertexSize;
 
-                x += random(-cellVertexSize / 2, cellVertexSize / 2);
-                y += random(-cellVertexSize / 2, cellVertexSize / 2);
+//                x += random(-cellVertexSize / 2, cellVertexSize / 2);
+//                y += random(-cellVertexSize / 2, cellVertexSize / 2);
 
 //                Point warpedPoint = warpSquareToCircle(x, y, radius, right, up, center);
 //                pointsOnArea.add(warpedPoint);
@@ -51,11 +51,11 @@ public final class Blackboard {
                     if (!isZero(y)) point = point.add(up.scale(y));
 
 
-                    double distanceFromCenter = point.distance(center);
-                    double radiusMinusDistanceFromCenter = alignZero(radius - distanceFromCenter);
-
-                    if (radiusMinusDistanceFromCenter > 0)
-                        point = point.add(normal.scale(radiusMinusDistanceFromCenter));
+//                    double distanceFromCenter = point.distance(center);
+//                    double radiusMinusDistanceFromCenter = alignZero(radius - distanceFromCenter);
+//
+//                    if (radiusMinusDistanceFromCenter > 0)
+//                        point = point.add(normal.scale(radiusMinusDistanceFromCenter));
                     pointsOnArea.add(point);
                 }
             }

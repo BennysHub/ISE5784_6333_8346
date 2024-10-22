@@ -36,7 +36,7 @@ public class DirectionalLight extends Light implements LightSource {
     }
 
     @Override
-    public List<Ray> getRaysBeam(Point p, Vector n, int numOfRays) {
+    public List<Ray> getRaysBeam(Point p, int numOfRays) {
         return List.of(new Ray(p, direction));
     }
 

@@ -102,29 +102,30 @@ public class SoftShadowsTest {
         Material ground = new Material().setKd(KD3).setKs(KS3).setShininess(SHININESS);
         scene.geometries.add(
                 new Plane(new Point(15, 0, 15), new Point(-15, 0, -15), new Point(-15, 0, 15)).setMaterial(ground),
-                new Sphere(3, new Point(0, 1, 0)).setMaterial(new Material().setKd(new Double3(0.8, 0.263, 0.145)).setKs(0.1).setShininess(15))
+                new Sphere(3, new Point(0, 1, 0)).setMaterial(new Material().setKd(new Double3(0.8, 0.263, 0.145)).setKs(0.1).setShininess(10))
         );
 
         scene.setAmbientLight(new AmbientLight(new Color(255, 191, 191), new Double3(0.15, 0.15, 0.3)));
 
 
-//        scene.lights.add(
-//                new SpotLight(new Color(255, 255, 255), new Point(20, -1, 0), new Point(0, 1, 0).subtract(new Point(20,-1, 0))).setKl(0.02).setKc(0).setSize(3)
-//                );
-
         scene.lights.add(
-                new PointLight(new Color(255, 255, 255), new Point(20, -1, 0)).setKl(0.02).setKc(0).setSize(3)
+                new SpotLight(new Color(255, 255, 255), new Point(20, -1, 0), new Point(0, 1, 0).subtract(new Point(20,-1, 0))).setKl(0.02).setKc(0).setSize(3)
                 );
 
+//        scene.lights.add(
+//                new PointLight(new Color(255, 255, 255), new Point(20, -1, 0)).setKl(0.008).setKc(0).setSize(3)
+//                );
+
         final Camera.Builder camera2 = Camera.getBuilder()
-                .setSoftShadows(false)
+                .setSoftShadows(true)
                 .setScene(scene)
                 .setLocation(new Point(-1, 6, -1))
                 .setTarget(Point.ZERO)
-                //.setMultiThreading(6)
-                .setVpSize(150, 150).setVpDistance(30);
+                .setMultiThreading(16)
+                .setVpSize(150, 150).setVpDistance(30)
+                .setAntiAliasing(false);
 
-        camera2.setResolution("underTheHorizon", 2540, 2540)
+        camera2.setResolution("underTheHorizon", 1080, 1080)
                 .build()
                 .renderImage()
                 .writeToImage();
