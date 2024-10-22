@@ -8,6 +8,8 @@ package primitives;
  */
 public class Vector extends Point {
 
+    private boolean isNormalized = false;
+
     /**
      * Constructs a new Vector with the specified coordinates.
      * Throws IllegalArgumentException if the vector is a zero vector.
@@ -32,6 +34,14 @@ public class Vector extends Point {
         super(double3);
         if (xyz.equals(Double3.ZERO))
             throw new IllegalArgumentException("Vector Zero is not allowed.");
+    }
+
+    private Vector(Double3 double3, boolean isNormalized) {
+        super(double3);
+        if (xyz.equals(Double3.ZERO))
+            throw new IllegalArgumentException("Vector Zero is not allowed.");
+
+        this.isNormalized = true;
     }
 
     /**
@@ -120,7 +130,7 @@ public class Vector extends Point {
      * @return A new Vector that is the normalized version of this vector.
      */
     public Vector normalize() {
-        return new Vector(xyz.reduce(length()));
+        return isNormalized ? this : new Vector(xyz.reduce(length()), true);
     }
 
     @Override

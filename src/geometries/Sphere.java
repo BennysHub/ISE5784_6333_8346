@@ -88,6 +88,6 @@ public class Sphere extends RadialGeometry {
 
     @Override
     protected Intersectable duplicateObjectHelper(Vector vector) {
-        return new Sphere(radius, center.add(vector)).setMaterial(this.getMaterial()).setEmission(this.getEmission());
+        return new Sphere(radius, center.add(vector)).setMaterial(this.getMaterial());
     }
 }

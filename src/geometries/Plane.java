@@ -61,12 +61,12 @@ public class Plane extends Geometry {
      * @return The normalized normal vector of the plane.
      */
     public Vector getNormal() {
-        return planeNormalizedVector.scale(-1);
+        return planeNormalizedVector;
     }
 
     @Override
     protected Intersectable duplicateObjectHelper(Vector vector){
-        return new Plane(planePoint.add(vector), planeNormalizedVector).setMaterial(this.getMaterial()).setEmission(this.getEmission());
+        return new Plane(planePoint.add(vector), planeNormalizedVector).setMaterial(this.getMaterial());
     }
 
     @Override

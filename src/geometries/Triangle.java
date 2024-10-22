@@ -32,7 +32,7 @@ public class Triangle extends Polygon {
 
     @Override
     protected Intersectable duplicateObjectHelper(Vector vector){
-        return new Triangle(vertices.getFirst().add(vector), vertices.get(1).add(vector), vertices.get(2).add(vector)).setMaterial(this.getMaterial()).setEmission(this.getEmission());
+        return new Triangle(vertices.getFirst().add(vector), vertices.get(1).add(vector), vertices.get(2).add(vector)).setMaterial(this.getMaterial());
     }
 
     @Override

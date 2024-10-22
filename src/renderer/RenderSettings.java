@@ -14,7 +14,7 @@ public class RenderSettings {
      * The minimum value for the reflection/refraction coefficient in color calculations.
      */
     static public final double MIN_CALC_COLOR_K = 0.001;
-    public static final int SHADOW_RAYS_SAMPLE_COUNT = 49 ;
+    public static int SHADOW_RAYS_SAMPLE_COUNT = 49 ;
 
 
     /**

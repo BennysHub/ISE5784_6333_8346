@@ -125,7 +125,7 @@ public class LightsTests {
      * The sphere in appropriate tests
      */
     private final Geometry sphere = new Sphere(SPHERE_RADIUS, sphereCenter)
-            .setEmission(sphereColor).setMaterial(new Material().setKd(KD).setKs(KS).setShininess(SHININESS));
+            .setMaterial(new Material().setKd(KD).setKs(KS).setShininess(SHININESS).setEmission(sphereColor));
     /**
      * The first triangle in appropriate tests
      */
@@ -259,7 +259,6 @@ public class LightsTests {
                 ));
 
         camera1.setResolution("allLightsSphere", 500, 500)
-                .duplicateScene(new Vector(10,10,10))
                 .build()
                 .renderImage()
                 .writeToImage();

@@ -45,13 +45,14 @@
     "geometries": {
       "description": {
         "d1": "all geometries can have a emission and a material, both optional",
-        "emission (Color)": "0 127 255",
+
         "material(all fields are optional)": {
           "kD (Double3)": 0.2,
           "kS (Double3)": "0.8",
           "kT (Double3)": "0.9 0.1 0",
           "kR (Double3)": "must be greater than 0",
-          "shininess (int)": 30
+          "shininess (int)": 30,
+          "emission (Color)": "0 127 255"
         }
       },
       "triangle": [

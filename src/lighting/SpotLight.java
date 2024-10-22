@@ -74,7 +74,7 @@ public class SpotLight extends PointLight {
     }
 
     @Override
-    public double getDistance(Point point) {
-        return point.distance(position) - size;
-    }//disk min distance???
+    public List<Point> getLightSample(Point p, int samplesCount) {
+        return Blackboard.getPointsOnSphere(direction, position, size, samplesCount);
+    }
 }

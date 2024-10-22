@@ -171,6 +171,9 @@ public class JsonSceneParser extends Scene {
             material.setKt(parseDouble3(materialJson.get("kT").getAsString()));
         if (materialJson.has("kR"))
             material.setKr(parseDouble3(materialJson.get("kR").getAsString()));
+        if (materialJson.has("emission"))
+            material.setEmission(parseColor(materialJson.get("emission").getAsString()));
+
         material.setShininess(materialJson.has("shininess") ? materialJson.get("shininess").getAsInt() : 0);
 
         return material;
@@ -270,10 +273,10 @@ public class JsonSceneParser extends Scene {
         double sphereRadius = sphereJson.get("radius").getAsDouble();
         Sphere sphere = new Sphere(sphereRadius, sphereCenter);
 
-        if (sphereJson.has("emission")) {
-            Color emissionColor = parseColor(sphereJson.get("emission").getAsString());
-            sphere.setEmission(emissionColor);
-        }
+//        if (sphereJson.has("emission")) {
+//            Color emissionColor = parseColor(sphereJson.get("emission").getAsString());
+//            sphere.setEmission(emissionColor);
+//        }
 
         if (sphereJson.has("material")) {
             sphere.setMaterial(parseMaterial(sphereJson.getAsJsonObject("material")));
@@ -293,10 +296,10 @@ public class JsonSceneParser extends Scene {
         Point p2 = parsePoint(triangleJson.get("p2").getAsString());
         Triangle triangle = new Triangle(p0, p1, p2);
 
-        if (triangleJson.has("emission")) {
-            Color emissionColor = parseColor(triangleJson.get("emission").getAsString());
-            triangle.setEmission(emissionColor);
-        }
+//        if (triangleJson.has("emission")) {
+//            Color emissionColor = parseColor(triangleJson.get("emission").getAsString());
+//            triangle.setEmission(emissionColor);
+//        }
 
         if (triangleJson.has("material")) {
             triangle.setMaterial(parseMaterial(triangleJson.getAsJsonObject("material")));
@@ -362,9 +365,9 @@ public class JsonSceneParser extends Scene {
                         try {
                             Triangle triangle = new Triangle(p0, p1, p2);
 
-                            if (emissionColor != null) {
-                                triangle.setEmission(emissionColor);
-                            }
+//                            if (emissionColor != null) {
+//                                triangle.setEmission(emissionColor);
+//                            }
                             if (material != null) {
                                 triangle.setMaterial(material);
                             }

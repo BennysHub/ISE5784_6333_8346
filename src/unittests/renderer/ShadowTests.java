@@ -1,7 +1,6 @@
 package renderer;
 
 import geometries.Intersectable;
-
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;
@@ -10,9 +9,13 @@ import lighting.PointLight;
 import lighting.SpotLight;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import primitives.*;
+import primitives.Color;
+import primitives.Material;
+import primitives.Point;
+import primitives.Vector;
 import scene.JsonSceneParser;
 import scene.Scene;
+
 import static java.awt.Color.*;
 
 /**
@@ -33,19 +36,18 @@ public class ShadowTests {
             .setLocation(new Point(0, 0, 1000)).setVpDistance(1000)
             .setVpSize(162, 288)
             .setSoftShadows(false)
-            .setAntiAliasing(true)
+            .setAntiAliasing(false)
             .setScene(scene);
 
     /**
      * The sphere in the tests
      */
     private final Intersectable sphere = new Sphere(60d, new Point(0, 0, -200))
-            .setEmission(new Color(BLUE))
-            .setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30));
+            .setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30).setEmission(new Color(BLUE)));
     /**
      * The material of the triangles in the tests
      */
-    private final Material trMaterial = new Material().setKd(0.5).setKs(0.5).setShininess(30);
+    private final Material trMaterial = new Material().setKd(0.5).setKs(0.5).setShininess(30).setEmission(new Color(BLUE));
 
     /**
      * Helper function for the tests in this module
@@ -55,7 +57,7 @@ public class ShadowTests {
      * @param spotLocation the spotlight location in the test
      */
     private void sphereTriangleHelper(String pictName, Triangle triangle, Point spotLocation) {
-        scene.geometries.add(sphere, triangle.setEmission(new Color(BLUE)).setMaterial(trMaterial));
+        scene.geometries.add(sphere, triangle.setMaterial(trMaterial));
         scene.lights.add(
                 new SpotLight(new Color(400, 240, 0), spotLocation, new Vector(1, 1, -3))
                         .setKl(1E-5).setKq(1.5E-7).setSize(2));
@@ -131,8 +133,7 @@ public class ShadowTests {
                 new Triangle(new Point(-150, -150, -115), new Point(-70, 70, -140), new Point(75, 75, -150))
                         .setMaterial(new Material().setKs(0.8).setShininess(60)),
                 new Sphere(30d, new Point(0, 0, -11))
-                        .setEmission(new Color(BLUE))
-                        .setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30))
+                        .setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30).setEmission(new Color(BLUE)))
         );
         scene.setAmbientLight(new AmbientLight(new Color(WHITE), 0.15));
         scene.lights.add(

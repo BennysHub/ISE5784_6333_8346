@@ -19,14 +19,6 @@ public interface LightSource {
     Color getIntensity(Point p);
 
     /**
-     * Gets the vector from the light source to a specific point.
-     *
-     * @param p the point at which the vector is to be calculated
-     * @return the vector from the light source to the given point
-     */
-    Vector getL(Point p);
-
-    /**
      * Generates a beam of rays from the given point and normal.
      *
      * @param p         The target point.
@@ -35,12 +27,8 @@ public interface LightSource {
      */
     List<Ray> getRaysBeam(Point p, int numOfRays);
 
+    List<Point>getLightSample(Point p, int samplesCount);
 
-    /**
-     * Calculate the distance between the light source and a point
-     *
-     * @param point the point witch we refer to
-     * @return the distance between the position and the given point
-     */
-    double getDistance(Point point);
+    Vector getL(Point to, Point lightPoint);
+
 }

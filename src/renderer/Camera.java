@@ -256,17 +256,13 @@ public class Camera {
          * @return the current Builder object for chaining method calls.
          */
         public Builder setBVH(Boolean flag) {
-            if (flag) {
+            if (flag)
                 setCBR(true);
-                this.rayTracerBase.scene.geometries.buildBVH();
-            }
             RenderSettings.BVHIsEnabled = flag;
             return this;
         }
 
         public Builder setCBR(Boolean flag) {
-            if (flag)
-                this.rayTracerBase.scene.geometries.calculateAABB();
             RenderSettings.CBRIsEnabled = flag;
             return this;
         }
@@ -331,6 +327,14 @@ public class Camera {
             if (this.rayTracerBase == null)
                 throw new MissingResourceException("Missing camera rayTracerBase", Camera.class.getName(), "rayTracerBase");
 
+            if (RenderSettings.CBRIsEnabled)
+                this.rayTracerBase.scene.geometries.calculateAABB();
+
+            if (RenderSettings.BVHIsEnabled)
+                this.rayTracerBase.scene.geometries.buildBVH();
+
+            if (!RenderSettings.softShadowsEnabled)
+                RenderSettings.SHADOW_RAYS_SAMPLE_COUNT = 1;
 
             //after all, the checks above set by order!!
             //-----------1

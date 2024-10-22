@@ -106,11 +106,6 @@ public class PointLight extends Light implements LightSource {
     }
 
     @Override
-    public Vector getL(Point p) {//original
-        return p.subtract(position).normalize();
-    }
-
-    @Override
     public List<Ray> getRaysBeam(Point p, int numOfRays) {
 //        if (lightSourceSample == null)
 //            lightSourceSample = Blackboard.getSphereSampleWithZNormal(position, size);
@@ -127,8 +122,13 @@ public class PointLight extends Light implements LightSource {
     }
 
     @Override
-    public double getDistance(Point point) {
-        return point.distance(position) - size;
-    }//sphere min distance
+    public List<Point> getLightSample(Point p, int samplesCount) {
+        return Blackboard.getPointsOnSphere(p.subtract(position).normalize(), position, size, samplesCount);
+    }
+
+    @Override
+    public Vector getL(Point to, Point lightPoint) {
+        return to.subtract(lightPoint).normalize();
+    }
 
 }

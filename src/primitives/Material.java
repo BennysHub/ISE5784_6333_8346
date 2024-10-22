@@ -1,10 +1,18 @@
 package primitives;
 
+import geometries.Geometry;
+
 /**
  * Class representing the material properties of a surface in a 3D scene.
  * Includes diffuse and specular reflection coefficients and shininess factor.
  */
 public class Material {
+
+    /**
+     * The emission color of the material, default is black.
+     */
+    protected Color emission = Color.BLACK;
+
     /**
      * The diffuse reflection coefficient, default is zero.
      */
@@ -29,6 +37,26 @@ public class Material {
      * The shininess factor, default is zero.
      */
     public int shininess = 0;
+
+    /**
+     * Gets the emission color of the geometry.
+     *
+     * @return the emission color of the geometry
+     */
+    public Color getEmission() {
+        return emission;
+    }
+
+    /**
+     * Sets the emission color of the geometry.
+     *
+     * @param emission the new emission color
+     * @return the current Geometry object, for method chaining
+     */
+    public Material setEmission(Color emission) {
+        this.emission = emission;
+        return this;
+    }
 
     /**
      * Sets the diffuse reflection coefficient.

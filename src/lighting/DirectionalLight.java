@@ -31,22 +31,19 @@ public class DirectionalLight extends Light implements LightSource {
     }
 
     @Override
-    public Vector getL(Point p) {
+    public List<Ray> getRaysBeam(Point p, int numOfRays) {
+        return List.of(new Ray(Point.POSITIVE_INFINITY, direction));
+    }
+
+    @Override
+    public List<Point> getLightSample(Point p, int samplesCount) {
+        return List.of(Point.ZERO);
+    }
+
+    @Override
+    public Vector getL(Point to, Point lightPoint) {
         return direction;
     }
 
-    @Override
-    public List<Ray> getRaysBeam(Point p, int numOfRays) {
-        return List.of(new Ray(p, direction));
-    }
 
-    @Override
-    public double getDistance(Point point) {
-        return Double.POSITIVE_INFINITY;
-    }
-
-    @Override
-    public List<Point> findExtreme(Vector vector) {
-        return null;
-    }
 }

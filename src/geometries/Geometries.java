@@ -47,7 +47,7 @@ public class Geometries extends Intersectable {
 
 
     @Override
-    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {//TODO if geometries is null we'll get null exception
         List<GeoPoint> intersections = null;
         for (Intersectable intersectable : geometries) {
             var geometryIntersections = intersectable.findGeoIntersections(ray, maxDistance);
