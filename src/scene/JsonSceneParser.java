@@ -194,9 +194,9 @@ public class JsonSceneParser extends Scene {
                 Color intensity = parseColor(spotLightJson.get("intensity").getAsString());
                 Point position = parsePoint(spotLightJson.get("position").getAsString());
                 Vector direction = parseVector(spotLightJson.get("direction").getAsString());
-                SpotLight spotLight = new SpotLight(intensity, position, direction);
-                if (spotLightJson.has("size"))
-                    spotLight.setSize(spotLightJson.get("size").getAsInt());
+                SpotLight spotLight = spotLightJson.has("size")
+                        ? new SpotLight(intensity, position, direction, spotLightJson.get("size").getAsDouble())
+                        : new SpotLight(intensity, position, direction);
                 if (spotLightJson.has("narrowBeam"))
                     spotLight.setNarrowBeam(spotLightJson.get("narrowBeam").getAsInt());
                 this.lights.add(spotLight);
@@ -210,9 +210,9 @@ public class JsonSceneParser extends Scene {
                 JsonObject pointLightJson = element.getAsJsonObject();
                 Color intensity = parseColor(pointLightJson.get("intensity").getAsString());
                 Point position = parsePoint(pointLightJson.get("position").getAsString());
-                PointLight pointLight = new PointLight(intensity, position);
-                if (pointLightJson.has("size"))
-                    pointLight.setSize(pointLightJson.get("size").getAsInt());
+                PointLight pointLight = pointLightJson.has("size")
+                        ? new PointLight(intensity, position, pointLightJson.get("size").getAsDouble())
+                        : new PointLight(intensity, position);
                 this.lights.add(pointLight);
             }
         }
@@ -273,11 +273,6 @@ public class JsonSceneParser extends Scene {
         double sphereRadius = sphereJson.get("radius").getAsDouble();
         Sphere sphere = new Sphere(sphereRadius, sphereCenter);
 
-//        if (sphereJson.has("emission")) {
-//            Color emissionColor = parseColor(sphereJson.get("emission").getAsString());
-//            sphere.setEmission(emissionColor);
-//        }
-
         if (sphereJson.has("material")) {
             sphere.setMaterial(parseMaterial(sphereJson.getAsJsonObject("material")));
         }
@@ -295,11 +290,6 @@ public class JsonSceneParser extends Scene {
         Point p1 = parsePoint(triangleJson.get("p1").getAsString());
         Point p2 = parsePoint(triangleJson.get("p2").getAsString());
         Triangle triangle = new Triangle(p0, p1, p2);
-
-//        if (triangleJson.has("emission")) {
-//            Color emissionColor = parseColor(triangleJson.get("emission").getAsString());
-//            triangle.setEmission(emissionColor);
-//        }
 
         if (triangleJson.has("material")) {
             triangle.setMaterial(parseMaterial(triangleJson.getAsJsonObject("material")));
@@ -364,10 +354,6 @@ public class JsonSceneParser extends Scene {
 
                         try {
                             Triangle triangle = new Triangle(p0, p1, p2);
-
-//                            if (emissionColor != null) {
-//                                triangle.setEmission(emissionColor);
-//                            }
                             if (material != null) {
                                 triangle.setMaterial(material);
                             }

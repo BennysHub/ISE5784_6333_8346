@@ -1,5 +1,7 @@
 package primitives;
 
+import static primitives.Util.isZero;
+
 /**
  * Represents a vector in 3D space, extending the Point class with additional vector operations.
  * Vectors can be added, scaled, and normalized, and their dot- and cross-products can be computed.
@@ -99,7 +101,16 @@ public class Vector extends Point {
         );
     }
 
-    public Vector projection(Vector other){
+    public boolean parallel(Vector vector) {
+
+        double crossX = xyz.d2 * vector.xyz.d3 - xyz.d3 * vector.xyz.d2;
+        double crossY = xyz.d3 * vector.xyz.d1 - xyz.d1 * vector.xyz.d3;
+        double crossZ = xyz.d1 * vector.xyz.d2 - xyz.d2 * vector.xyz.d1;
+
+        return isZero(crossX) && isZero(crossY) && isZero(crossZ);
+    }
+
+    public Vector projection(Vector other) {
         double dotProduct = this.dotProduct(other);
         double otherLengthSquared = other.lengthSquared();
         return other.scale(dotProduct / otherLengthSquared);

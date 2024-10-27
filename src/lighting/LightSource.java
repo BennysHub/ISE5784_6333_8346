@@ -10,24 +10,9 @@ import java.util.List;
  */
 public interface LightSource {
 
-    /**
-     * Gets the intensity of the light at a specific point.
-     *
-     * @param p the point at which the light intensity is to be calculated
-     * @return the color representing the light intensity at the given point
-     */
-    Color getIntensity(Point p);
+    Color getIntensity(Point p, Point lightPoint);
 
-    /**
-     * Generates a beam of rays from the given point and normal.
-     *
-     * @param p         The target point.
-     * @param numOfRays The number of rays to generate.
-     * @return A list of rays forming a beam.
-     */
-    List<Ray> getRaysBeam(Point p, int numOfRays);
-
-    List<Point>getLightSample(Point p, int samplesCount);
+    Point[] getLightSample(Point p, int samplesCount);
 
     Vector getL(Point to, Point lightPoint);
 

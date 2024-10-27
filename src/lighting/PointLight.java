@@ -1,14 +1,9 @@
 package lighting;
 
-import primitives.*;
-import renderer.RenderSettings;
+import primitives.Color;
+import primitives.Point;
+import primitives.Vector;
 import renderer.super_sampling.Blackboard;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static primitives.Util.alignZero;
-import static primitives.Util.compareSign;
 
 /**
  * Class representing a point light source in a 3D scene.
@@ -25,9 +20,9 @@ public class PointLight extends Light implements LightSource {
     /**
      * Size of the light. Use for soft shadows
      */
-    protected double size = 0d;
+    protected double radius = 0d;
 
-    List<Point> lightSourceSample = null;
+    protected Point[] lightSamples = null;
 
     private double kC = 1;
     private double kL = 0;
@@ -42,6 +37,12 @@ public class PointLight extends Light implements LightSource {
     public PointLight(Color intensity, Point position) {
         super(intensity);
         this.position = position;
+    }
+
+    public PointLight(Color intensity, Point position, double radius) {
+        this(intensity, position);
+        this.radius = radius;
+        setLightSamples();
     }
 
     /**
@@ -82,48 +83,24 @@ public class PointLight extends Light implements LightSource {
      *
      * @return the size of the light
      */
-    public Double getSize() {
-        return size;
+    public Double getRadius() {
+        return radius;
     }
 
-    /**
-     * Sets the size/radius of the light.
-     *
-     * @param size the size/radius of the light
-     * @return the current PointLight instance for chaining
-     */
-    public PointLight setSize(double size) {
-        this.size = size;
-        return this;
+    protected void setLightSamples() {
+
     }
 
     @Override
-    public Color getIntensity(Point p) {
-        double d = p.distance(position) - size;
-        if (alignZero(d) <= 0)
-            d =0;
+    public Color getIntensity(Point p, Point lightPoint) {
+        //what if the point is inside the light sphere??
+        double d = p.distance(lightPoint);
         return intensity.reduce(kC + (kL * d) + (kQ * d * d));
     }
 
     @Override
-    public List<Ray> getRaysBeam(Point p, int numOfRays) {
-//        if (lightSourceSample == null)
-//            lightSourceSample = Blackboard.getSphereSampleWithZNormal(position, size);
-//        return Blackboard.constructRays(Blackboard.rotatePointsOnSphere(lightSourceSample, new Vector(0,0,1), n, position), p);
-        return Blackboard.constructRays(Blackboard.getPointsOnSphere(p.subtract(position).normalize(), position, size, numOfRays), p);
-
-
-//        var x = Blackboard.applyJitter( Blackboard.warpToDisk(Blackboard.grid169, size), size/numOfRays );
-//        var y = Blackboard.convertTo3D(x, position, n.perpendicular(), n.perpendicular().crossProduct(n));
-//        y = Blackboard.addSphereDepth(y, position, size, n);
-//        return Blackboard.constructRays(y, n);
-
-
-    }
-
-    @Override
-    public List<Point> getLightSample(Point p, int samplesCount) {
-        return Blackboard.getPointsOnSphere(p.subtract(position).normalize(), position, size, samplesCount);
+    public Point[] getLightSample(Point p, int samplesCount) {
+        return samplesCount == 1 ? new Point[]{position} : Blackboard.getSpherePoints(position, radius, p.subtract(position).normalize());
     }
 
     @Override

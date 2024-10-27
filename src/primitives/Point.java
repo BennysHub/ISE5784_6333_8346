@@ -110,7 +110,7 @@ public class Point {
 
     @Override
     public String toString() {
-        return String.valueOf(xyz);
+        return  String.valueOf(xyz);
     }
 
     @Override

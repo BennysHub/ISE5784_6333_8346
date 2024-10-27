@@ -211,4 +211,23 @@ class VectorTest {
         assertTrue(v1.dotProduct(normalizedV1) > 0,
                 "The normalized vector should have the same direction as the original vector.");
     }
+
+    @Test
+    void perpendicular() {
+        Vector a = new Vector(3, -1, 12);
+        Vector b = a.perpendicular();
+        assertEquals(0d, a.dotProduct(b), DELTA,
+                "Dot product of orthogonal vectors should be zero.");
+    }
+
+    @Test
+    void parallel() {
+        assertTrue(v1.parallel(v2));
+        assertTrue(new Vector(0, 0, 2).parallel(new Vector(0, 0, 1)));
+    }
+
+    @Test
+    void projection() {
+    }
+
 }

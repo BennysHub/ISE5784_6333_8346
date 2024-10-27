@@ -2,14 +2,10 @@ package lighting;
 
 import primitives.Color;
 import primitives.Point;
-import primitives.Ray;
 import primitives.Vector;
 import renderer.super_sampling.Blackboard;
 
-import java.util.List;
-
 import static primitives.Util.alignZero;
-import static primitives.Util.isZero;
 
 /**
  * Class representing a spotlight in a 3D scene.
@@ -19,7 +15,7 @@ public class SpotLight extends PointLight {
 
     private final Vector direction;
 
-    private int beamFocus = 1;
+    private int narrowBeam = 1;
 
     /**
      * Constructs a spotlight with the specified intensity, position, and direction.
@@ -31,6 +27,18 @@ public class SpotLight extends PointLight {
     public SpotLight(Color intensity, Point position, Vector direction) {
         super(intensity, position);
         this.direction = direction.normalize();
+
+    }
+
+    public SpotLight(Color intensity, Point position, Vector direction, double size) {
+        this(intensity, position, direction);
+        this.radius = size;
+        setLightSamples();
+    }
+
+    @Override
+    protected void setLightSamples() {
+        lightSamples = Blackboard.getDiskPoints(position, radius, direction);
     }
 
     @Override
@@ -58,23 +66,18 @@ public class SpotLight extends PointLight {
      * @return the current PointLight instance for chaining
      */
     public PointLight setNarrowBeam(int beamFocus) {
-        this.beamFocus = beamFocus;
+        this.narrowBeam = beamFocus;
         return this;
     }
 
     @Override
-    public Color getIntensity(Point p) {
-        double directionStrength = alignZero(direction.dotProduct(p.subtract(position).normalize()));
-        return super.getIntensity(p).scale(directionStrength <= 0 ? 0 : Math.pow(directionStrength, beamFocus));
+    public Color getIntensity(Point p, Point lightPoint) {
+        double directionStrength = alignZero(direction.dotProduct(p.subtract(lightPoint).normalize()));
+        return super.getIntensity(p, lightPoint).scale(directionStrength <= 0 ? 0 : Math.pow(directionStrength, narrowBeam));
     }
 
     @Override
-    public List<Ray> getRaysBeam(Point p, int numOfRays) {
-        return Blackboard.constructRays(Blackboard.getPointsOnSphere(direction, position, size, numOfRays), p);
-    }
-
-    @Override
-    public List<Point> getLightSample(Point p, int samplesCount) {
-        return Blackboard.getPointsOnSphere(direction, position, size, samplesCount);
+    public Point[] getLightSample(Point p, int samplesCount) {
+        return samplesCount == 1 ? new Point[]{position} : lightSamples;
     }
 }

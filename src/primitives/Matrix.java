@@ -32,6 +32,7 @@ public class Matrix {
     }
 
     public static Matrix rotationMatrix(Vector axis, double angle) {
+        axis = axis.normalize();
         double x = axis.getX();
         double y = axis.getY();
         double z = axis.getZ();

@@ -60,7 +60,7 @@ public class ShadowTests {
         scene.geometries.add(sphere, triangle.setMaterial(trMaterial));
         scene.lights.add(
                 new SpotLight(new Color(400, 240, 0), spotLocation, new Vector(1, 1, -3))
-                        .setKl(1E-5).setKq(1.5E-7).setSize(2));
+                        .setKl(1E-5).setKq(1.5E-7));
         camera.setResolution(pictName, 1920, 1080)
                 .build()
                 .renderImage()
@@ -138,7 +138,7 @@ public class ShadowTests {
         scene.setAmbientLight(new AmbientLight(new Color(WHITE), 0.15));
         scene.lights.add(
                 new SpotLight(new Color(700, 400, 400), new Point(40, 40, 115), new Vector(-1, -1, -4))
-                        .setKl(4E-4).setKq(2E-5).setSize(4));
+                        .setKl(4E-4).setKq(2E-5));
 
         camera.setResolution("shadowTrianglesSphere", 600, 600)
                 .build()

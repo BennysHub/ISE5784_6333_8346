@@ -69,14 +69,11 @@ public class SimpleRayTracer extends RayTracerBase {
     }
 
     protected Color calcLocalEffects(Point intersection, Material material, Vector v, Vector n, double nv, Double3 k) {
-        //in soft shadow we can limit to be done only in first level and then use hard shadow meaning one central ray
+        //in soft shadow we can limit to be done only in first level and then use hard shadow meaning one sample
         Color color = Color.BLACK;
         for (LightSource lightSource : scene.lights) {
-
-
-
-            List<Point> lightSample = lightSource.getLightSample(intersection, RenderSettings.SHADOW_RAYS_SAMPLE_COUNT);
-            int lightSampleSize = lightSample.size();
+            Point[] lightSample = lightSource.getLightSample(intersection, RenderSettings.SHADOW_RAYS_SAMPLE_COUNT);
+            int lightSampleSize = lightSample.length;
 
             for (Point lightPoint : lightSample) {
                 Vector l = lightSource.getL(intersection, lightPoint);
@@ -84,49 +81,19 @@ public class SimpleRayTracer extends RayTracerBase {
 
                 if (compareSign(nl, nv)) {
                     Ray lightRay = new Ray(intersection, l.scale(-1), n);
-                    Double3 ktr = transparency(intersection, lightRay, lightPoint);
+                    Double3 ktr = transparency(intersection, lightPoint, lightRay);
 
                     if (!ktr.product(k).lowerThan(RenderSettings.MIN_CALC_COLOR_K)) {
-                        Color iL = lightSource.getIntensity(intersection).scale(ktr);
+                        Color iL = lightSource.getIntensity(intersection, lightPoint).scale(ktr);
                         color = color.add(
                                 iL.scale(calcDiffusive(material, nl).add(calcSpecular(material, n, l, nl, v))));
                     }
                 }
-
             }
             color = color.reduce(lightSampleSize);
         }
         return color.add(material.getEmission());
     }
-
-//    protected Color calcLocalEffects(Intersectable.GeoPoint gp, Vector v, Vector n, double nv, Double3 k) {
-//        //in soft shadow we can limit to be done only in first level and then use hard shadow meaning one central ray
-//        Material material = gp.geometry.getMaterial();
-//        Color color = Color.BLACK;
-//        for (LightSource lightSource : scene.lights) {
-//
-//            List<Ray> lightRays = lightSource.getRaysBeam(gp.point, RenderSettings.SHADOW_RAYS_SAMPLE_COUNT);
-//            int lightRaysSize = lightRays.size();
-//
-//
-//            for (Ray lightRay : lightRays) {
-//                Vector l = lightRay.getDirection();
-//                double nl = alignZero(n.dotProduct(l));
-//
-//                if (compareSign(nl, nv)) {
-//                    Double3 ktr = transparency(gp, lightRay);
-//                    if (!ktr.product(k).lowerThan(RenderSettings.MIN_CALC_COLOR_K)) {
-//                        Color iL = lightSource.getIntensity(gp.point).scale(ktr);
-//                        color = color.add(
-//                                iL.scale(calcDiffusive(material, nl).add(calcSpecular(material, n, l, nl, v))));
-//                    }
-//                }
-//
-//            }
-//            color = color.reduce(lightRaysSize);
-//        }
-//        return color.add(gp.geometry.getEmission());
-//    }
 
     /**
      * Calculates the global effects of lighting at the given point.
@@ -226,7 +193,7 @@ public class SimpleRayTracer extends RayTracerBase {
 
 
 
-    protected Double3 transparency(Point intersection, Ray lightRay, Point lightPoint) {
+    protected Double3 transparency(Point intersection, Point lightPoint, Ray lightRay) {
         List<GeoPoint> intersections =  scene.geometries.findGeoIntersections(lightRay, intersection.distance(lightPoint));
         Double3 ktr = Double3.ONE;
         if (intersections == null) return ktr;

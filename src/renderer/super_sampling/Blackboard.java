@@ -1,15 +1,16 @@
 package renderer.super_sampling;
 
-import primitives.*;
-import renderer.RenderSettings;
+import primitives.Double2;
+import primitives.Matrix;
+import primitives.Point;
+import primitives.Vector;
 
-import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static java.lang.Math.sqrt;
-import static primitives.Util.*;
+import static primitives.Util.isZero;
+import static primitives.Util.random;
 
 /**
  * The {@code Blackboard} class provides utility methods for generating random points within geometric shapes.
@@ -17,277 +18,179 @@ import static primitives.Util.*;
 public final class Blackboard {
 
 
-    //    public static List<Point2D> circleSample = null;
-//    public static List<Point2D> squareSample = null;
-    public static Point2D[] grid169 = generateGrid(1, 169);
-
-    public static List<Point> getPointsOnSphere(Vector normal, Point center, double radius, int numOfPoints) {
-        if (alignZero(radius) <= 0 || numOfPoints == 1)
-            return List.of(center);
-
-        Vector right = normal.perpendicular();
-        Vector up = right.crossProduct(normal);
-
-        List<Point> pointsOnArea = new ArrayList<>(numOfPoints);
+    public static Double2[] GRID_1_169 = generateSquareGrid(1, 169);
+    public static Double2[] CIRCLE_1_169 = warpToCircle2(GRID_1_169, 1, 1);
 
 
-        int cellsInRow = (int) sqrt(numOfPoints);
-        double cellVertexSize = radius * 2 / cellsInRow;
-        for (int i = 0; i < cellsInRow; i++) {
-            for (int j = 0; j < cellsInRow; j++) {
-                double x = -(i - (cellsInRow - 1) / 2d) * cellVertexSize;
-                double y = (j - (cellsInRow - 1) / 2d) * cellVertexSize;
-
-//                x += random(-cellVertexSize / 2, cellVertexSize / 2);
-//                y += random(-cellVertexSize / 2, cellVertexSize / 2);
-
-//                Point warpedPoint = warpSquareToCircle(x, y, radius, right, up, center);
-//                pointsOnArea.add(warpedPoint);
-
-                double distanceSquared = x * x + y * y;
-                Point point = center;
-                if (distanceSquared <= radius * radius) {
-                    if (!isZero(x)) point = point.add(right.scale(x));
-                    if (!isZero(y)) point = point.add(up.scale(y));
-
-
-//                    double distanceFromCenter = point.distance(center);
-//                    double radiusMinusDistanceFromCenter = alignZero(radius - distanceFromCenter);
-//
-//                    if (radiusMinusDistanceFromCenter > 0)
-//                        point = point.add(normal.scale(radiusMinusDistanceFromCenter));
-                    pointsOnArea.add(point);
-                }
-            }
-        }
-        return pointsOnArea;
+    public static Double2[] generateSquareGrid(double gridSize, int numOfPoints) {
+        return generateSquareGrid(gridSize, Double2.ZERO, numOfPoints);
     }
 
-    public static Point2D[] generateGrid(int gridSize, int numOfPoints) {
-        int pointsPerRow = (int) sqrt(numOfPoints);
-        Point2D[] grid = new Point2D[pointsPerRow * pointsPerRow];
-        double distanceRation = (double) gridSize / pointsPerRow;
-        for (int i = 0; i < pointsPerRow; i++) {
-            for (int j = 0; j < pointsPerRow; j++) {
-                double x = -(i - (pointsPerRow - 1) / 2d) * distanceRation;
-                double y = (j - (pointsPerRow - 1) / 2d) * distanceRation;
-                grid[i * pointsPerRow + j] = new Point2D(x, y);
+    public static Double2[] generateSquareGrid(double gridSize, Double2 center, int numOfPoints) {
+        int pointsPerSide = (int) sqrt(numOfPoints);
+        Double2[] grid = new Double2[pointsPerSide * pointsPerSide];
+        double distanceRation = gridSize / pointsPerSide;
+        for (int i = 0; i < pointsPerSide; i++) {
+            for (int j = 0; j < pointsPerSide; j++) {
+                double x = -(i - (pointsPerSide - 1) / 2d) * distanceRation;
+                double y = (j - (pointsPerSide - 1) / 2d) * distanceRation;
+
+                grid[i * pointsPerSide + j] = new Double2(x + center.x(), y + center.y());
             }
         }
         return grid;
     }
 
 
-    public static Point2D[] applyJitter(Point2D[] points, double jitter) {
+    public static Double2[] applyJitter(Double2[] points, double jitter) {
         for (int i = 0; i < points.length; i++) {
             double jitterX = random(-jitter, jitter);
             double jitterY = random(-jitter, jitter);
-            points[i] = new Point2D(points[i].getX() + jitterX, points[i].getY() + jitterY);
+            points[i] = new Double2(points[i].x() + jitterX, points[i].y() + jitterY);
         }
         return points;
     }
 
+    public static Point[] convertTo3D(Double2[] points, Point center, Vector right, Vector up) {
+        right = right.normalize();
+        up = up.normalize();
+        Point[] points3D = new Point[points.length];
+        for (int i = 0; i < points.length; i++) {
 
-    public static Point2D[] warpToDisk(Point2D[] grid, double radius) {
-        int size = (int) Math.sqrt(grid.length);
-        Point2D[] diskPoints = new Point2D[grid.length];
-        for (int i = 0; i < grid.length; i++) {
-            double theta = 2 * Math.PI * grid[i].getX() / size;
-            double r = radius * Math.sqrt(grid[i].getY() / size);
-            double x = r * Math.cos(theta);
-            double y = r * Math.sin(theta);
-            diskPoints[i] = new Point2D(x, y);
-        }
-        return diskPoints;
-    }
+            double u = points[i].x();
+            double v = points[i].y();
 
-    public static Point[] convertTo3D(Point2D[] diskPoints, Point center, Vector right, Vector up) {
+            double x = center.getX() + u * right.getX() + v * up.getX();
+            double y = center.getY() + u * right.getY() + v * up.getY();
+            double z = center.getZ() + u * right.getZ() + v * up.getZ();
 
-        Point[] points3D = new Point[diskPoints.length];
-        for (int i = 0; i < diskPoints.length; i++) {
-            Point point = center;
-            if (!isZero(diskPoints[i].getX())) point = point.add(right.scale(diskPoints[i].getX()));
-            if (!isZero(diskPoints[i].getY())) point = point.add(up.scale(diskPoints[i].getY()));
-            points3D[i] = point;
+            points3D[i] = new Point(x, y, z);
         }
         return points3D;
     }
 
+
     public static Point[] addSphereDepth(Point[] points, Point sphereCenter, double sphereRadius, Vector normal) {
+        /*
+        take a sample of point within a plane where the plane center is the sphere center and take normal vector of the plane
+        the function moves the points from the disk in the direction of the normal until they reach the sphere
+        Note make sure that the sphere radius is >= plane (max) radius, meaning it could fit inside the sphere.
+        */
+        normal = normal.normalize();
         Point[] spherePoints = new Point[points.length];
         for (int i = 0; i < points.length; i++) {
-            double distanceFromCenter = points[i].distance(sphereCenter);
-            double radiusMinusDistanceFromCenter = alignZero(sphereRadius - distanceFromCenter);
+            double xSquared = points[i].distanceSquared(sphereCenter);
 
-            if (radiusMinusDistanceFromCenter > 0)
-                spherePoints[i] = points[i].add(normal.scale(radiusMinusDistanceFromCenter));
+            double ySquared = Math.pow(sphereRadius, 2) - xSquared;
+            double y = Math.sqrt(ySquared);
+            if (!isZero(y))
+                spherePoints[i] = points[i].add(normal.scale(y));
             else
                 spherePoints[i] = points[i];
         }
         return spherePoints;
     }
 
-
-    public static List<Ray> constructRays(Point[] points, Point p) {
-        List<Ray> rays = new ArrayList<>(points.length);
-        for (Point point : points)
-            rays.add(new Ray(point, p.subtract(point)));
-        return rays;
+    public static Double2[] scale(Double2[] points, double num) {
+        int length = points.length;
+        Double2[] scaledPoints = new Double2[length];
+        for (int i = 0; i < length; i++) {
+            scaledPoints[i] = points[i].scale(num);
+        }
+        return scaledPoints;
     }
 
 
-    public static List<Ray> constructRays(List<Point> points, Point p) {
-        List<Ray> rays = new ArrayList<>(points.size());
-        for (Point point : points)
-            rays.add(new Ray(point, p.subtract(point)));
-        return rays;
-    }
-
-    public static Point[] applyJitterToSphere(Point[] points, Point sphereCenter, double radius ,double jitter){
+    public static Point[] applyJitterToSphere(Point[] points, Point sphereCenter, double radius, double jitter) {
         return null;
     }
 
 
+    //takes a square sample of point the function scale and warp the point to fit inside a disk with given radius
+    public static Double2[] warpToCircle1(Double2[] squarePoints, Double2 center, double sideLength, double diskRadius) {
+        Double2[] warpedPoints = new Double2[squarePoints.length];
 
-//    public static Point[] convertTo3D(Point2D[] diskPoints, Point center, Vector right, Vector up) {
-//        Point normal = right.crossProduct(up);
-//
-//        double[][] transformationData = {
-//                {right.getX(), up.getX(), normal.getX()},
-//                {right.getY(), up.getY(), normal.getY()},
-//                {right.getZ(), up.getZ(), normal.getZ()}
-//        };
-//        Matrix transformationMatrix = new Matrix(transformationData);
-//
-//        Point[] points3D = new Point[diskPoints.length];
-//        for (int i = 0; i < diskPoints.length; i++) {
-//            Vector pointData = new Vector(diskPoints[i].getX(), diskPoints[i].getY(), 1);
-//            Vector transformedPoint = transformationMatrix.multiply(pointData);
-//            points3D[i] = center.add(transformedPoint);
-//        }
-//        return points3D;
-//    }
+        for (int i = 0; i < squarePoints.length; i++) {
+            //normalize points to be withing [-1, 1]
+            double normX = (squarePoints[i].x() - center.x()) / sideLength * 2.0;
+            double normY = (squarePoints[i].y() - center.y()) / sideLength * 2.0;
+            //convert to Cartesian coordinates
+            double r = Math.sqrt(normX * normX + normY * normY);
+            double theta = Math.atan2(normY, normX);
+            //adjust point radius to fit in disk radius
 
+            //option 1 less edge points
+            //double rPrime = (r / Math.sqrt(2)) * diskRadius;
 
+            //option2 2 more edge points
+            double rPrime = Math.min(r, 1) * diskRadius;
+            double xPrime = rPrime * Math.cos(theta);
+            double yPrime = rPrime * Math.sin(theta);
+            warpedPoints[i] = new Double2(xPrime + center.x(), yPrime + center.y());
+        }
+        return warpedPoints;
+    }
 
+    //assume the square center is at the origin
+    public static Double2[] warpToCircle1(Double2[] squarePoints, double sideLength, double diskRadius) {
+        return warpToCircle1(squarePoints, Double2.ZERO, sideLength, diskRadius);
+    }
 
-//    public static List<Point2D> warpToDisk(List<Point2D> points, double diskRadius) {
-//        List<Point2D> warpedPoints = new ArrayList<>();
-//
-//        for (Point2D point : points) {
-//            double x = point.getX();
-//            double y = point.getY();
-//            double r = Math.sqrt(x * x + y * y);
-//            double theta = Math.atan2(y, x);
-//            double rPrime = Math.sqrt(r);
-//            double xPrime = rPrime * Math.cos(theta) * diskRadius;
-//            double yPrime = rPrime * Math.sin(theta) * diskRadius;
-//            warpedPoints.add(new Point2D(xPrime, yPrime));
-//        }
-//
-//        return warpedPoints;
-//    }
-//
-//    // can be improved by adding to point a bit at a time to center instead of adding to center each time
-//    public static List<Point> to3D(List<Point2D> twoDPoints, Vector right, Vector up, Point center) {
-//        List<Point> threeDPoints = new ArrayList<>(RenderSettings.getShadowRaysSampleCount());
-//        Point point3D = center;
-//        for (Point2D point2D : twoDPoints) {
-//            if (!isZero(point2D.getX()))
-//                point3D = point3D.add(right.scale(point2D.getX()));
-//            if (!isZero(point2D.getY()))
-//                point3D = point3D.add(up.scale(point2D.getY()));
-//
-//            threeDPoints.add(point3D);
-//        }
-//        return threeDPoints;
-//    }
-//
-//    public static List<Point> convert2DTo3D(List<Point2D> points2D, Point center, Vector right, Vector up) {
-//        List<Point> points3D = new ArrayList<>();
-//
-//        for (Point2D point2D : points2D) {
-//            double u = point2D.getX();
-//            double v = point2D.getY();
-//
-//            double x = center.getX() + u * right.getX() + v * up.getX();
-//            double y = center.getY() + u * right.getY() + v * up.getY();
-//            double z = center.getZ() + u * right.getZ() + v * up.getZ();
-//
-//            points3D.add(new Point(x, y, z));
-//        }
-//        return points3D;
-//    }
-//
-//    public static List<Point> addSphereDepth(List<Point> points, Point sphereCenter, double sphereRadius, Vector normal) {
-//        List<Point> spherePoints = new ArrayList<>();
-//        for (Point point : points) {
-//            double distanceFromCenter = point.distance(sphereCenter);
-//            double radiusMinusDistanceFromCenter = alignZero(sphereRadius - distanceFromCenter);
-//
-//            if (radiusMinusDistanceFromCenter > 0)
-//                spherePoints.add(point.add(normal.scale(radiusMinusDistanceFromCenter)));
-//            else
-//                spherePoints.add(point);
-//        }
-//        return spherePoints;
-//    }
-//
-//
-//    public static List<Point> getSpherePoints(Point sphereCenter, double sphereRadius, int numOfPoints, Vector right, Vector up) {
-//        List<Point2D> distPoints = generateJitteredGrid(numOfPoints, 0);
-//        distPoints = warpToDisk(distPoints, sphereRadius);
-//        List<Point> spherePoints = convert2DTo3D(distPoints, sphereCenter, right, up);
-//        return addSphereDepth(spherePoints, sphereCenter, sphereRadius, right.crossProduct(up));
-//    }
-//
-//    public static List<Point2D> circleScale(double scaleFactor) {
-//        List<Point2D> scaledCircleSample = new ArrayList<>(RenderSettings.getShadowRaysSampleCount());
-//        for (Point2D point2D : circleSample)
-//            scaledCircleSample.add(point2D.scale(scaleFactor));
-//        return scaledCircleSample;
-//    }
-//
-//
-//    public static List<Point> rotatePointsOnSphere(List<Point> points, Vector originalNormal, Vector newNormal, Point center) {
-//        List<Point> transformedPoints = new ArrayList<>();
-//
-//        // Calculate the rotation matrix
-//        Vector axis = originalNormal.crossProduct(newNormal);
-//        double angle = Math.acos(originalNormal.dotProduct(newNormal) / (originalNormal.length() * newNormal.length()));
-//        Matrix rotationMatrix = Matrix.rotationMatrix(axis, angle);
-//
-//        // Apply the rotation to each point
-//        for (Point point : points) {
-//            Vector translatedPoint = point.subtract(center);
-//            Vector rotatedPoint = rotationMatrix.multiply(translatedPoint);
-//            Point finalPoint = center.add(rotatedPoint);
-//            transformedPoints.add(finalPoint);
-//        }
-//
-//        return transformedPoints;
-//    }
-//
-//
-//    public static List<Point> scalePoints(List<Point> points, double oldRadius, double newRadius) {
-//        double scaleFactor = newRadius / oldRadius;
-//        List<Point> newSpherePoints = new ArrayList<>(points.size());
-//        for (Point point : points)
-//            newSpherePoints.add(new Point(point.getX() * scaleFactor, point.getY() * scaleFactor, point.getZ() * scaleFactor));
-//        return newSpherePoints;
-//    }
-//
-//    public static List<Point> addPoint(List<Point> points, Point newPoint) {
-//        List<Point> newPoints = new ArrayList<>(points.size());
-//        for (Point point : points)
-//            newPoints.add(new Point(point.getX() + newPoint.getX(), point.getY() + newPoint.getY(), point.getZ() + newPoint.getZ()));
-//        return newPoints;
-//    }
-//
-//    public static List<Point> getSphereSampleWithZNormal(Point center, double radius) {
-//        List<Point> newPoints = new ArrayList<>(sphereSample.size());
-//        for (Point point : sphereSample)
-//            newPoints.add(new Point(point.getX() * radius + center.getX(), point.getY() * radius + center.getY(), point.getZ() * radius + center.getZ()));
-//        return newPoints;
-//    }
+    //assume the square center is at the origin
+    public static Double2[] warpToCircle2(Double2[] squarePoints, Double2 center, double sideLength, double radius) {
+        Double2[] circlePoints = new Double2[squarePoints.length];
+
+        for (int i = 0; i < squarePoints.length; i++) {
+            // Normalize coordinates to [-1, 1]
+            double normX = (squarePoints[i].x() - center.x()) / sideLength * 2.0;
+            double normY = (squarePoints[i].y() - center.y()) / sideLength * 2.0;
+
+            // Map to circle using inverse transformation
+            double circleX = normX * Math.sqrt(1 - (normY * normY / 2));
+            double circleY = normY * Math.sqrt(1 - (normX * normX / 2));
+
+            // Scale back to original size
+            circleX *= radius;
+            circleY *= radius;
+
+            circlePoints[i] = new Double2(circleX + center.x(), circleY + center.y());
+        }
+        return circlePoints;
+    }
+
+    public static Double2[] warpToCircle2(Double2[] squarePoints, double sideLength, double radius) {
+        return warpToCircle2(squarePoints, Double2.ZERO, sideLength, radius);
+    }
+
+    public static Point[] rotatePointsOnSphere(Point[] points, Vector originalNormal, Vector newNormal, Point center) {
+        Point[] transformedPoints = new Point[points.length];
+
+        // Calculate the rotation matrix
+        Vector axis = originalNormal.parallel(newNormal) ? originalNormal.perpendicular() : originalNormal.crossProduct(newNormal);
+
+        double angle = Math.acos(originalNormal.dotProduct(newNormal) / (originalNormal.length() * newNormal.length()));
+        Matrix rotationMatrix = Matrix.rotationMatrix(axis, angle);
+
+        // Apply the rotation to each point
+        for (int i = 0; i<points.length; i++) {
+            Vector translatedPoint = points[i].subtract(center);
+            Vector rotatedPoint = rotationMatrix.multiply(translatedPoint);
+            Point finalPoint = center.add(rotatedPoint);
+            transformedPoints[i]  = finalPoint;
+        }
+        return transformedPoints;
+    }
+
+    static public Point[] getDiskPoints(Point center, double radius, Vector normal) {
+        Vector right = normal.perpendicular();
+        Vector up = normal.crossProduct(right);
+        return convertTo3D(scale(CIRCLE_1_169, radius), center, right, up);
+    }
+
+    static public Point[] getSpherePoints(Point center, double radius, Vector normal) {
+        Vector right = normal.perpendicular();
+        Vector up = normal.crossProduct(right);
+        var a = convertTo3D(scale(CIRCLE_1_169, radius), center, right, up);
+        return addSphereDepth(a, center, radius, normal);
+    }
 }
