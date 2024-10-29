@@ -4,20 +4,22 @@ import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
+import renderer.ImageWriter;
 import renderer.RayTracerBase;
+import renderer.Render;
 import renderer.ViewPlane;
 
 //SSAA, we can add MSAA, FXAA, TAA, SMAA
-public class SuperSamplingAntiAliasing extends PixelSamplingStrategy {
+public class SuperSamplingAntiAliasing extends Render {
 
 
     private static final int SSAA_SAMPLE_COUNT = 3;
 
-    public SuperSamplingAntiAliasing(ViewPlane viewPlane, RayTracerBase rayTracer, Point camaraLocation) {
-        super(viewPlane, rayTracer, camaraLocation);
+    public SuperSamplingAntiAliasing(ImageWriter imageWriter, ViewPlane viewPlane, RayTracerBase rayTracer, Point camaraLocation) {
+        super(imageWriter, viewPlane, rayTracer, camaraLocation);
     }
 
-    @Override
+
     public Color calcalatePixelColor(int x, int y) {
         //return superSamplingAntiAliasing(viewPlane.getPixelCenter(x, y), viewPlane.pixelWidth, viewPlane.pixelHeight, 1);
         //return superSamplingAntiAliasingCorners(viewPlane.getPixelCenter(x, y), viewPlane.pixelWidth, viewPlane.pixelHeight, 1);
@@ -129,6 +131,8 @@ public class SuperSamplingAntiAliasing extends PixelSamplingStrategy {
     }
 
 
+    @Override
+    public void renderImage() {
 
-
+    }
 }

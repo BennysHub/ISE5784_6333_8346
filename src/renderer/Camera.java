@@ -4,16 +4,10 @@ import geometries.Geometries;
 import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
-import renderer.renderstrategies.antialiasingstrategies.DefaultSampling;
-import renderer.renderstrategies.antialiasingstrategies.PixelSamplingStrategy;
+import renderer.renderstrategies.antialiasingstrategies.DefaultRendering;
 import renderer.renderstrategies.antialiasingstrategies.SSAA4X;
-import renderer.renderstrategies.antialiasingstrategies.SuperSamplingAntiAliasing;
 import scene.Scene;
-
-import java.util.LinkedList;
-import java.util.List;
 import java.util.MissingResourceException;
-import java.util.stream.IntStream;
 
 import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
@@ -27,24 +21,13 @@ import static primitives.Util.isZero;
  * @author TzviYisrael and Benny
  */
 public class Camera {
-    private final ImageWriter imageWriter;
-    private final PixelSamplingStrategy pixelSamplingStrategy;
-
-    /**
-     * Pixel manager for supporting:
-     * <ul>
-     * <li>multi-threading</li>
-     * <li>debug print of progress percentage in Console window/tab</li>
-     * </ul>
-     */
-    private PixelManager pixelManager;
+    private final Render render;
 
     /**
      * Default constructor for {@code Camera}.
      */
-    private Camera(Builder cameraBuilder) {
-        this.imageWriter = cameraBuilder.imageWriter;
-        this.pixelSamplingStrategy = cameraBuilder.pixelSamplingStrategy;
+    protected Camera(Builder cameraBuilder) {
+        render = new SSAA4X(cameraBuilder.imageWriter, cameraBuilder.viewPlane, cameraBuilder.rayTracerBase, cameraBuilder.location );
     }
 
 
@@ -57,137 +40,20 @@ public class Camera {
         return new Builder();
     }
 
-    /**
-     * Renders the entire image by iterating through each pixel and casting a ray to determine the color.
-     *
-     * @return the Camera instance for method chaining
-     */
-//    public Camera renderImage() {
-//        int nX = imageWriter.getNx();
-//        int nY = imageWriter.getNy();
-//
-//
-//        if (RenderSettings.threadsCount < 2) {
-//            for (int x = nX - 1; x >= 0; --x)
-//                for (int y = nY - 1; y >= 0; --y)
-//                    castRay(x, y);
-//
-//
-////        } else { // see further... option 2
-////            pixelManager = new PixelManager(nY, nX, 0);
-////            int threadsCount = RenderSettings.threadsCount;
-////            var threads = new LinkedList<Thread>(); // list of threads
-////            while (threadsCount-- > 0) // add the appropriate number of threads
-////                threads.add(new Thread(() -> { // add a thread with its code
-////                    PixelManager.Pixel pixel; // current pixel(row,col)
-////                    // allocate pixel(row,col) in loop until there are no more pixels
-////                    while ((pixel = pixelManager.nextPixel()) != null)
-////                        // cast ray through pixel (and color it – inside castRay)
-////                        castRay(pixel.col(), pixel.row());
-////                }));
-////            // start all the threads
-////            for (var thread : threads) thread.start();
-////            // wait until all the threads have finished
-////            try {
-////                for (var thread : threads) thread.join();
-////            } catch (InterruptedException ignore) {
-////            }
-//        }
-////        else {
-////            IntStream.range(0, nY).parallel()
-////                    .forEach(i -> IntStream.range(0, nX).parallel() // for each row:
-////                            .forEach(j -> castRay(j, i))); // for each column in row
-////        }
-//        return this;
-//    }
     public Camera renderImage() {
-        int nX = imageWriter.getNx();
-        int nY = imageWriter.getNy();
-
-        if (RenderSettings.threadsCount < 2)
-            singleThreadedRender(nX, nY);
-        else
-            multiThreadedRender(nX, nY);
-
+        render.renderImage();
         return this;
     }
 
-
-    private void singleThreadedRender(int nX, int nY) {
-        for (int x = nX - 1; x >= 0; --x)
-            for (int y = nY - 1; y >= 0; --y)
-                castRay(x, y);
-    }
-
-    private void streamParallelRender(int nX, int nY) {
-        IntStream.range(0, nY).parallel()
-                .forEach(i -> IntStream.range(0, nX).parallel()
-                        .forEach(j -> castRay(j, i)));
-    }
-
-    private void multiThreadedRender(int nX, int nY) {
-        pixelManager = new PixelManager(nY, nX, 0);
-        int threadsCount = RenderSettings.threadsCount;
-        List<Thread> threads = new LinkedList<>();
-
-        while (threadsCount-- > 0) {
-            threads.add(new Thread(this::processPixels));
-        }
-
-        startAndJoinThreads(threads);
-    }
-
-    private void processPixels() {
-        PixelManager.Pixel pixel;
-        while ((pixel = pixelManager.nextPixel()) != null) {
-            castRay(pixel.col(), pixel.row());
-        }
-    }
-
-    private void startAndJoinThreads(List<Thread> threads) {
-        threads.forEach(Thread::start);
-        for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException ignore) {
-            }
-        }
-    }
-
-
-    /**
-     * Casts a ray through the given pixel coordinates and writes the computed color to the image.
-     *
-     * @param x the x-coordinate of the pixel
-     * @param y the y-coordinate of the pixel
-     */
-    private void castRay(int x, int y) {
-        Color pixelColor = pixelSamplingStrategy.calcalatePixelColor(x, y);
-        imageWriter.writePixel(x, y, pixelColor);
-    }
-
-    /**
-     * Prints a grid on the image with the specified interval and color.
-     *
-     * @param interval the spacing between grid lines
-     * @param color    the color of the grid lines
-     * @return the Camera instance for method chaining
-     */
-    public Camera printGrid(int interval, Color color) {
-        int nX = imageWriter.getNx();
-        int nY = imageWriter.getNy();
-        for (int x = nX - 1; x >= 0; --x)
-            for (int y = nY - 1; y >= 0; --y)
-                if (x % interval == 0 || y % interval == 0) imageWriter.writePixel(x, y, color);
-        return this;
-    }
-
-    /**
-     * Writes the image to a file.
-     */
     public void writeToImage() {
-        imageWriter.writeToImage();
+        render.writeToImage();
     }
+
+    public Camera printGrid(int interval, Color color) {
+        render.printGrid(interval, color);
+        return this;
+    }
+
 
     /**
      * The {@code Builder} class for {@code Camera}.
@@ -201,9 +67,9 @@ public class Camera {
         private double vpHeight;
         private double vpWidth;
         private double vpDistance;
+        private ViewPlane viewPlane;
         private ImageWriter imageWriter;
         private RayTracerBase rayTracerBase;
-        private PixelSamplingStrategy pixelSamplingStrategy;
 
         private boolean antiAliasingFlag = false;
         boolean rayTracerWasSet = false;
@@ -404,9 +270,8 @@ public class Camera {
             if (center == null)
                 throw new MissingResourceException("Missing camera center", Camera.class.getName(), "center");
             //-----------3
-            ViewPlane viewPlane = new ViewPlane(right, up, vpHeight, vpWidth, center, imageWriter.getNx(), imageWriter.getNy());
+            viewPlane = new ViewPlane(right, up, vpHeight, vpWidth, center, imageWriter.getNx(), imageWriter.getNy());
             //-----------4
-            pixelSamplingStrategy = antiAliasingFlag ? new SSAA4X(viewPlane, rayTracerBase, location) : new DefaultSampling(viewPlane, rayTracerBase, location);
 
             return new Camera(this);
         }

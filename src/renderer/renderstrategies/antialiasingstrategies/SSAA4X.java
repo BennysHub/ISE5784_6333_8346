@@ -2,25 +2,62 @@ package renderer.renderstrategies.antialiasingstrategies;
 
 import primitives.Color;
 import primitives.Point;
+import primitives.Ray;
+import renderer.ImageWriter;
 import renderer.RayTracerBase;
+import renderer.Render;
 import renderer.ViewPlane;
 
-public class SSAA4X extends PixelSamplingStrategy {
+import java.util.stream.IntStream;
 
-    public SSAA4X(ViewPlane viewPlane, RayTracerBase rayTracer, Point camaraLocation) {
-        //sample each pixel 4 corners, corners can be reused for other pixels samples total sample is increased from x* Y to (x+1)*(y+1)
-        super(
-                new ViewPlane(viewPlane.right, viewPlane.up, viewPlane.vpHeight + viewPlane.pixelHeight, viewPlane.vpWidth + viewPlane.pixelWidth, viewPlane.center, viewPlane.nX + 1, viewPlane.nY + 1),
-                rayTracer,
-                camaraLocation);
+public class SSAA4X extends Render {
+
+    ViewPlane newViewPlane =  new ViewPlane(viewPlane.right, viewPlane.up, viewPlane.vpHeight + viewPlane.pixelHeight, viewPlane.vpWidth + viewPlane.pixelWidth, viewPlane.center, viewPlane.nX + 1, viewPlane.nY + 1);
+
+
+    Color[][] pixelColors = new Color[newViewPlane.nX][newViewPlane.nY];
+
+    public SSAA4X(ImageWriter imageWriter, ViewPlane viewPlane, RayTracerBase rayTracer, Point camaraLocation) {
+        super(imageWriter, viewPlane, rayTracer, camaraLocation);
     }
 
+
+
     @Override
-    public Color calcalatePixelColor(int x, int y) {
-        Color color = rayTracer.traceRay(constructCentralRay(x, y))
-                .add(rayTracer.traceRay(constructCentralRay(x + 1, y)),
-                        rayTracer.traceRay(constructCentralRay(x + 1, y)),
-                        rayTracer.traceRay(constructCentralRay(x + 1, y + 1)));
-        return color.reduce(4);
+    public void renderImage() {
+        streamParallelRender(newViewPlane.nX, newViewPlane.nY);
+        writePixelsParallel();
+        //writePixels();
+    }
+
+    private void streamParallelRender(int nX, int nY) {
+        IntStream.range(0, nY).parallel()
+                .forEach(i -> IntStream.range(0, nX).parallel()
+                        .forEach(j -> calcColor(j, i)));
+    }
+
+    private void calcColor (int x, int y){
+        Ray ray = new Ray(camaraLocation, newViewPlane.getPixelCenter(x,y));
+        pixelColors[x][y] = rayTracer.traceRay(ray);
+    }
+
+    public void writePixelsParallel() {
+        int nX = imageWriter.getNx();
+        int nY = imageWriter.getNy();
+
+        IntStream.range(0, nX).parallel().forEach(x -> {
+            IntStream.range(0, nY).parallel().forEach(y -> {
+                imageWriter.writePixel(x, y, pixelColors[x][y]
+                        .add(pixelColors[x + 1][y], pixelColors[x][y + 1], pixelColors[x + 1][y + 1])
+                        .reduce(4));
+            });
+        });
+        }
+
+
+    public void writePixels(){
+        for (int x = 0; x < imageWriter.getNx(); x++)
+            for (int y = 0; y < imageWriter.getNy(); y++)
+                imageWriter.writePixel(x, y, pixelColors[x][y].add(pixelColors[x+1][y], pixelColors[x][y+1], pixelColors[x+1][y+1]).reduce(4));
     }
 }
