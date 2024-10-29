@@ -8,26 +8,24 @@ import primitives.Vector;
 import renderer.super_sampling.Blackboard;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static primitives.Util.alignZero;
+import static primitives.Util.isZero;
 
 public class BlackBoardTest {
 
 
     private Point center;
-    private Vector right;
-    private Vector up;
+    private Point center2;
     private Vector normal;
 
 
     @BeforeEach
     public void setUp() {
-        center = new Point(0, 0, 0);
-        right = new Vector(1, 0, 0);
-        up = new Vector(0, 1, 0);
-        normal = new Vector(0, 0, 1);
+        center = Point.ZERO;
+        center2 = new Point(5, 4, 7);
+        normal = Vector.UNIT_Z;
     }
 
     @Test
@@ -48,7 +46,7 @@ public class BlackBoardTest {
         square2DPoints[3] = new Double2(1, 1);
 
         // Convert the disk to 3D
-        Point[] actualConversionPoints = Blackboard.convertTo3D(square2DPoints, center, right, up);
+        Point[] actualConversionPoints = Blackboard.convertTo3D(square2DPoints, center, normal);
 
         Point[] expectedConversionPoints = {Point.ZERO, new Point(1, 0, 0), new Point(0, 1, 0), new Point(1, 1, 0)};
 
@@ -67,7 +65,7 @@ public class BlackBoardTest {
     public void testAddSphereDepth() {
         //Point center =  new Point(1, 5, 2);
         Double2[] gridPoint = Blackboard.generateSquareGrid(8, 169);
-        Point[] girdPoints3D = Blackboard.convertTo3D(gridPoint, center, right, up);
+        Point[] girdPoints3D = Blackboard.convertTo3D(gridPoint, center, normal);
         Point[] spherePoints = Blackboard.addSphereDepth(girdPoints3D, center, 6, normal);
         for (Point point : spherePoints)
             assertEquals(0, alignZero(point.distance(center) - 6), "Sphere depth is incorrect");
@@ -113,34 +111,35 @@ public class BlackBoardTest {
     }
 
     private void sortPoints(Point[] points) {
-        Arrays.sort(points, Comparator.comparingDouble(Point::getX)
-                .thenComparingDouble(Point::getY)
-                .thenComparingDouble(Point::getZ));
+        Arrays.sort(points, (p1, p2) -> {
+            if (isZero(p1.getX() - p2.getX())) {
+                if (isZero(p1.getY() - p2.getY())) {
+                    return Double.compare(p1.getZ(), p2.getZ());
+                }
+                return Double.compare(p1.getY(), p2.getY());
+            }
+            return Double.compare(p1.getX(), p2.getX());
+        });
     }
 
     @Test
     public void testRotatePointsOnSphere() {
-        Vector up = new Vector(0, 0, 1);
-        Vector down = new Vector(0, 0, -1);
-        Point center = new Point(3, -1, 30);
-        Point[] points = Blackboard.getSpherePoints(center, 3, up);
+
+        Point[] points = Blackboard.getSpherePoints(center2, 3, normal);
 
         // Test case 1: Rotate from up to down
 
-        testRotation(points, up, down, center);
+        testRotation(points, normal, normal.scale(-1), center2);
 
         // Test case 2: Rotate from up to right
-        Vector right = new Vector(0, 1, 0);
-        testRotation(points, up, right, center);
+        Vector right = new Vector(0, 8, 0);
+        testRotation(points, normal, right, center2);
 
-        // Test case 3: Rotate from up to right with a different center
-        //Point center = new Point(3, -1, 30);
-        testRotation(points, up, right, center);
-
-        // Test case 4: Rotate from up to an arbitrary vector (1, 1, 1)
+        // Test case 3: Rotate from up to an arbitrary vector (1, 1, 1)
         Vector arbitraryVector = new Vector(1, 1, 1);
-        testRotation(points, up, arbitraryVector, center);
+        testRotation(points, normal, arbitraryVector, center2);
     }
+
 
     private void testRotation(Point[] points, Vector from, Vector to, Point center) {
         Point[] expectedPoints = Blackboard.getSpherePoints(center, 3, to);
@@ -151,4 +150,6 @@ public class BlackBoardTest {
         sortPoints(actualPoints);
         assertArrayEquals(expectedPoints, actualPoints, "Sphere points rotation is incorrect.");
     }
+
+
 }

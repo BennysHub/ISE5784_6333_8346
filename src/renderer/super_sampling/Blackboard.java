@@ -21,6 +21,9 @@ public final class Blackboard {
     public static Double2[] GRID_1_169 = generateSquareGrid(1, 169);
     public static Double2[] CIRCLE_1_169 = warpToCircle2(GRID_1_169, 1, 1);
 
+    //We can scale the sphere's points and add center rotate from z (0, 0, 1) to get any sphere.
+    public static Point[] SPHERE_1_169_Z = null;
+
 
     public static Double2[] generateSquareGrid(double gridSize, int numOfPoints) {
         return generateSquareGrid(gridSize, Double2.ZERO, numOfPoints);
@@ -51,9 +54,10 @@ public final class Blackboard {
         return points;
     }
 
-    public static Point[] convertTo3D(Double2[] points, Point center, Vector right, Vector up) {
-        right = right.normalize();
-        up = up.normalize();
+    public static Point[] convertTo3D(Double2[] points, Point center, Vector normal) {
+        Vector right = normal.perpendicular();
+        Vector up = normal.crossProduct(right).normalize();
+
         Point[] points3D = new Point[points.length];
         for (int i = 0; i < points.length; i++) {
 
@@ -101,7 +105,11 @@ public final class Blackboard {
     }
 
 
-    public static Point[] applyJitterToSphere(Point[] points, Point sphereCenter, double radius, double jitter) {
+    public static Point[] applyFastJitter(Point[] points, double radius, double jitter) {
+        return null;
+    }
+
+    public static Double2[] applyFastJitter(Double2[] points,  double radius, double jitter) {
         return null;
     }
 
@@ -119,10 +127,10 @@ public final class Blackboard {
             double theta = Math.atan2(normY, normX);
             //adjust point radius to fit in disk radius
 
-            //option 1 less edge points
+            //option #1 less edge points
             //double rPrime = (r / Math.sqrt(2)) * diskRadius;
 
-            //option2 2 more edge points
+            //option2 #2 more edge points
             double rPrime = Math.min(r, 1) * diskRadius;
             double xPrime = rPrime * Math.cos(theta);
             double yPrime = rPrime * Math.sin(theta);
@@ -182,15 +190,11 @@ public final class Blackboard {
     }
 
     static public Point[] getDiskPoints(Point center, double radius, Vector normal) {
-        Vector right = normal.perpendicular();
-        Vector up = normal.crossProduct(right);
-        return convertTo3D(scale(CIRCLE_1_169, radius), center, right, up);
+        return convertTo3D(scale(CIRCLE_1_169, radius), center, normal);
     }
 
     static public Point[] getSpherePoints(Point center, double radius, Vector normal) {
-        Vector right = normal.perpendicular();
-        Vector up = normal.crossProduct(right);
-        var a = convertTo3D(scale(CIRCLE_1_169, radius), center, right, up);
+        var a = convertTo3D(scale(CIRCLE_1_169, radius), center, normal);
         return addSphereDepth(a, center, radius, normal);
     }
 }

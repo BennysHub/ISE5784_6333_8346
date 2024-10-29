@@ -7,7 +7,7 @@ public class MatrixTest {
 
     @Test
     public void testRotationMatrix() {
-        Vector axis = new Vector(0, 0, 1);
+        Vector axis = Vector.UNIT_Z;
         double angle = Math.PI / 2; // 90 degrees
 
         Matrix rotationMatrix = Matrix.rotationMatrix(axis, angle);
@@ -64,11 +64,11 @@ public class MatrixTest {
 
     @Test
     public void testRotationMatrixMultiplication() {
-        Vector axis = new Vector(0, 0, 1);
+        Vector axis = Vector.UNIT_Z;
         double angle = Math.PI / 2; // 90 degrees
 
         Matrix rotationMatrix = Matrix.rotationMatrix(axis, angle);
-        Vector vector = new Vector(1, 0, 0);
+        Vector vector = Vector.UNIT_X;
 
         Vector result = rotationMatrix.multiply(vector);
 

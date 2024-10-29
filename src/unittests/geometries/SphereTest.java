@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class SphereTest {
 
     private static final Point p100 = new Point(1, 0, 0);
-    private static final Vector v001 = new Vector(0, 0, 1);
+    private static final Vector v001 = Vector.UNIT_Z;
     private static final Sphere sphere = new Sphere(1, p100);
 
     /**
@@ -49,7 +49,7 @@ class SphereTest {
 
         final Vector v310 = new Vector(3, 1, 0);
         final Vector v110 = new Vector(1, 1, 0);
-        final Vector v100 = new Vector(1, 0, 0);
+        final Vector v100 = Vector.UNIT_X;
         final Point p01 = new Point(-1, 0, 0);
 
         // ============ Equivalence Partitions Tests ==============
@@ -131,7 +131,7 @@ class SphereTest {
 
         // TC22: Ray's line is outside, ray is orthogonal to ray start to sphere's center line
         Point orthogonalStart = new Point(3, 0, 0); // Example orthogonal start point
-        Vector orthogonalDirection = new Vector(0, 1, 0); // Example orthogonal direction
+        Vector orthogonalDirection = Vector.UNIT_Y; // Example orthogonal direction
         assertNull(sphere.findIntersections(new Ray(orthogonalStart, orthogonalDirection)),
                 "Ray should be orthogonal to sphere's center line");
 

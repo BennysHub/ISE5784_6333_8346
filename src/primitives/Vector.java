@@ -10,6 +10,11 @@ import static primitives.Util.isZero;
  */
 public class Vector extends Point {
 
+
+    public static final Vector UNIT_X = new Vector(new Double3(1, 0, 0), true);
+    public static final Vector UNIT_Y = new Vector(new Double3(0, 1, 0), true);
+    public static final Vector UNIT_Z = new Vector(new Double3(0, 0, 1), true);
+
     private boolean isNormalized = false;
 
     /**

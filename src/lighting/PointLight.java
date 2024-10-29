@@ -88,7 +88,7 @@ public class PointLight extends Light implements LightSource {
     }
 
     protected void setLightSamples() {
-
+            lightSamples = Blackboard.getSpherePoints(position, radius, Vector.UNIT_Z);
     }
 
     @Override
@@ -101,6 +101,7 @@ public class PointLight extends Light implements LightSource {
     @Override
     public Point[] getLightSample(Point p, int samplesCount) {
         return samplesCount == 1 ? new Point[]{position} : Blackboard.getSpherePoints(position, radius, p.subtract(position).normalize());
+        //return samplesCount == 1 ? new Point[]{position} : Blackboard.rotatePointsOnSphere(lightSamples, Vector.UNIT_Z, p.subtract(position), position);
     }
 
     @Override

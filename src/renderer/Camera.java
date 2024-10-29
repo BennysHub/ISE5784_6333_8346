@@ -6,10 +6,14 @@ import primitives.Point;
 import primitives.Vector;
 import renderer.renderstrategies.antialiasingstrategies.DefaultSampling;
 import renderer.renderstrategies.antialiasingstrategies.PixelSamplingStrategy;
+import renderer.renderstrategies.antialiasingstrategies.SSAA4X;
 import renderer.renderstrategies.antialiasingstrategies.SuperSamplingAntiAliasing;
 import scene.Scene;
+
 import java.util.LinkedList;
+import java.util.List;
 import java.util.MissingResourceException;
+import java.util.stream.IntStream;
 
 import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
@@ -58,41 +62,98 @@ public class Camera {
      *
      * @return the Camera instance for method chaining
      */
+//    public Camera renderImage() {
+//        int nX = imageWriter.getNx();
+//        int nY = imageWriter.getNy();
+//
+//
+//        if (RenderSettings.threadsCount < 2) {
+//            for (int x = nX - 1; x >= 0; --x)
+//                for (int y = nY - 1; y >= 0; --y)
+//                    castRay(x, y);
+//
+//
+////        } else { // see further... option 2
+////            pixelManager = new PixelManager(nY, nX, 0);
+////            int threadsCount = RenderSettings.threadsCount;
+////            var threads = new LinkedList<Thread>(); // list of threads
+////            while (threadsCount-- > 0) // add the appropriate number of threads
+////                threads.add(new Thread(() -> { // add a thread with its code
+////                    PixelManager.Pixel pixel; // current pixel(row,col)
+////                    // allocate pixel(row,col) in loop until there are no more pixels
+////                    while ((pixel = pixelManager.nextPixel()) != null)
+////                        // cast ray through pixel (and color it – inside castRay)
+////                        castRay(pixel.col(), pixel.row());
+////                }));
+////            // start all the threads
+////            for (var thread : threads) thread.start();
+////            // wait until all the threads have finished
+////            try {
+////                for (var thread : threads) thread.join();
+////            } catch (InterruptedException ignore) {
+////            }
+//        }
+////        else {
+////            IntStream.range(0, nY).parallel()
+////                    .forEach(i -> IntStream.range(0, nX).parallel() // for each row:
+////                            .forEach(j -> castRay(j, i))); // for each column in row
+////        }
+//        return this;
+//    }
     public Camera renderImage() {
         int nX = imageWriter.getNx();
         int nY = imageWriter.getNy();
 
+        if (RenderSettings.threadsCount < 2)
+            singleThreadedRender(nX, nY);
+        else
+            multiThreadedRender(nX, nY);
+
+        return this;
+    }
+
+
+    private void singleThreadedRender(int nX, int nY) {
+        for (int x = nX - 1; x >= 0; --x)
+            for (int y = nY - 1; y >= 0; --y)
+                castRay(x, y);
+    }
+
+    private void streamParallelRender(int nX, int nY) {
+        IntStream.range(0, nY).parallel()
+                .forEach(i -> IntStream.range(0, nX).parallel()
+                        .forEach(j -> castRay(j, i)));
+    }
+
+    private void multiThreadedRender(int nX, int nY) {
         pixelManager = new PixelManager(nY, nX, 0);
-        if (RenderSettings.threadsCount < 2) {
-            for (int x = nX - 1; x >= 0; --x)
-                for (int y = nY - 1; y >= 0; --y)
-                    castRay(x, y);
-        } else { // see further... option 2
-            int threadsCount = RenderSettings.threadsCount;
-            var threads = new LinkedList<Thread>(); // list of threads
-            while (threadsCount-- > 0) // add the appropriate number of threads
-                threads.add(new Thread(() -> { // add a thread with its code
-                    PixelManager.Pixel pixel; // current pixel(row,col)
-                    // allocate pixel(row,col) in loop until there are no more pixels
-                    while ((pixel = pixelManager.nextPixel()) != null)
-                        // cast ray through pixel (and color it – inside castRay)
-                        castRay(pixel.col(), pixel.row());
-                }));
-            // start all the threads
-            for (var thread : threads) thread.start();
-            // wait until all the threads have finished
+        int threadsCount = RenderSettings.threadsCount;
+        List<Thread> threads = new LinkedList<>();
+
+        while (threadsCount-- > 0) {
+            threads.add(new Thread(this::processPixels));
+        }
+
+        startAndJoinThreads(threads);
+    }
+
+    private void processPixels() {
+        PixelManager.Pixel pixel;
+        while ((pixel = pixelManager.nextPixel()) != null) {
+            castRay(pixel.col(), pixel.row());
+        }
+    }
+
+    private void startAndJoinThreads(List<Thread> threads) {
+        threads.forEach(Thread::start);
+        for (Thread thread : threads) {
             try {
-                for (var thread : threads) thread.join();
+                thread.join();
             } catch (InterruptedException ignore) {
             }
         }
-//        else {
-//            IntStream.range(0, nY).parallel()
-//                    .forEach(i -> IntStream.range(0, nX).parallel() // for each row:
-//                            .forEach(j -> castRay(j, i))); // for each column in row
-//        }
-        return this;
     }
+
 
     /**
      * Casts a ray through the given pixel coordinates and writes the computed color to the image.
@@ -189,10 +250,10 @@ public class Camera {
         public Builder setTarget(Point target) {
             this.to = target.subtract(this.location).normalize();
 
-            this.up = new Vector(0, 1, 0); // The y-axis is up
+            this.up = Vector.UNIT_Y; // The y-axis is up
 //            if (!isZero(camera.to.dotProduct(camera.up))) {
             if (this.up.equals(this.to) || this.up.equals(this.to.scale(-1))) {
-                this.up = new Vector(0, 0, 1); // Switch to Z-axis if Vector to is (0, 1, 0)
+                this.up = Vector.UNIT_Z; // Switch to Z-axis if Vector to is (0, 1, 0)
             }
             this.right = this.to.crossProduct(this.up).normalize();
             this.up = this.right.crossProduct(this.to);
@@ -345,7 +406,7 @@ public class Camera {
             //-----------3
             ViewPlane viewPlane = new ViewPlane(right, up, vpHeight, vpWidth, center, imageWriter.getNx(), imageWriter.getNy());
             //-----------4
-            pixelSamplingStrategy = antiAliasingFlag ? new SuperSamplingAntiAliasing(viewPlane, rayTracerBase, location) : new DefaultSampling(viewPlane, rayTracerBase, location);
+            pixelSamplingStrategy = antiAliasingFlag ? new SSAA4X(viewPlane, rayTracerBase, location) : new DefaultSampling(viewPlane, rayTracerBase, location);
 
             return new Camera(this);
         }
