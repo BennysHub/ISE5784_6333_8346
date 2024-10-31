@@ -61,7 +61,8 @@ public class ShadowTests {
         scene.lights.add(
                 new SpotLight(new Color(400, 240, 0), spotLocation, new Vector(1, 1, -3))
                         .setKl(1E-5).setKq(1.5E-7));
-        camera.setResolution(pictName, 1920, 1080)
+        camera.setResolution(1920, 1080)
+                .setImageName(pictName)
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -140,7 +141,8 @@ public class ShadowTests {
                 new SpotLight(new Color(700, 400, 400), new Point(40, 40, 115), new Vector(-1, -1, -4))
                         .setKl(4E-4).setKq(2E-5));
 
-        camera.setResolution("shadowTrianglesSphere", 600, 600)
+        camera.setResolution(600, 600)
+                .setImageName("shadowTrianglesSphere")
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -164,7 +166,8 @@ public class ShadowTests {
                 .setVpSize(200, 200)
                 .setScene(scene);
 
-        camera.setResolution("stlTurnaround/stlShadow", 600, 600)
+        camera.setResolution( 600, 600)
+                .setImageName("stlTurnaround/stlShadow")
                 .build()
                 .renderImage()
                 .writeToImage();

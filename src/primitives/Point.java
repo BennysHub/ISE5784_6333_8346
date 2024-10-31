@@ -12,6 +12,7 @@ public class Point {
     public static final Point ZERO = new Point(0, 0, 0);
 
     public static final Point POSITIVE_INFINITY = new Point(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+
     /**
      * The x, y, and z coordinates of the point, encapsulated in a Double3 object.
      */

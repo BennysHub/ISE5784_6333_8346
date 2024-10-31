@@ -15,7 +15,7 @@ import static java.awt.Color.*;
  *
  * @author Dan
  */
-public class RenderTests {
+public class RenderingTests {
     /**
      * Scene of the tests
      */
@@ -42,7 +42,8 @@ public class RenderTests {
                 new Triangle(new Point(100, 0, -100), new Point(0, -100, -100), new Point(100, -100, -100)));
         scene.setAmbientLight(new AmbientLight(new Color(255, 191, 191), Double3.ONE))
                 .setBackground(new Color(75, 127, 90));
-        camera.setResolution("base render test", 1000, 1000)
+        camera.setResolution( 1000, 1000)
+                .setImageName("base render test")
                 .build()
                 .renderImage()
                 .printGrid(100, new Color(YELLOW))
@@ -69,7 +70,8 @@ public class RenderTests {
         scene.setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.2, 0.2, 0.2)));
 
         camera
-                .setResolution("color render test", 1000, 1000)
+                .setResolution( 1000, 1000)
+                .setImageName("color render test")
                 .build()
                 .renderImage()
                 .printGrid(100, new Color(WHITE))
@@ -89,7 +91,8 @@ public class RenderTests {
                 .setVpDistance(100)
                 .setVpSize(500, 500);
 
-        camera.setResolution("json render test", 1000, 1000)
+        camera.setResolution(1000, 1000)
+                .setImageName("json render test")
                 .build()
                 .renderImage()
                 .printGrid(100, new Color(YELLOW))

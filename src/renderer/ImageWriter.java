@@ -23,17 +23,10 @@ public class ImageWriter {
      * directory
      */
     private static final String FOLDER_PATH = System.getProperty("user.dir") + "/images";
-    //    /**
-//     * Horizontal resolution of the image - number of pixels in row
-//     */
-//    private final int nX;
-//    /**
-//     * Vertical resolution of the image - number of pixels in column
-//     */
-//    private final int nY;
-//    /**
-//     * Image generation buffer (the matrix of the pixels)
-//     */
+
+    /**
+     * Image generation buffer (the matrix of the pixels)
+     */
     private final BufferedImage image;
     /**
      * image file name, not including the file extension '.png'
@@ -53,13 +46,6 @@ public class ImageWriter {
      * @param nX        number of pixels by Width
      * @param nY        number of pixels by height
      */
-//    public ImageWriter(String imageName, int nX, int nY) {
-//        this.imageName = imageName;
-//        this.nX = nX;
-//        this.nY = nY;
-//
-//        image = new BufferedImage(nX, nY, BufferedImage.TYPE_INT_RGB);
-//    }
     public ImageWriter(String imageName, int nX, int nY) {
         this.imageName = imageName;
         image = new BufferedImage(nX, nY, BufferedImage.TYPE_INT_RGB);

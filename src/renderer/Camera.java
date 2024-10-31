@@ -4,9 +4,11 @@ import geometries.Geometries;
 import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
-import renderer.renderstrategies.antialiasingstrategies.DefaultRendering;
-import renderer.renderstrategies.antialiasingstrategies.SSAA4X;
+import renderer.anti_aliasing_rendering.AntiAliasingUltra;
+import renderer.anti_aliasing_rendering.SSAA4X;
+import renderer.anti_aliasing_rendering.SuperSamplingAntiAliasing;
 import scene.Scene;
+
 import java.util.MissingResourceException;
 
 import static primitives.Util.alignZero;
@@ -21,13 +23,13 @@ import static primitives.Util.isZero;
  * @author TzviYisrael and Benny
  */
 public class Camera {
-    private final Render render;
+    private final Render renderBase;
 
     /**
      * Default constructor for {@code Camera}.
      */
     protected Camera(Builder cameraBuilder) {
-        render = new SSAA4X(cameraBuilder.imageWriter, cameraBuilder.viewPlane, cameraBuilder.rayTracerBase, cameraBuilder.location );
+        renderBase = cameraBuilder.render;
     }
 
 
@@ -40,17 +42,25 @@ public class Camera {
         return new Builder();
     }
 
-    public Camera renderImage() {
-        render.renderImage();
-        return this;
-    }
 
     public void writeToImage() {
-        render.writeToImage();
+        renderBase.writeToImage();
     }
 
     public Camera printGrid(int interval, Color color) {
-        render.printGrid(interval, color);
+        renderBase.printGrid(interval, color);
+        return this;
+    }
+
+    public Camera renderImage() {
+
+        if (RenderSettings.parallelStreamsEnabled)
+            renderBase.parallelStreamsRender();
+        else if (RenderSettings.multiThreadingEnabled)
+            renderBase.multiThreadingRender(RenderSettings.threadsCount);
+        else
+            renderBase.render();
+
         return this;
     }
 
@@ -67,11 +77,14 @@ public class Camera {
         private double vpHeight;
         private double vpWidth;
         private double vpDistance;
+        private Point vpCenter;
         private ViewPlane viewPlane;
         private ImageWriter imageWriter;
+        private int nX;
+        private int nY;
+        private String imageName;
         private RayTracerBase rayTracerBase;
-
-        private boolean antiAliasingFlag = false;
+        private Render render;
         boolean rayTracerWasSet = false;
 
 
@@ -160,8 +173,14 @@ public class Camera {
         }
 
 
-        public Builder setResolution(String imageName, int nX, int nY) {
-            this.imageWriter = new ImageWriter(imageName, nX, nY);
+        public Builder setImageName(String imageName) {
+            this.imageName = imageName;
+            return this;
+        }
+
+        public Builder setResolution(int nX, int nY) {
+            this.nX = nX;
+            this.nY = nY;
             return this;
         }
 
@@ -173,6 +192,12 @@ public class Camera {
          */
         public Builder setSoftShadows(Boolean flag) {
             RenderSettings.softShadowsEnabled = flag;
+            return this;
+        }
+
+
+        public Builder setAntiAliasingQuality(QualityLevel qualityLevel) {
+            RenderSettings.antiAliasingQuality = qualityLevel;
             return this;
         }
 
@@ -201,8 +226,18 @@ public class Camera {
             return this;
         }
 
-        public Builder setMultiThreading(int threadsCount) {
+        public Builder setThreadsCount(int threadsCount) {
             RenderSettings.threadsCount = threadsCount;
+            return this;
+        }
+
+        public Builder setMultiThreading(boolean flag) {
+            RenderSettings.multiThreadingEnabled = flag;
+            return this;
+        }
+
+        public Builder setParallelStreams(boolean flag) {
+            RenderSettings.parallelStreamsEnabled = flag;
             return this;
         }
 
@@ -215,8 +250,46 @@ public class Camera {
         }
 
         public Builder setAntiAliasing(boolean flag) {
-            antiAliasingFlag = flag;
+            RenderSettings.antiAliasingEnabled = flag;
             return this;
+        }
+
+        private void setImageWriter() {
+            imageWriter = new ImageWriter(imageName, nX, nY);
+        }
+
+        private void setVPCenter() {
+            vpCenter = location.add(to.scale(vpDistance));
+        }
+
+        private void setViewingPlane() {
+            viewPlane = new ViewPlane(right, up, vpHeight, vpWidth, vpCenter, imageWriter.getNx(), imageWriter.getNy());
+        }
+
+        private void setRender() {
+            if (!RenderSettings.antiAliasingEnabled) {
+                render = new Render(imageWriter, viewPlane, rayTracerBase, location);
+                return;
+            }
+
+            switch (RenderSettings.antiAliasingQuality) {
+                case LOW:
+                    System.out.println("Applying low quality settings");
+                    render = new SSAA4X(imageWriter, viewPlane, rayTracerBase, location);
+                    break;
+                case MEDIUM:
+                    System.out.println("Applying medium quality settings");
+                    // Apply medium quality settings
+                    break;
+                case HIGH:
+                    System.out.println("Applying high quality settings");
+                    render = new SuperSamplingAntiAliasing(imageWriter, viewPlane, rayTracerBase, location);
+                    break;
+                case ULTRA:
+                    System.out.println("Applying ultra quality settings");
+                    render = new AntiAliasingUltra(imageWriter, viewPlane, rayTracerBase, location);
+                    break;
+            }
         }
 
         /**
@@ -242,14 +315,17 @@ public class Camera {
             if (!isZero(this.to.dotProduct(this.up)))
                 throw new IllegalArgumentException("the vectors are not perpendicular");
 
+            if (nX <= 0 || nY <= 0)
+                throw new MissingResourceException("Missing image resolution", Camera.class.getName(), "nX, nY");
+
+            if (imageName == null)
+                throw new MissingResourceException("Missing image name", Camera.class.getName(), "imageName");
+
             if (alignZero(this.vpHeight) <= 0 || alignZero(this.vpWidth) <= 0)
                 throw new MissingResourceException("Invalid view plane dimensions", Camera.class.getName(), "height/width");
 
             if (alignZero(this.vpDistance) <= 0)
                 throw new MissingResourceException("Invalid view plane distance", Camera.class.getName(), "vpDistance");
-
-            if (this.imageWriter == null)
-                throw new MissingResourceException("Missing camera imageWriter", Camera.class.getName(), "imageWriter");
 
             if (this.rayTracerBase == null)
                 throw new MissingResourceException("Missing camera rayTracerBase", Camera.class.getName(), "rayTracerBase");
@@ -263,15 +339,23 @@ public class Camera {
             if (!RenderSettings.softShadowsEnabled)
                 RenderSettings.SHADOW_RAYS_SAMPLE_COUNT = 1;
 
-            //after all, the checks above set by order!!
-            //-----------1
-            Point center = this.location.add(this.to.scale(this.vpDistance));
-            //-----------2
-            if (center == null)
-                throw new MissingResourceException("Missing camera center", Camera.class.getName(), "center");
-            //-----------3
-            viewPlane = new ViewPlane(right, up, vpHeight, vpWidth, center, imageWriter.getNx(), imageWriter.getNy());
-            //-----------4
+
+            setImageWriter();
+            if (this.imageWriter == null)
+                throw new MissingResourceException("Missing camera imageWriter", Camera.class.getName(), "imageWriter");
+
+
+            setVPCenter();
+            if (vpCenter == null)
+                throw new MissingResourceException("ERROR constructing camera center", Camera.class.getName(), "center");
+
+            setViewingPlane();
+            if (viewPlane == null)
+                throw new MissingResourceException("ERROR constructing camera viewPlane", Camera.class.getName(), "viewPlane");
+
+            setRender();
+            if (render == null)
+                throw new MissingResourceException("ERROR constructing camera render", Camera.class.getName(), "render");
 
             return new Camera(this);
         }

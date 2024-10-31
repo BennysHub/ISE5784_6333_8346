@@ -21,7 +21,8 @@ class CameraTest {
             .setLocation(Point.ZERO)
             .setDirection(new Vector(0, 0, -1), new Vector(0, -1, 0))
             .setScene(new Scene("Test"))
-            .setResolution("Test", 4, 4)
+            .setImageName("Test")
+            .setResolution(4, 4)
             .setVpDistance(10);
 
     /**

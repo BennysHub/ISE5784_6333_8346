@@ -8,12 +8,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public abstract class Render {
+public class Render implements Rendering,MultiThreadingRendering, ParallelStreamsRendering {
 
     protected final ImageWriter imageWriter;
     protected final ViewPlane viewPlane;
     protected final RayTracerBase rayTracer;
     protected final Point camaraLocation;
+    private PixelManager pixelManager;
 
     public Render(ImageWriter imageWriter, ViewPlane viewPlane, RayTracerBase rayTracer, Point camaraLocation) {
         this.imageWriter = imageWriter;
@@ -22,64 +23,32 @@ public abstract class Render {
         this.camaraLocation = camaraLocation;
     }
 
-//    public void renderImage(){
-//        int nX = imageWriter.getNx();
-//        int nY = imageWriter.getNy();
-//
-//        if (RenderSettings.threadsCount < 2)
-//            singleThreadedRender(nX, nY);
-//        else
-//            multiThreadedRender(nX, nY);
-//    }
+    @Override
+    public void render() {
+        render(imageWriter.getNx(), imageWriter.getNy());
+    }
 
-    public abstract void renderImage();
+    @Override
+    public void multiThreadingRender(int threadsCount) {
+        multiThreadedRender(imageWriter.getNx(), imageWriter.getNy(), threadsCount);
+    }
 
+    @Override
+    public void parallelStreamsRender() {
+        parallelStreamsRender(imageWriter.getNx(), imageWriter.getNy());
+    }
 
-//    private void singleThreadedRender(int nX, int nY) {
-//        for (int x = nX - 1; x >= 0; --x)
-//            for (int y = nY - 1; y >= 0; --y)
-//                castRay(x, y);
-//    }
-//
-//    private void streamParallelRender(int nX, int nY) {
-//        IntStream.range(0, nY).parallel()
-//                .forEach(i -> IntStream.range(0, nX).parallel()
-//                        .forEach(j -> castRay(j, i)));
-//    }
+    private void parallelStreamsRender(int nX, int nY) {
+        IntStream.range(0, nY).parallel()
+                .forEach(i -> IntStream.range(0, nX).parallel()
+                        .forEach(j -> castRay(j, i)));
+    }
 
 
-//
-//    private void multiThreadedRender(int nX, int nY) {
-//        pixelManager = new PixelManager(nY, nX, 0);
-//        int threadsCount = RenderSettings.threadsCount;
-//        List<Thread> threads = new LinkedList<>();
-//
-//        while (threadsCount-- > 0) {
-//            threads.add(new Thread(this::processPixels));
-//        }
-//
-//        startAndJoinThreads(threads);
-//    }
-//
-//    private void processPixels() {
-//        PixelManager.Pixel pixel;
-//        while ((pixel = pixelManager.nextPixel()) != null) {
-//            castRay(pixel.col(), pixel.row());
-//        }
-//    }
-//
-//    private void startAndJoinThreads(List<Thread> threads) {
-//        threads.forEach(Thread::start);
-//        for (Thread thread : threads) {
-//            try {
-//                thread.join();
-//            } catch (InterruptedException ignore) {
-//            }
-//        }
-//    }
-
-    protected Ray constructCentralRay(int x, int y){
-        return new Ray(camaraLocation, viewPlane.getPixelCenter(x,y));
+    private void render(int nX, int nY) {
+        for (int x = nX - 1; x >= 0; --x)
+            for (int y = nY - 1; y >= 0; --y)
+                castRay(x, y);
     }
 
     /**
@@ -93,6 +62,39 @@ public abstract class Render {
         Color pixelColor = rayTracer.traceRay(ray);
         imageWriter.writePixel(x, y, pixelColor);
     }
+
+
+    private void multiThreadedRender(int nX, int nY, int threadsCount) {
+        pixelManager = new PixelManager(nY, nX, 0);
+        List<Thread> threads = new LinkedList<>();
+        while (threadsCount-- > 0)
+            threads.add(new Thread(this::processPixels));
+
+        startAndJoinThreads(threads);
+    }
+
+    private void processPixels() {
+        PixelManager.Pixel pixel;
+        while ((pixel = pixelManager.nextPixel()) != null) {
+            castRay(pixel.col(), pixel.row());
+        }
+    }
+
+    private void startAndJoinThreads(List<Thread> threads) {
+        threads.forEach(Thread::start);
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException _) {
+            }
+        }
+    }
+
+    protected Ray constructCentralRay(int x, int y) {
+        return new Ray(camaraLocation, viewPlane.getPixelCenter(x, y));
+    }
+
+
 
     /**
      * Prints a grid on the image with the specified interval and color.

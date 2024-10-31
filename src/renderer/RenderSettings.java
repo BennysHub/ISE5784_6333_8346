@@ -14,13 +14,14 @@ public class RenderSettings {
      * The minimum value for the reflection/refraction coefficient in color calculations.
      */
     static public final double MIN_CALC_COLOR_K = 0.001;
+
     public static int SHADOW_RAYS_SAMPLE_COUNT = 49 ;
 
 
     /**
-     * The number of threads to use. Set to 0 for no multithreading
+     * The number of threads to use
      */
-    static int threadsCount = 0;
+    static int threadsCount = 4;
     /**
      * Indicates whether BVH is enabled.
      */
@@ -32,17 +33,18 @@ public class RenderSettings {
      */
     static boolean softShadowsEnabled = false;
 
-    public static boolean isSoftShadowsEnabled(){
-        return softShadowsEnabled;
-    }
+    static QualityLevel softShadowQuality =  QualityLevel.LOW;
 
-    public static int getShadowRaysSampleCount(){
-        return SHADOW_RAYS_SAMPLE_COUNT;
-    }
+    static boolean multiThreadingEnabled = false;
+
+    static boolean parallelStreamsEnabled = false;
+
     /**
      * Indicates whether antialiasing is enabled.
      */
     static boolean antiAliasingEnabled = false;
+
+    static QualityLevel antiAliasingQuality =  QualityLevel.LOW;
     /**
      * Indicates whether depth of field is enabled.
      */
@@ -56,14 +58,6 @@ public class RenderSettings {
      */
     static boolean DiffusedGlassEnabled = false;
 
-    /**
-     * Indicates whether BVH is enabled.
-     *
-     * @return true if BVH is enabled.
-     */
-    public static boolean isBVHEnabled() {
-        return BVHIsEnabled;
-    }
-    public static boolean isSAHIsEnabled(){return BVHIsEnabled; }
+
 }
 

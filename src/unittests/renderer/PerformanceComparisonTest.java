@@ -56,6 +56,13 @@ public class PerformanceComparisonTest {
         endTime = System.nanoTime();
         duration = endTime - startTime;
         System.out.println("BVH plus MultiThreading execution time: " + formatDuration(duration));
+
+        // Testing BVH plus ParallelStreams
+        startTime = System.nanoTime();
+        bvhPlusParallelStreams();
+        endTime = System.nanoTime();
+        duration = endTime - startTime;
+        System.out.println("BVH plus ParallelStreams execution time: " + formatDuration(duration));
     }
 
     /**
@@ -83,7 +90,8 @@ public class PerformanceComparisonTest {
             .setVpSize(300, 300)
             .setScene(scene)
             .setSoftShadows(false)
-            .setResolution("snowGlobeBuildTime", 600, 600);
+            .setResolution(600, 600)
+            .setImageName("snowGlobeBuildTime");
 
     /**
      * Renders the image using the base camera configuration.
@@ -97,7 +105,7 @@ public class PerformanceComparisonTest {
      * Renders the image using the multi-threading camera configuration.
      */
     private void multiThreading() {
-        Camera camera = cameraBase.setMultiThreading(8).build();
+        Camera camera = cameraBase.setMultiThreading(true).setThreadsCount(16).build();
         camera.renderImage();
     }
 
@@ -123,7 +131,20 @@ public class PerformanceComparisonTest {
     private void bvhPlusMultiThreading() {
         Camera camera = cameraBase
                 .setScene(new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json", "Test Scene"))  // build BVH again
-                .setMultiThreading(16)
+                .setMultiThreading(true)
+                .setThreadsCount(16)
+                .setBVH(true)
+                .build();
+        camera.renderImage();
+    }
+
+    /**
+     * Renders the image using the BVH plus parallel-streams camera configuration.
+     */
+    private void bvhPlusParallelStreams() {
+        Camera camera = cameraBase
+                .setScene(new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json", "Test Scene"))  // build BVH again
+                .setParallelStreams(true)
                 .setBVH(true)
                 .build();
         camera.renderImage();

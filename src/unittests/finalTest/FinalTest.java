@@ -1,13 +1,12 @@
 package finalTest;
 
-import geometries.Sphere;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import primitives.Material;
 import primitives.Point;
 import primitives.Vector;
 import renderer.Camera;
-import renderer.ImageWriter;
+import renderer.QualityLevel;
+import renderer.RenderSettings;
 import scene.JsonSceneParser;
 import scene.Scene;
 
@@ -48,7 +47,8 @@ public class FinalTest {
                 //.setSoftShadows(true)
                 .setScene(scene)
                 .setBVH(true)
-                .setResolution("snowGlobe_both", 600, 600);
+                .setResolution( 600, 600)
+                .setImageName("snowGlobe_both");
 
         camera.build()
                 .renderImage()
@@ -69,7 +69,8 @@ public class FinalTest {
             double z = center.getZ() + radius * Math.sin(angle);
             camera.setLocation(new Point(x * 3, 60, z * 3)).setTarget(center);
 
-            camera.setResolution("snowGlobe/turnaround_" + i, 1920, 1080)
+            camera.setResolution( 1920, 1080)
+                    .setImageName("snowGlobe/turnaround_" + i)
                     .build()
                     .renderImage()
                     .writeToImage();
@@ -92,7 +93,8 @@ public class FinalTest {
                 .setBVH(true)
                 .setScene(scene);
 
-        camera.setResolution("finalTest", 480 * 2, 270 * 2)
+        camera.setResolution(480 * 2, 270 * 2)
+                .setImageName("finalTest")
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -125,12 +127,13 @@ public class FinalTest {
                 .setVpDistance(150)
                 .setVpSize(300, 300)
                 .setScene(scene)
-
-                .setMultiThreading(16)
+                .setParallelStreams(true)
                 .setSoftShadows(false)
                 .setAntiAliasing(true)
+                .setAntiAliasingQuality(QualityLevel.ULTRA)
                 .setBVH(true)
-                .setResolution("snowGlobeBuildTime", 1440, 1440);
+                .setResolution(1440, 1440)
+                .setImageName("snowGlobeBuildTime");
 
         for (int i = 0; i < SNOW_GLOBE_FRAMES; ++i)
             camera.build().renderImage().writeToImage();

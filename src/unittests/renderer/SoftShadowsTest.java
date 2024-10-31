@@ -61,7 +61,8 @@ public class SoftShadowsTest {
     public void softShadowBase() {
         scene.geometries.add(plane, triangle);
         scene.lights.add(pointLight);
-        camera1.setResolution("softShadowBase", 600, 600)
+        camera1.setResolution( 600, 600)
+                .setImageName("softShadowBase")
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -85,7 +86,8 @@ public class SoftShadowsTest {
         scene.lights.add(new SpotLight(new Color(700, 400, 400), new Point(40, 40, 115), new Vector(-1, -1, -4), 4)
                 .setKl(4E-4).setKq(2E-5));
 
-        camera1.setResolution("softShadowTrianglesSphere", 600, 600)
+        camera1.setResolution( 600, 600)
+                .setImageName("softShadowTrianglesSphere")
                 .setSoftShadows(true)
                 .build()
                 .renderImage()
@@ -116,11 +118,12 @@ public class SoftShadowsTest {
                 .setScene(scene)
                 .setLocation(new Point(-1, 6, -1))
                 .setTarget(Point.ZERO)
-                .setMultiThreading(16)
+                .setThreadsCount(16)
                 .setVpSize(150, 150).setVpDistance(30)
                 .setAntiAliasing(false);
 
-        camera2.setResolution("underTheHorizonSpotLight", 1080, 1080)
+        camera2.setResolution(1080, 1080)
+                .setImageName("underTheHorizonSpotLight")
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -138,18 +141,21 @@ public class SoftShadowsTest {
 
         scene.lights.add(
                 new PointLight(new Color(255, 255, 255), new Point(20, -1, 0), 3).setKl(0.02).setKc(0)
-                );
+        );
 
         final Camera.Builder camera2 = Camera.getBuilder()
                 .setSoftShadows(true)
                 .setScene(scene)
                 .setLocation(new Point(-1, 6, -1))
                 .setTarget(Point.ZERO)
-                .setMultiThreading(16)
+                .setParallelStreams(true)
                 .setVpSize(150, 150).setVpDistance(30)
-                .setAntiAliasing(false);
+                .setAntiAliasing(true)
+                .setAntiAliasingQuality(QualityLevel.HIGH);
 
-        camera2.setResolution("underTheHorizonPointLight", 1080, 1080)
+
+        camera2.setResolution(1080, 1080)
+                .setImageName("underTheHorizonPointLight")
                 .build()
                 .renderImage()
                 .writeToImage();

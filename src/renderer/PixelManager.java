@@ -45,7 +45,7 @@ class PixelManager {
     private volatile int lastPrinted = 0;
 
     /**
-     * Flag of debug printing of progress percentage
+     * Flag of debug printing progress percentage
      */
     private boolean print = false;
     /**
