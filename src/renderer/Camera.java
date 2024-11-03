@@ -60,7 +60,6 @@ public class Camera {
             renderBase.multiThreadingRender(RenderSettings.threadsCount);
         else
             renderBase.render();
-
         return this;
     }
 
@@ -85,7 +84,7 @@ public class Camera {
         private String imageName;
         private RayTracerBase rayTracerBase;
         private Render render;
-        boolean rayTracerWasSet = false;
+        private boolean rayTracerWasSet = false;
 
 
         /**
@@ -343,8 +342,7 @@ public class Camera {
             setImageWriter();
             if (this.imageWriter == null)
                 throw new MissingResourceException("Missing camera imageWriter", Camera.class.getName(), "imageWriter");
-
-
+            
             setVPCenter();
             if (vpCenter == null)
                 throw new MissingResourceException("ERROR constructing camera center", Camera.class.getName(), "center");

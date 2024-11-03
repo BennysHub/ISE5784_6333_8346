@@ -82,6 +82,7 @@ public class AntiAliasingTest {
         cameraBase
                 .setImageName("AntiAliasing-Ultra")
                 .setAntiAliasing(true)
+                .setParallelStreams(true)
                 .setAntiAliasingQuality(QualityLevel.ULTRA)
                 .build()
                 .renderImage()

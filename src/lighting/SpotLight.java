@@ -62,11 +62,11 @@ public class SpotLight extends PointLight {
     /**
      * Sets the beamFocus for the spotLight direction
      *
-     * @param beamFocus the strength of the beam will be more focus
+     * @param narrowBeam the strength of the beam will be more focus
      * @return the current PointLight instance for chaining
      */
-    public PointLight setNarrowBeam(int beamFocus) {
-        this.narrowBeam = beamFocus;
+    public PointLight setNarrowBeam(int narrowBeam) {
+        this.narrowBeam = narrowBeam;
         return this;
     }
 
