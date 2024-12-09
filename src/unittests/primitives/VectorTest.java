@@ -17,6 +17,8 @@ class VectorTest {
     private static final Vector v2 = new Vector(-2, -4, -6); // Parallel opposite vector to v1
     private static final Vector v3 = new Vector(0, 3, -2); // Orthogonal vector to v1
     private static final Vector v4 = new Vector(1, 2, 2);
+    private static final Vector v5 = new Vector(2, 1, 3); // Non-parallel, non-perpendicular, angle between 0 and 90 degrees
+    private static final Vector v6 = new Vector(-1, 0, 0); // Same direction as v1, but negative, angle between 90 and 180 degrees
     private static final double DELTA = 0.000001; // Delta value for accuracy when comparing 'double' types
 
     /**
@@ -221,13 +223,70 @@ class VectorTest {
     }
 
     @Test
-    void parallel() {
-        assertTrue(v1.parallel(v2));
-        assertTrue(new Vector(0, 0, 2).parallel(new Vector(0, 0, 1)));
+    void isParallel() {
+        assertTrue(v1.isParallel(v2));
+        assertTrue(new Vector(0, 0, 2).isParallel(new Vector(0, 0, 1)));
     }
 
     @Test
-    void projection() {
+    void testProject() {
+        // ============ Equivalence Partitions Tests ==============
+
+        // TC01: Projecting onto a non-parallel, non-perpendicular vector where 0 < x < 90 degrees
+        Vector projection = v1.project(v5);
+        Vector expectedProjectionTC01 = new Vector(1.8571428571428572, 0.9285714285714286, 2.7857142857142856);
+        assertEquals(expectedProjectionTC01, projection, "Projection onto a vector where 0 < angle < 90 degrees did not match the expected vector.");
+
+        // TC02: Projecting onto a non-parallel, non-perpendicular vector where 90 < x < 180 degrees
+        projection = v1.project(v6);
+        Vector expectedProjectionTC02 = new Vector(1, 0, 0); // Updated to a proper non-parallel, non-perpendicular vector
+        assertEquals(expectedProjectionTC02, projection, "Projection onto a vector where 90 < angle < 180 degrees did not match the expected vector.");
+
+        // =============== Boundary Values Tests ==================
+
+        // TC11: Projecting onto a vector itself
+        projection = v1.project(v1);
+        assertEquals(v1, projection, "Projection onto itself should be the same vector.");
+
+        // TC12: Projecting onto a parallel vector (opposite direction)
+        projection = v1.project(v2);
+        assertEquals(v1, projection, "Projection onto a parallel opposite vector should be the same vector.");
+
+        // TC13: Projecting onto a perpendicular vector
+        assertThrows(IllegalArgumentException.class, () -> v1.project(v3), "Projection onto a perpendicular vector should throw an exception.");
+
+        // TC14: Projecting onto a non-parallel, non-perpendicular vector
+        projection = v1.project(v4);
+        assertTrue(projection.length() > 0, "Projection onto a non-parallel, non-perpendicular vector should not be zero.");
     }
 
+    @Test
+    void testReject() {
+        // ============ Equivalence Partitions Tests ==============
+
+        // TC01: Rejecting from a non-parallel, non-perpendicular vector where 0 < x < 90 degrees
+        Vector rejection = v1.reject(v5);
+        Vector expectedRejectionTC01 = v1.subtract(new Vector(1.8571428571428572, 0.9285714285714286, 2.7857142857142856));
+        assertEquals(expectedRejectionTC01, rejection, "Rejection from a vector where 0 < angle < 90 degrees did not match the expected vector.");
+
+        // TC02: Rejecting from a non-parallel, non-perpendicular vector where 90 < x < 180 degrees
+        rejection = v1.reject(v6);
+        Vector expectedRejectionTC02 = v1.subtract(new Vector(1,0,0)); // Since they are collinear but in opposite directions
+        assertEquals(expectedRejectionTC02, rejection, "Rejection from a vector where 90 < angle < 180 degrees did not match the expected vector.");
+
+        // =============== Boundary Values Tests ==================
+
+        // TC11: Rejecting from a vector itself
+        assertThrows(IllegalArgumentException.class, () -> v1.reject(v1), "Rejection from itself should throw an exception.");
+
+        // TC12: Rejecting from a parallel vector (opposite direction)
+        assertThrows(IllegalArgumentException.class, () -> v1.reject(v2), "Rejection from a parallel opposite vector should throw an exception.");
+
+        // TC13: Rejecting from a perpendicular vector
+        assertThrows(IllegalArgumentException.class, () -> v1.reject(v3), "Rejection from a perpendicular vector should throw an exception.");
+
+        // TC14: Rejecting from a non-parallel, non-perpendicular vector
+        rejection = v1.reject(v4);
+        assertTrue(rejection.length() > 0, "Rejection from a non-parallel, non-perpendicular vector should not be zero.");
+    }
 }

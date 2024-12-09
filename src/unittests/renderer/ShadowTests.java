@@ -33,7 +33,8 @@ public class ShadowTests {
      */
     private final Camera.Builder camera = Camera.getBuilder()
             .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
-            .setLocation(new Point(0, 0, 1000)).setVpDistance(1000)
+            .setLocation(new Point(0, 0, 1000))
+            .setVpDistance(1000)
             .setVpSize(162, 288)
             .setSoftShadows(false)
             .setAntiAliasing(false)

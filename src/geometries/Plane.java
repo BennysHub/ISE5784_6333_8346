@@ -69,9 +69,41 @@ public class Plane extends Geometry {
         return new Plane(planePoint.add(vector), planeNormalizedVector).setMaterial(this.getMaterial());
     }
 
+
+
     @Override
     public Vector getNormal(Point planePoint) {
         return getNormal(); // The normal is the same everywhere on an infinite plane.
+    }
+
+    @Override
+    public Geometry move(Vector translation) {
+        return null;
+    }
+
+    @Override
+    public Geometry scale(Vector scale) {
+        return null;
+    }
+
+    @Override
+    public Geometry rotate(Vector rotation) {
+        return null;
+    }
+
+    @Override
+    public Geometry moveX(double dx) {
+        return null;
+    }
+
+    @Override
+    public Geometry moveY(double dy) {
+        return null;
+    }
+
+    @Override
+    public Geometry moveZ(double dz) {
+        return null;
     }
 
     @Override

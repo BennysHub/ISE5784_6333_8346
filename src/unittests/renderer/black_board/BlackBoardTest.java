@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import primitives.Double2;
 import primitives.Point;
 import primitives.Vector;
+import renderer.QualityLevel;
 import renderer.super_sampling.Blackboard;
 
 import java.util.Arrays;
@@ -125,7 +126,7 @@ public class BlackBoardTest {
     @Test
     public void testRotatePointsOnSphere() {
 
-        Point[] points = Blackboard.getSpherePoints(center2, 3, normal);
+        Point[] points = Blackboard.getSpherePoints(center2, 3, normal, QualityLevel.HIGH);
 
         // Test case 1: Rotate from up to down
 
@@ -142,7 +143,7 @@ public class BlackBoardTest {
 
 
     private void testRotation(Point[] points, Vector from, Vector to, Point center) {
-        Point[] expectedPoints = Blackboard.getSpherePoints(center, 3, to);
+        Point[] expectedPoints = Blackboard.getSpherePoints(center, 3, to, QualityLevel.HIGH);
         Point[] actualPoints = Blackboard.rotatePointsOnSphere(points, from, to, center);
 
         // Sort the arrays

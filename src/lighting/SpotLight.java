@@ -3,9 +3,11 @@ package lighting;
 import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
+import renderer.QualityLevel;
 import renderer.super_sampling.Blackboard;
 
 import static primitives.Util.alignZero;
+import static primitives.Util.isZero;
 
 /**
  * Class representing a spotlight in a 3D scene.
@@ -16,6 +18,8 @@ public class SpotLight extends PointLight {
     private final Vector direction;
 
     private int narrowBeam = 1;
+
+    private Point[] lightSamples = null;
 
     /**
      * Constructs a spotlight with the specified intensity, position, and direction.
@@ -33,13 +37,23 @@ public class SpotLight extends PointLight {
     public SpotLight(Color intensity, Point position, Vector direction, double size) {
         this(intensity, position, direction);
         this.radius = size;
-        setLightSamples();
     }
 
+
     @Override
-    protected void setLightSamples() {
-        lightSamples = Blackboard.getDiskPoints(position, radius, direction);
+    public SpotLight setLightSampleQuality(QualityLevel sampleQuality){
+        lightSampleQuality = sampleQuality;
+        return this;
     }
+
+
+
+    @Override
+    public void setLightSample(QualityLevel sampleQuality) {
+        lightSamples = Blackboard.getDiskPoints(position, radius, direction,
+                lightSampleQuality != null ? lightSampleQuality : sampleQuality);
+    }
+
 
     @Override
     public SpotLight setKc(double kc) {
@@ -77,7 +91,7 @@ public class SpotLight extends PointLight {
     }
 
     @Override
-    public Point[] getLightSample(Point p, int samplesCount) {
-        return samplesCount == 1 ? new Point[]{position} : lightSamples;
+    public Point[] getLightSample(Point p) {
+        return lightSamples == null || isZero(radius) ? new Point[]{position} : lightSamples;
     }
 }

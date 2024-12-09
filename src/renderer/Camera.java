@@ -1,7 +1,9 @@
 package renderer;
 
 import geometries.Geometries;
+import lighting.LightSource;
 import primitives.Color;
+import primitives.Matrix;
 import primitives.Point;
 import primitives.Vector;
 import renderer.anti_aliasing_rendering.AntiAliasingUltra;
@@ -70,6 +72,7 @@ public class Camera {
      */
     public static class Builder {
         private Point location;
+        private Point target;
         private Vector right;
         private Vector up;
         private Vector to;
@@ -85,6 +88,10 @@ public class Camera {
         private RayTracerBase rayTracerBase;
         private Render render;
         private boolean rayTracerWasSet = false;
+        private double apertureSize;
+        private double focalLength;
+
+
 
 
         /**
@@ -129,8 +136,7 @@ public class Camera {
             this.to = target.subtract(this.location).normalize();
 
             this.up = Vector.UNIT_Y; // The y-axis is up
-//            if (!isZero(camera.to.dotProduct(camera.up))) {
-            if (this.up.equals(this.to) || this.up.equals(this.to.scale(-1))) {
+            if (up.isPerpendicular(to)) {
                 this.up = Vector.UNIT_Z; // Switch to Z-axis if Vector to is (0, 1, 0)
             }
             this.right = this.to.crossProduct(this.up).normalize();
@@ -138,6 +144,32 @@ public class Camera {
             return this;
         }
 
+
+        public Builder setT(Point target, Vector up){
+
+            to = target.subtract(this.location).normalize();
+
+            if (to.isParallel(up))
+                throw new IllegalArgumentException("Vector 'up' can't be parallel to vector 'to' ");
+
+            this.up = up.reject(to).normalize();
+            right = to.crossProduct(this.up);
+            return this;
+        }
+
+        public Builder changeTarget(Point target, Point camaraLocation){
+
+            location = camaraLocation;
+            Vector newTo = target.subtract(this.location).normalize();
+            Vector axis = to.isParallel(newTo) ? right : to.crossProduct(newTo);
+
+            double angle = Math.acos(to.dotProduct(newTo) / (to.length() * newTo.length()));
+            Matrix rotationMatrix = Matrix.rotationMatrix(axis, angle);
+            up = rotationMatrix.multiply(up);
+            to  = newTo;
+            right  = to.crossProduct(up);
+            return this;
+        }
 
         /**
          * Sets the view plane size of the camera.
@@ -200,6 +232,19 @@ public class Camera {
             return this;
         }
 
+        public Builder setSoftShadowsQuality(QualityLevel qualityLevel) {
+            RenderSettings.softShadowQuality = qualityLevel;
+            return this;
+        }
+
+        public Builder setDepthOfFieldQualityQuality(QualityLevel qualityLevel) {
+            RenderSettings.depthOfFieldQuality = qualityLevel;
+            return this;
+        }
+
+
+
+
         /**
          * Enables or disables BVH in the render.
          *
@@ -253,6 +298,21 @@ public class Camera {
             return this;
         }
 
+        public Builder setDepthOfField(boolean flag) {
+            RenderSettings.depthOfFieldEnabled = flag;
+            return this;
+        }
+
+        public Builder setApertureSize(double apertureSize){
+            this.apertureSize = apertureSize;
+            return this;
+        }
+
+        public Builder setFocalLength(double focalLength){
+            this.focalLength = focalLength;
+            return this;
+        }
+
         private void setImageWriter() {
             imageWriter = new ImageWriter(imageName, nX, nY);
         }
@@ -262,33 +322,41 @@ public class Camera {
         }
 
         private void setViewingPlane() {
-            viewPlane = new ViewPlane(right, up, vpHeight, vpWidth, vpCenter, imageWriter.getNx(), imageWriter.getNy());
+            viewPlane = new ViewPlane(right, up, to, vpHeight, vpWidth, vpCenter, imageWriter.getNx(), imageWriter.getNy());
         }
 
         private void setRender() {
-            if (!RenderSettings.antiAliasingEnabled) {
-                render = new Render(imageWriter, viewPlane, rayTracerBase, location);
+
+            if (RenderSettings.depthOfFieldEnabled) {
+                render = new DOFRendering(imageWriter, viewPlane, rayTracerBase, location, apertureSize, focalLength);
                 return;
             }
 
-            switch (RenderSettings.antiAliasingQuality) {
-                case LOW:
-                    System.out.println("Applying low quality settings");
-                    render = new SSAA4X(imageWriter, viewPlane, rayTracerBase, location);
-                    break;
-                case MEDIUM:
-                    System.out.println("Applying medium quality settings");
-                    // Apply medium quality settings
-                    break;
-                case HIGH:
-                    System.out.println("Applying high quality settings");
-                    render = new SuperSamplingAntiAliasing(imageWriter, viewPlane, rayTracerBase, location);
-                    break;
-                case ULTRA:
-                    System.out.println("Applying ultra quality settings");
-                    render = new AntiAliasingUltra(imageWriter, viewPlane, rayTracerBase, location);
-                    break;
+            if (RenderSettings.antiAliasingEnabled) {
+                switch (RenderSettings.antiAliasingQuality) {
+                    case LOW:
+                        System.out.println("Applying low quality settings");
+                        render = new SSAA4X(imageWriter, viewPlane, rayTracerBase, location);
+                        break;
+                    case MEDIUM:
+                        System.out.println("Applying medium quality settings");
+                        // Apply medium quality settings
+                        break;
+                    case HIGH:
+                        System.out.println("Applying high quality settings");
+                        render = new SuperSamplingAntiAliasing(imageWriter, viewPlane, rayTracerBase, location);
+                        break;
+                    case ULTRA:
+                        System.out.println("Applying ultra quality settings");
+                        render = new AntiAliasingUltra(imageWriter, viewPlane, rayTracerBase, location);
+                        break;
+                }
+                return;
             }
+
+            render = new Render(imageWriter, viewPlane, rayTracerBase, location);
+
+
         }
 
         /**
@@ -335,14 +403,16 @@ public class Camera {
             if (RenderSettings.BVHIsEnabled)
                 this.rayTracerBase.scene.geometries.buildBVH();
 
-            if (!RenderSettings.softShadowsEnabled)
-                RenderSettings.SHADOW_RAYS_SAMPLE_COUNT = 1;
+            if (RenderSettings.softShadowsEnabled){//what if we add lights after initialize scene
+                for(LightSource light : this.rayTracerBase.scene.lights)
+                    light.setLightSample(RenderSettings.softShadowQuality);
+            }
 
 
             setImageWriter();
             if (this.imageWriter == null)
                 throw new MissingResourceException("Missing camera imageWriter", Camera.class.getName(), "imageWriter");
-            
+
             setVPCenter();
             if (vpCenter == null)
                 throw new MissingResourceException("ERROR constructing camera center", Camera.class.getName(), "center");

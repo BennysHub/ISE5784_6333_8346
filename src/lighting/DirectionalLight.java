@@ -2,10 +2,8 @@ package lighting;
 
 import primitives.Color;
 import primitives.Point;
-import primitives.Ray;
 import primitives.Vector;
-
-import java.util.List;
+import renderer.QualityLevel;
 
 /**
  * Class representing a directional light source in a 3D scene.
@@ -26,12 +24,16 @@ public class DirectionalLight extends Light implements LightSource {
     }
 
     @Override
+    public void setLightSample(QualityLevel sampleCount) {
+    }
+
+    @Override
     public Color getIntensity(Point p, Point lightPoint) {
         return intensity;
     }
 
     @Override
-    public Point[] getLightSample(Point p, int samplesCount) {
+    public Point[] getLightSample(Point p) {
         return new Point[]{Point.POSITIVE_INFINITY};
     }
 

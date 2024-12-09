@@ -39,7 +39,7 @@ public class FinalTest {
         Camera.Builder camera = Camera.getBuilder()
                 .setLocation(new Point(-75, 60, -90))
                 .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
-                .setTarget(new Point(0, 30, 0))
+                //.setTarget(new Point(0, 30, 0))
                 .setVpDistance(150)
                 .setVpSize(300, 300)
 
@@ -67,7 +67,7 @@ public class FinalTest {
             // Update the point's position
             double x = center.getX() + radius * Math.cos(angle);
             double z = center.getZ() + radius * Math.sin(angle);
-            camera.setLocation(new Point(x * 3, 60, z * 3)).setTarget(center);
+            camera.setLocation(new Point(x * 3, 60, z * 3));//.setTarget(center);
 
             camera.setResolution( 1920, 1080)
                     .setImageName("snowGlobe/turnaround_" + i)
@@ -87,7 +87,7 @@ public class FinalTest {
         Camera.Builder camera = Camera.getBuilder()
                 .setLocation(new Point(-18 * scale, 6 * scale, -27 * scale))
                 .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
-                .setTarget(new Point(0, 1, 0))
+                //.setTarget(new Point(0, 1, 0))
                 .setVpDistance(1500)
                 .setVpSize(360, 360)
                 .setBVH(true)
@@ -121,18 +121,17 @@ public class FinalTest {
     private void performTimeConsumingOperation() {
 
         Camera.Builder camera = Camera.getBuilder()
-                .setLocation(new Point(-75, 60, -90))
-                .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
-                .setTarget(new Point(0, 30, 0))
-                .setVpDistance(150)
-                .setVpSize(300, 300)
+                .setLocation(new Point(-750, 600, -900))
+                .setT(new Point(0, 30, 0), Vector.UNIT_Y)
+                .setVpDistance(500)
+                .setVpSize(30, 56)
                 .setScene(scene)
                 .setParallelStreams(true)
                 .setSoftShadows(false)
-                .setAntiAliasing(true)
+                .setAntiAliasing(false)
                 .setAntiAliasingQuality(QualityLevel.ULTRA)
                 .setBVH(true)
-                .setResolution(1440, 1440)
+                .setResolution(2560, 1440)
                 .setImageName("snowGlobeBuildTime");
 
         for (int i = 0; i < SNOW_GLOBE_FRAMES; ++i)

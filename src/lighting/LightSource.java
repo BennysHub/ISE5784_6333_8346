@@ -1,8 +1,7 @@
 package lighting;
 
 import primitives.*;
-
-import java.util.List;
+import renderer.QualityLevel;
 
 /**
  * Interface representing a light source in a 3D scene.
@@ -10,9 +9,11 @@ import java.util.List;
  */
 public interface LightSource {
 
+    void setLightSample(QualityLevel sampleCount);
+
     Color getIntensity(Point p, Point lightPoint);
 
-    Point[] getLightSample(Point p, int samplesCount);
+    Point[] getLightSample(Point p);
 
     Vector getL(Point to, Point lightPoint);
 

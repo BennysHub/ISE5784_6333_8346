@@ -1,9 +1,13 @@
 package lighting;
 
 import primitives.Color;
+import primitives.Double2;
 import primitives.Point;
 import primitives.Vector;
+import renderer.QualityLevel;
 import renderer.super_sampling.Blackboard;
+
+import static primitives.Util.isZero;
 
 /**
  * Class representing a point light source in a 3D scene.
@@ -17,12 +21,16 @@ public class PointLight extends Light implements LightSource {
      */
     protected final Point position;
 
+    protected QualityLevel lightSampleQuality = null;
+
+    private Double2[] lightSamples = null;
+
     /**
      * Size of the light. Use for soft shadows
      */
     protected double radius = 0d;
 
-    protected Point[] lightSamples = null;
+
 
     private double kC = 1;
     private double kL = 0;
@@ -42,7 +50,6 @@ public class PointLight extends Light implements LightSource {
     public PointLight(Color intensity, Point position, double radius) {
         this(intensity, position);
         this.radius = radius;
-        setLightSamples();
     }
 
     /**
@@ -87,8 +94,16 @@ public class PointLight extends Light implements LightSource {
         return radius;
     }
 
-    protected void setLightSamples() {
-            lightSamples = Blackboard.getSpherePoints(position, radius, Vector.UNIT_Z);
+    public PointLight setLightSampleQuality(QualityLevel sampleQuality){
+        lightSampleQuality = sampleQuality;
+        return this;
+    }
+
+    @Override
+    public void setLightSample(QualityLevel sampleQuality) {
+        lightSamples = Blackboard.getCirclePoints(radius,
+                lightSampleQuality != null ? lightSampleQuality : sampleQuality);
+
     }
 
     @Override
@@ -99,9 +114,13 @@ public class PointLight extends Light implements LightSource {
     }
 
     @Override
-    public Point[] getLightSample(Point p, int samplesCount) {
-        return samplesCount == 1 ? new Point[]{position} : Blackboard.getSpherePoints(position, radius, p.subtract(position).normalize());
-        //return samplesCount == 1 ? new Point[]{position} : Blackboard.rotatePointsOnSphere(lightSamples, Vector.UNIT_Z, p.subtract(position), position);
+    public Point[] getLightSample(Point p) {
+        if (lightSamples == null || isZero(radius))
+            return new Point[]{position};
+
+        Vector normal = p.subtract(position).normalize();
+        Point[] diskPoints = Blackboard.convertTo3D( lightSamples, position, normal);
+        return Blackboard.addSphereDepth(diskPoints, position, radius, normal);
     }
 
     @Override

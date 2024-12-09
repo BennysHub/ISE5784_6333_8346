@@ -19,7 +19,8 @@ public abstract class Intersectable {
     /**
      * build AABB for the Intersectable
      */
-    protected void calculateAABBHelper() {}
+    protected void calculateAABBHelper() {
+    }
 
     public void calculateAABB() {
         if (aabb == null) calculateAABBHelper();
@@ -83,11 +84,14 @@ public abstract class Intersectable {
      */
     protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance);
 
-    public Intersectable duplicateObject(Vector vector){
+    public Intersectable duplicateObject(Vector vector) {
         return duplicateObjectHelper(vector);
     }
 
     protected abstract Intersectable duplicateObjectHelper(Vector vector);
+
+
+
 
     /**
      * A class representing a geometric point of intersection.
@@ -125,6 +129,8 @@ public abstract class Intersectable {
             if (!(obj instanceof GeoPoint other)) return false;
             return other.geometry == geometry && other.point.equals(point);
         }
+
+
     }
 
 }

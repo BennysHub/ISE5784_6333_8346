@@ -110,17 +110,22 @@ public class SoftShadowsTest {
 
         scene.lights.add(
                 new SpotLight(new Color(255, 255, 255), new Point(20, -1, 0), new Point(0, 1, 0).subtract(new Point(20, -1, 0)), 5)
-                        .setKl(0.02).setKc(0)
+                        .setKl(0.02).setKc(0).setLightSampleQuality(QualityLevel.LOW)
         );
 
         final Camera.Builder camera2 = Camera.getBuilder()
                 .setSoftShadows(true)
+                .setSoftShadowsQuality(QualityLevel.ULTRA)
+                .setAntiAliasing(false)
+                .setAntiAliasingQuality(QualityLevel.ULTRA)
                 .setScene(scene)
                 .setLocation(new Point(-1, 6, -1))
                 .setTarget(Point.ZERO)
-                .setThreadsCount(16)
-                .setVpSize(150, 150).setVpDistance(30)
-                .setAntiAliasing(false);
+                .setVpSize(150, 150)
+                .setVpDistance(30);
+
+
+
 
         camera2.setResolution(1080, 1080)
                 .setImageName("underTheHorizonSpotLight")
@@ -150,7 +155,7 @@ public class SoftShadowsTest {
                 .setTarget(Point.ZERO)
                 .setParallelStreams(true)
                 .setVpSize(150, 150).setVpDistance(30)
-                .setAntiAliasing(true)
+                .setAntiAliasing(false)
                 .setAntiAliasingQuality(QualityLevel.HIGH);
 
 

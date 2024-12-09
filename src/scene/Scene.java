@@ -20,7 +20,6 @@ public class Scene {
      */
     public final String name;
 
-
     /**
      * The background color of the scene
      */

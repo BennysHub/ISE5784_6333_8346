@@ -106,7 +106,7 @@ public class Vector extends Point {
         );
     }
 
-    public boolean parallel(Vector vector) {
+    public boolean isParallel(Vector vector) {
 
         double crossX = xyz.d2 * vector.xyz.d3 - xyz.d3 * vector.xyz.d2;
         double crossY = xyz.d3 * vector.xyz.d1 - xyz.d1 * vector.xyz.d3;
@@ -115,10 +115,21 @@ public class Vector extends Point {
         return isZero(crossX) && isZero(crossY) && isZero(crossZ);
     }
 
-    public Vector projection(Vector other) {
+
+
+    public boolean isPerpendicular(Vector other) {
+        return isZero(this.dotProduct(other));
+    }
+
+
+    public Vector project(Vector other) {
         double dotProduct = this.dotProduct(other);
         double otherLengthSquared = other.lengthSquared();
         return other.scale(dotProduct / otherLengthSquared);
+    }
+
+    public Vector reject(Vector other) {
+        return this.subtract(this.project(other));
     }
 
     /**

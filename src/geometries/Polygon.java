@@ -91,10 +91,7 @@ public class Polygon extends Geometry {
         }
     }
 
-    @Override
-    protected Intersectable duplicateObjectHelper(Vector vector){
-        return null;
-    }
+
 
     @Override
     public Vector getNormal(Point point) {
@@ -102,7 +99,42 @@ public class Polygon extends Geometry {
     }
 
     @Override
+    public Geometry move(Vector translation) {
+        return null;
+    }
+
+    @Override
+    public Geometry scale(Vector scale) {
+        return null;
+    }
+
+    @Override
+    public Geometry rotate(Vector rotation) {
+        return null;
+    }
+
+    @Override
+    public Geometry moveX(double dx) {
+        return null;
+    }
+
+    @Override
+    public Geometry moveY(double dy) {
+        return null;
+    }
+
+    @Override
+    public Geometry moveZ(double dz) {
+        return null;
+    }
+
+    @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+        return null;
+    }
+
+    @Override
+    protected Intersectable duplicateObjectHelper(Vector vector) {
         return null;
     }
 

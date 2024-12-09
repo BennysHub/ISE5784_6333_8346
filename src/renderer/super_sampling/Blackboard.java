@@ -4,9 +4,10 @@ import primitives.Double2;
 import primitives.Matrix;
 import primitives.Point;
 import primitives.Vector;
+import renderer.QualityLevel;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.Math.sqrt;
 import static primitives.Util.isZero;
@@ -17,13 +18,29 @@ import static primitives.Util.random;
  */
 public final class Blackboard {
 
+    private static final int SAMPLE_COUNT_LOW = 36;
+    private static final int SAMPLE_COUNT_MEDIUM = 64;
+    private static final int SAMPLE_COUNT_HIGH = 100;
+    private static final int SAMPLE_COUNT_ULTRA = 169;
 
-    public static Double2[] GRID_1_169 = generateSquareGrid(1, 169);
-    public static Double2[] CIRCLE_1_169 = warpToCircle2(GRID_1_169, 1, 1);
 
-    //We can scale the sphere's points and add center rotate from z (0, 0, 1) to get any sphere.
-    public static Point[] SPHERE_1_169_Z = null;
 
+
+
+    private static final Map<QualityLevel, Double2[]> GRID_MAP = new HashMap<>(4);
+    private static final Map<QualityLevel, Double2[]> CIRCLE_MAP = new HashMap<>(4);
+
+    static {
+        GRID_MAP.put(QualityLevel.LOW, generateSquareGrid(1, SAMPLE_COUNT_LOW));
+        GRID_MAP.put(QualityLevel.MEDIUM, generateSquareGrid(1, SAMPLE_COUNT_MEDIUM));
+        GRID_MAP.put(QualityLevel.HIGH, generateSquareGrid(1, SAMPLE_COUNT_HIGH));
+        GRID_MAP.put(QualityLevel.ULTRA, generateSquareGrid(1, SAMPLE_COUNT_ULTRA));
+
+        CIRCLE_MAP.put(QualityLevel.LOW, warpToCircle2(GRID_MAP.get(QualityLevel.LOW), 1, 1));
+        CIRCLE_MAP.put(QualityLevel.MEDIUM, warpToCircle2(GRID_MAP.get(QualityLevel.MEDIUM), 1, 1));
+        CIRCLE_MAP.put(QualityLevel.HIGH, warpToCircle2(GRID_MAP.get(QualityLevel.HIGH), 1, 1));
+        CIRCLE_MAP.put(QualityLevel.ULTRA, warpToCircle2(GRID_MAP.get(QualityLevel.ULTRA), 1, 1));
+    }
 
     public static Double2[] generateSquareGrid(double gridSize, int numOfPoints) {
         return generateSquareGrid(gridSize, Double2.ZERO, numOfPoints);
@@ -130,7 +147,7 @@ public final class Blackboard {
             //option #1 less edge points
             //double rPrime = (r / Math.sqrt(2)) * diskRadius;
 
-            //option2 #2 more edge points
+            //option2 #2 more-edge points
             double rPrime = Math.min(r, 1) * diskRadius;
             double xPrime = rPrime * Math.cos(theta);
             double yPrime = rPrime * Math.sin(theta);
@@ -174,7 +191,7 @@ public final class Blackboard {
         Point[] transformedPoints = new Point[points.length];
 
         // Calculate the rotation matrix
-        Vector axis = originalNormal.parallel(newNormal) ? originalNormal.perpendicular() : originalNormal.crossProduct(newNormal);
+        Vector axis = originalNormal.isParallel(newNormal) ? originalNormal.perpendicular() : originalNormal.crossProduct(newNormal);
 
         double angle = Math.acos(originalNormal.dotProduct(newNormal) / (originalNormal.length() * newNormal.length()));
         Matrix rotationMatrix = Matrix.rotationMatrix(axis, angle);
@@ -189,12 +206,19 @@ public final class Blackboard {
         return transformedPoints;
     }
 
-    static public Point[] getDiskPoints(Point center, double radius, Vector normal) {
-        return convertTo3D(scale(CIRCLE_1_169, radius), center, normal);
+
+
+    static public Double2[] getCirclePoints(double radius, QualityLevel qualityLevel){
+        return scale(CIRCLE_MAP.get(qualityLevel), radius);
     }
 
-    static public Point[] getSpherePoints(Point center, double radius, Vector normal) {
-        var a = convertTo3D(scale(CIRCLE_1_169, radius), center, normal);
+    static public Point[] getDiskPoints(Point center, double radius, Vector normal, QualityLevel qualityLevel) {
+        return convertTo3D(scale(CIRCLE_MAP.get(qualityLevel), radius), center, normal);
+    }
+
+    static public Point[] getSpherePoints(Point center, double radius, Vector normal, QualityLevel qualityLevel) {
+        var a = convertTo3D(scale(CIRCLE_MAP.get(qualityLevel), radius), center, normal);
         return addSphereDepth(a, center, radius, normal);
     }
+
 }

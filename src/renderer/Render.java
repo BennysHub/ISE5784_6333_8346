@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class Render implements Rendering,MultiThreadingRendering, ParallelStreamsRendering {
+public class Render implements Rendering, MultiThreadingRendering, ParallelStreamsRendering {
 
     protected final ImageWriter imageWriter;
     protected final ViewPlane viewPlane;

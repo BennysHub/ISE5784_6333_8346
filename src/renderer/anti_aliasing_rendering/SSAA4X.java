@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
 
 public class SSAA4X extends Render {
 
-    protected ViewPlane viewPlaneHelper = new ViewPlane(viewPlane.right, viewPlane.up, viewPlane.vpHeight + viewPlane.pixelHeight, viewPlane.vpWidth + viewPlane.pixelWidth, viewPlane.center, viewPlane.nX + 1, viewPlane.nY + 1);
+    protected ViewPlane viewPlaneHelper = new ViewPlane(viewPlane.right, viewPlane.up, viewPlane.direction, viewPlane.vpHeight + viewPlane.pixelHeight, viewPlane.vpWidth + viewPlane.pixelWidth, viewPlane.center, viewPlane.nX + 1, viewPlane.nY + 1);
 
 
     Color[][] pixelColors = new Color[viewPlaneHelper.nX][viewPlaneHelper.nY];

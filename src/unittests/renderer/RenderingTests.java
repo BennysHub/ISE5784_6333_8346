@@ -25,9 +25,19 @@ public class RenderingTests {
      */
     private final Camera.Builder camera = Camera.getBuilder()
             .setScene(scene)
-            .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0)) //changed
+            .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
             .setVpDistance(100)
             .setVpSize(500, 500);
+
+
+//    private final Camera.Builder camera = Camera.getBuilder()
+//            .setScene(scene)
+//            .setLocation(Point.ZERO)
+//            .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
+//            .changeTarget(new Point(0, 0, -100), new Point(100, 40, 1))
+//            .setVpDistance(100)
+//            .setVpSize(500, 500);
+
 
     /**
      * Produce a scene with basic 3D model and render it into a png image with a
@@ -42,7 +52,7 @@ public class RenderingTests {
                 new Triangle(new Point(100, 0, -100), new Point(0, -100, -100), new Point(100, -100, -100)));
         scene.setAmbientLight(new AmbientLight(new Color(255, 191, 191), Double3.ONE))
                 .setBackground(new Color(75, 127, 90));
-        camera.setResolution( 1000, 1000)
+        camera.setResolution(1000, 1000)
                 .setImageName("base render test")
                 .build()
                 .renderImage()
@@ -70,12 +80,29 @@ public class RenderingTests {
         scene.setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.2, 0.2, 0.2)));
 
         camera
-                .setResolution( 1000, 1000)
-                .setImageName("color render test")
-                .build()
-                .renderImage()
-                .printGrid(100, new Color(WHITE))
-                .writeToImage();
+                .setResolution(1000, 1000);
+
+
+        double R = 150;  // Radius of the circle
+        double h = -0;  // x-coordinate of the center
+        double k = -100;  // y-coordinate of the center
+
+        for (double t = 0; t <= 1; t += 0.01) {
+            double x = h + R * Math.cos(2 * Math.PI * t);
+            double y = k + R * Math.sin(2 * Math.PI * t);
+            System.out.println("Point on circle: (" + x + ", " + y + ")" + " distance: " + Math.sqrt((x - h) * (x - h) + (y - k) * (y - k)));
+
+            camera
+
+
+                    .changeTarget(new Point(0, 0, -100), new Point(x, 0, y))
+                    .setImageName("color render test" + (int) (t * 100))
+                    .build()
+                    .renderImage()
+                    .printGrid(100, new Color(WHITE))
+                    .writeToImage();
+        }
+
     }
 
     /**
@@ -83,7 +110,7 @@ public class RenderingTests {
      */
     @Test
     public void basicRenderJson() {
-        final Scene scene1 = new JsonSceneParser("src/unittests/renderer/json/twoColorJson.json" , "testScene");
+        final Scene scene1 = new JsonSceneParser("src/unittests/renderer/json/twoColorJson.json", "testScene");
 
         final Camera.Builder camera = Camera.getBuilder()
                 .setScene(scene1)

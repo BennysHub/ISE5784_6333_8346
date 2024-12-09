@@ -15,9 +15,6 @@ public class RenderSettings {
      */
     static public final double MIN_CALC_COLOR_K = 0.001;
 
-    public static int SHADOW_RAYS_SAMPLE_COUNT = 49 ;
-
-
     /**
      * The number of threads to use
      */
@@ -49,6 +46,8 @@ public class RenderSettings {
      * Indicates whether depth of field is enabled.
      */
     static boolean depthOfFieldEnabled = false;
+
+    static QualityLevel depthOfFieldQuality =  QualityLevel.LOW;
     /**
      * Indicates whether glossy surfaces are enabled.
      */

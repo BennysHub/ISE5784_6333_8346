@@ -70,6 +70,7 @@ public class Geometries extends Intersectable {
     }
 
 
+
     private void buildBVHUsingSAH(List<Intersectable> geometries, int listSize) {
         if (listSize <= MAX_PRIMITIVES_PER_LEAF) {
             this.geometries = geometries;

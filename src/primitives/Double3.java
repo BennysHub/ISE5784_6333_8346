@@ -30,7 +30,7 @@ public class Double3 {
     final double d3;
 
     /**
-     * Constructor to initialize Double3 based object with its three number values
+     * Constructor to initialize a Double3 based object with its three number values
      *
      * @param d1 first number value
      * @param d2 second number value
@@ -43,9 +43,9 @@ public class Double3 {
     }
 
     /**
-     * Constructor to initialize Double3 based object the same number values
+     * Constructor to initialize a Double3 based object the same number values
      *
-     * @param value number value for all 3 numbers
+     * @param value number value for all three numbers
      */
     public Double3(double value) {
         this.d1 = value;
@@ -76,8 +76,8 @@ public class Double3 {
      * Sum two floating point triads into a new triad where each couple of numbers
      * is summarized
      *
-     * @param rhs right hand side operand for addition
-     * @return result of add
+     * @param rhs right-hand side operand for addition
+     * @return result of adding
      */
     public Double3 add(Double3 rhs) {
         return new Double3(d1 + rhs.d1, d2 + rhs.d2, d3 + rhs.d3);
@@ -87,8 +87,8 @@ public class Double3 {
      * Subtract two floating point triads into a new triad where each couple of
      * numbers is subtracted
      *
-     * @param rhs right hand side operand for addition
-     * @return result of add
+     * @param rhs right-hand side operand for addition
+     * @return result of adding
      */
     public Double3 subtract(Double3 rhs) {
         return new Double3(d1 - rhs.d1, d2 - rhs.d2, d3 - rhs.d3);
@@ -121,7 +121,7 @@ public class Double3 {
      * Product two floating point triads into a new triad where each couple of
      * numbers is multiplied
      *
-     * @param rhs right hand side operand for product
+     * @param rhs right-hand side operand for product
      * @return result of product
      */
     public Double3 product(Double3 rhs) {
@@ -142,9 +142,9 @@ public class Double3 {
     /**
      * Checks whether all the numbers are lower than three numbers in another triad
      *
-     * @param other other triad
+     * @param other another triad
      * @return true if all the numbers are less that appropriate numbers in
-     * other
+     * another
      * triad, false otherwise
      */
     public boolean lowerThan(Double3 other) {

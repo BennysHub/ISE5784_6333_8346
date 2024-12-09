@@ -49,4 +49,16 @@ public abstract class Geometry extends Intersectable {
      * @return the normal vector at the specified point on the geometry
      */
     public abstract Vector getNormal(Point point);
+
+    public abstract Geometry move(Vector translation);
+
+    public abstract Geometry scale(Vector scale);
+
+    public abstract Geometry rotate(Vector rotation);
+
+    public abstract Geometry moveX(double dx);
+
+    public abstract Geometry moveY(double dy);
+
+    public abstract Geometry moveZ(double dz);
 }

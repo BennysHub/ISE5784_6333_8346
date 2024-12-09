@@ -4,6 +4,8 @@ import primitives.Point;
 import primitives.Vector;
 
 public class ViewPlane {
+
+    public final Vector direction;
     public final Vector right;
     public final Vector up;
     public final double vpHeight;
@@ -14,9 +16,10 @@ public class ViewPlane {
     public final double pixelWidth;
     public final double pixelHeight;
 
-    public ViewPlane(Vector right, Vector up, double vpHeight, double vpWidth, Point center, int nX, int nY) {
+    public ViewPlane(Vector right, Vector up, Vector direction, double vpHeight, double vpWidth, Point center, int nX, int nY) {
         this.right = right;
         this.up = up;
+        this.direction = direction;
         this.vpHeight = vpHeight;
         this.vpWidth = vpWidth;
         this.center = center;

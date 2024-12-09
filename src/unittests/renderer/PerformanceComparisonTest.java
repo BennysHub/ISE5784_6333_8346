@@ -85,7 +85,6 @@ public class PerformanceComparisonTest {
     Camera.Builder cameraBase = Camera.getBuilder()
             .setLocation(new Point(-75, 60, -90))
             .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
-            .setTarget(new Point(0, 30, 0))
             .setVpDistance(150)
             .setVpSize(300, 300)
             .setScene(scene)

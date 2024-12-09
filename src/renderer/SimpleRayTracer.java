@@ -72,8 +72,7 @@ public class SimpleRayTracer extends RayTracerBase {
         //in soft shadow we can limit to be done only in first level and then use hard shadow meaning one sample
         Color color = Color.BLACK;
         for (LightSource lightSource : scene.lights) {
-            Point[] lightSample = lightSource.getLightSample(intersection, RenderSettings.SHADOW_RAYS_SAMPLE_COUNT);
-            int lightSampleSize = lightSample.length;
+            Point[] lightSample = lightSource.getLightSample(intersection);
 
             for (Point lightPoint : lightSample) {
                 Vector l = lightSource.getL(intersection, lightPoint);
@@ -90,7 +89,7 @@ public class SimpleRayTracer extends RayTracerBase {
                     }
                 }
             }
-            color = color.reduce(lightSampleSize);
+            color = color.reduce(lightSample.length);
         }
         return color.add(material.getEmission());
     }

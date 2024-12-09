@@ -61,4 +61,34 @@ public class Tube extends RadialGeometry {
         return null;
     }
 
+    @Override
+    public Geometry move(Vector translation) {
+        return null;
+    }
+
+    @Override
+    public Geometry scale(Vector scale) {
+        return null;
+    }
+
+    @Override
+    public Geometry rotate(Vector rotation) {
+        return null;
+    }
+
+    @Override
+    public Geometry moveX(double dx) {
+        return null;
+    }
+
+    @Override
+    public Geometry moveY(double dy) {
+        return null;
+    }
+
+    @Override
+    public Geometry moveZ(double dz) {
+        return null;
+    }
+
 }

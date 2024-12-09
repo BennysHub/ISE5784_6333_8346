@@ -39,6 +39,36 @@ public class Sphere extends RadialGeometry {
     }
 
     @Override
+    public Geometry move(Vector translation) {
+        return new Sphere(radius, center.add(translation));
+    }
+
+    @Override
+    public Geometry scale(Vector scale) {
+        return null;
+    }
+
+    @Override
+    public Geometry rotate(Vector rotation) {
+        return null;
+    }
+
+    @Override
+    public Geometry moveX(double dx) {
+        return move(new Vector(dx, 0, 0));
+    }
+
+    @Override
+    public Geometry moveY(double dy) {
+        return move(new Vector(0, dy, 0));
+    }
+
+    @Override
+    public Geometry moveZ(double dz) {
+        return move(new Vector(0, 0, dz));
+    }
+
+    @Override
     protected void calculateAABBHelper() {
         Point min = new Point(center.getX() - radius, center.getY() - radius, center.getZ() - radius);
         Point max = new Point(center.getX() + radius, center.getY() + radius, center.getZ() + radius);
@@ -90,4 +120,6 @@ public class Sphere extends RadialGeometry {
     protected Intersectable duplicateObjectHelper(Vector vector) {
         return new Sphere(radius, center.add(vector)).setMaterial(this.getMaterial());
     }
+
+
 }
