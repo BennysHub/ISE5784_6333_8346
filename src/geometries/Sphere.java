@@ -105,5 +105,4 @@ public class Sphere extends RadialGeometry {
         else
             return t1 > 0 ? List.of(new GeoPoint(this, ray.getPoint(t1))) : null;
     }
-
 }

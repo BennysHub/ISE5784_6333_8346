@@ -77,18 +77,15 @@ public class AABB {
         this.merge(other2);
     }
 
-    /**
-     * Constructor to initialize an AABB that encompasses all intersectables in the given collection.
-     *
-     * @param intersectables A collection of intersectable objects to encompass in the AABB.
-     */
-    public AABB(Collection<Intersectable> intersectables) {
+
+    public AABB(Collection<Geometry> geometries) {
         this(); // Initialize to an empty AABB
-        for (Intersectable intersectable : intersectables) {
-            intersectable.calculateAABB();
-            this.merge(intersectable.aabb);
+        for (Geometry geometry : geometries) {
+            geometry.calculateAABB();
+            this.merge(geometry.aabb);
         }
     }
+
 
     /**
      * Expands the AABB to include a given point.
@@ -163,6 +160,12 @@ public class AABB {
         this.isCenterValid = true;
         return center;
     }
+
+    public Point getCenterPoint() {
+        double[] center = getCenter();
+        return new Point (center[0], center[1], center[2]);
+    }
+
 
     /**
      * Gets the minimum point of the AABB.

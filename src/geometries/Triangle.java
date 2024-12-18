@@ -107,6 +107,7 @@ public class Triangle extends Polygon {
                 : null;
     }
 
+
     /**
      * Translates the triangle by a given translation vector.
      *

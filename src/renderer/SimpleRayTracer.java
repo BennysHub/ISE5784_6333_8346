@@ -1,7 +1,7 @@
 package renderer;
 
 import geometries.Intersectable;
-import geometries.Intersectable.GeoPoint;
+import geometries.GeoPoint;
 import lighting.LightSource;
 import primitives.*;
 import scene.Scene;
@@ -195,7 +195,7 @@ public class SimpleRayTracer extends RayTracerBase {
         List<GeoPoint> intersections = scene.geometries.findGeoIntersections(lightRay, intersection.distance(lightPoint));
         Double3 ktr = Double3.ONE;
         if (intersections == null) return ktr;
-        for (Intersectable.GeoPoint p : intersections) {
+        for (GeoPoint p : intersections) {
             ktr = ktr.product(p.geometry().getMaterial().kT);
             if (ktr.lowerThan(RenderSettings.MIN_CALC_COLOR_K))
                 return ktr;

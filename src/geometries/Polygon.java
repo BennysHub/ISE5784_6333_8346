@@ -131,7 +131,6 @@ public class Polygon extends Geometry {
         aabb = new AABB(min, max);
     }
 
-
     /**
      * Finds the intersections of a ray with the polygon.
      * <p>This implementation works as follows:</p>

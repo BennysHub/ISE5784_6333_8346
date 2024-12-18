@@ -8,75 +8,80 @@ import java.util.*;
 
 /**
  * Represents a collection of geometric objects that can be intersected by a ray.
- * This class also provides mechanisms to optimize ray intersections using Bounding Volume Hierarchies (BVH).
+ * Provides support for optimizing ray intersections using a Bounding Volume Hierarchy (BVH).
+ *
+ * <p>The class can perform geometric transformations (translation, rotation, scaling)
+ * and calculate intersection points with rays either using the BVH structure for optimization
+ * or directly with individual geometries.</p>
+ *
+ * @author
+ * Benny Avrahami
  */
-public class Geometries extends Intersectable {
-
-    private static final double MAX_OBJECTS_PER_LEAF = 2;
+public class Geometries implements Intersectable {
 
     /**
-     * The list of intersectable geometric objects in this collection.
+     * List of geometries contained in this collection.
      */
-    private List<Intersectable> intersectables;
-
-    private BVHNode bvhRoot; // Root node of the BVH
-    private boolean useBVH = false; // Flag to determine if BVH should be used
-
+    private final List<Geometry> geometries;
 
     /**
-     * Default constructor for an empty collection of geometries.
+     * The root node of the Bounding Volume Hierarchy (BVH) for optimized intersections.
+     */
+    private BVHNode bvhRoot;
+
+    /**
+     * Default constructor. Creates an empty collection of geometries.
      */
     public Geometries() {
+        geometries = new ArrayList<>();
     }
 
     /**
-     * Constructs a Geometries object initialized with the given intersectable objects.
+     * Constructor to initialize the collection with an array of geometries.
      *
-     * @param intersectables The intersectable objects to include in this collection.
+     * @param geometries The initial geometries to add to this collection.
      */
-    public Geometries(Intersectable... intersectables) {
-        add(intersectables);
+    public Geometries(Geometry... geometries) {
+        this.geometries = new ArrayList<>();
+        add(geometries);
     }
 
     /**
-     * Adds one or more intersectable objects to the collection.
+     * Adds one or more geometries to the collection.
      *
-     * @param intersectables The intersectable objects to add.
+     * @param geometries The geometries to add.
      */
-    public void add(Intersectable... intersectables) {
-        if (this.intersectables == null) {
-            this.intersectables = new ArrayList<>();
+    public void add(Geometry... geometries) {
+        Collections.addAll(this.geometries, geometries);
+    }
+
+    /**
+     * Builds the BVH (Bounding Volume Hierarchy) for the geometries in this collection.
+     * Uses the Surface Area Heuristic (SAH) method for optimal node splitting.
+     */
+    public void buildBVH() {
+        if (!geometries.isEmpty()) {
+            bvhRoot = new BVHNode(geometries, BVHNode.BVHBuildMethod.LINEAR_BVH);
         }
-        Collections.addAll(this.intersectables, intersectables);
     }
 
     /**
-     * Adds all intersectable objects from another Geometries object to this collection.
+     * Finds the intersection points of a ray with the geometries in the collection.
+     * Uses the BVH for optimization if available.
      *
-     * @param otherGeometries The other Geometries object to merge into this collection.
+     * @param ray         The ray to intersect with the geometries.
+     * @param maxDistance The maximum distance for valid intersections.
+     * @return A list of {@link GeoPoint} objects representing the intersections, or {@code null} if none exist.
      */
-    public void add(Geometries otherGeometries) {
-        if (this.intersectables == null) this.intersectables = new ArrayList<>();
-
-        this.intersectables.addAll(otherGeometries.intersectables);
-    }
-
     @Override
-    protected void calculateAABBHelper() {
-        aabb = new AABB(intersectables);
-    }
-
-    @Override
-    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
-        if (bvhRoot != null)
+    public List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
+        if (bvhRoot != null) {
             return bvhRoot.findIntersections(ray, maxDistance);
-
-        if (intersectables == null || intersectables.isEmpty()) {
-            return null;
         }
+
         List<GeoPoint> intersections = null;
-        for (Intersectable intersectable : intersectables) {
-            var geometryIntersections = intersectable.findGeoIntersections(ray, maxDistance);
+        for (Geometry geometry : geometries) {
+            var geometryIntersections = geometry.findGeoIntersections(ray, maxDistance);
             if (geometryIntersections != null) {
                 if (intersections == null) {
                     intersections = new LinkedList<>(geometryIntersections);
@@ -88,133 +93,87 @@ public class Geometries extends Intersectable {
         return intersections;
     }
 
-
-    private void buildBVHWithSAH(List<Intersectable> intersectables, int numObjects) {
-        if (numObjects <= MAX_OBJECTS_PER_LEAF) {
-            this.intersectables = intersectables;
-            calculateAABB();
-            return;
+    /**
+     * Calculates the Axis-Aligned Bounding Box (AABB) for all geometries in the collection.
+     */
+    public void calculateAABB() {
+        for (Geometry geometry : geometries) {
+            geometry.calculateAABB();
         }
-
-        int splitIndex = findOptimalSplit(intersectables, numObjects);
-
-        Geometries leftNode = new Geometries();
-        Geometries rightNode = new Geometries();
-
-        leftNode.buildBVHWithSAH(intersectables.subList(0, splitIndex), splitIndex);
-        rightNode.buildBVHWithSAH(intersectables.subList(splitIndex, numObjects), numObjects - splitIndex);
-
-        this.intersectables = List.of(leftNode, rightNode);
-        aabb = new AABB(leftNode.aabb, rightNode.aabb);
     }
 
-    private int findOptimalSplit(List<Intersectable> intersectables, int numObjects) {
-        double bestSplitCost = Double.MAX_VALUE;
-        int bestSplitIndex = 0;
-        int bestSortAxis = 0;
-
-        for (int sortAxis = 0; sortAxis < 3; sortAxis++) {
-            sortByAxis(intersectables, sortAxis);
-            for (int splitIndex = 0; splitIndex < numObjects; splitIndex++) {
-                AABB leftBoundingBox = new AABB(intersectables.subList(0, splitIndex));
-                AABB rightBoundingBox = new AABB(intersectables.subList(splitIndex, numObjects));
-                double splitCost = calculateSplitCost(leftBoundingBox, rightBoundingBox, splitIndex, numObjects - splitIndex);
-                if (splitCost < bestSplitCost) {
-                    bestSplitCost = splitCost;
-                    bestSplitIndex = splitIndex;
-                    bestSortAxis = sortAxis;
-                }
-            }
-        }
-
-        if (bestSortAxis != 2) {
-            sortByAxis(intersectables, bestSortAxis);
-        }
-        return bestSplitIndex;
-    }
-
-    private void buildBVHWithMedianSplit(int currentDepth, int numObjects, int splitIndex, List<Intersectable> intersectables) {
-        if (numObjects <= MAX_OBJECTS_PER_LEAF) {
-            this.intersectables = intersectables;
-            calculateAABB();
-            return;
-        }
-
-        sortByAxis(intersectables, currentDepth);
-
-        Geometries leftNode = new Geometries();
-        Geometries rightNode = new Geometries();
-
-        leftNode.buildBVHWithMedianSplit(currentDepth + 1, splitIndex, splitIndex / 2, intersectables.subList(0, splitIndex));
-        rightNode.buildBVHWithMedianSplit(currentDepth + 1, numObjects - splitIndex, (numObjects - splitIndex) / 2, intersectables.subList(splitIndex, numObjects));
-
-        this.intersectables = List.of(leftNode, rightNode);
-        aabb = new AABB(leftNode.aabb, rightNode.aabb);
-    }
-
-    private void sortByAxis(List<Intersectable> intersectables, int sortAxis) {
-        intersectables.sort(Comparator.comparingDouble(intersectable -> intersectable.aabb.getCenter()[sortAxis % 3]));
-    }
-
-    private double calculateSplitCost(AABB leftBBox, AABB rightBBox, int leftCount, int rightCount) {
-        double leftArea = leftBBox.surfaceArea();
-        double rightArea = rightBBox.surfaceArea();
-        return (leftArea * leftCount) + (rightArea * rightCount);
-    }
-
-    public void buildBVH() {
-        // buildBVHWithSAH(intersectables, intersectables.size());
-
-        if (useBVH) {
-            bvhRoot = new BVHNode(intersectables);
-            return;
-        }
-
-        buildBVHWithMedianSplit(0, intersectables.size(), intersectables.size() / 2, intersectables);
-    }
-
-
-
-
-
-
-
-    @Override
-    public Intersectable translate(Vector translationVector) {
+    /**
+     * Translates all geometries in the collection by the given vector.
+     *
+     * @param translationVector The vector by which to translate the geometries.
+     */
+    public void translate(Vector translationVector) {
         Geometries newGeometries = new Geometries();
-        for (Intersectable intersectable : intersectables) {
-            newGeometries.add(intersectable.translate(translationVector));
+        for (Geometry geometry : geometries) {
+            newGeometries.add(geometry.translate(translationVector));
         }
-        return newGeometries;
     }
 
-    @Override
-    public Intersectable rotate(Vector axis, double angleInRadians) {
-        this.calculateAABB(); // Calculate AABB to find the center of rotation
-        var aabbCenter = aabb.getCenter();
-        Point center = new Point(aabbCenter[0], aabbCenter[1], aabbCenter[2]);
+    /**
+     * Rotates all geometries in the collection around a specified axis by a given angle.
+     * The rotation is performed relative to the center of the entire collection.
+     *
+     * @param axis             The axis of rotation.
+     * @param angleInRadians   The angle of rotation in radians.
+     */
+    public void rotate(Vector axis, double angleInRadians) {
+        calculateAABB(); // Ensure the AABB is calculated to find the center
+        Point center = getGeometriesCenter();
 
-        // Compute the translation to move the object to the origin, rotate, and return it
+        // Translate geometries to the origin, rotate, and return them to the original position
         Vector toOrigin = Point.ZERO.subtract(center);
         Vector backToOriginalPosition = toOrigin.scale(-1);
 
         Geometries newGeometries = new Geometries();
-        for (Intersectable intersectable : intersectables) {
+        for (Geometry geometry : geometries) {
             newGeometries.add(
-                    intersectable.translate(toOrigin)
+                    geometry.translate(toOrigin)
                             .rotate(axis, angleInRadians)
                             .translate(backToOriginalPosition)
             );
         }
-        return newGeometries;
     }
 
-    @Override
-    public Intersectable scale(Vector scale) {
+    /**
+     * Scales all geometries in the collection by the given scaling vector.
+     *
+     * @param scale The scaling vector containing factors for each axis.
+     */
+    public void scale(Vector scale) {
         Geometries newGeometries = new Geometries();
-        for (Intersectable intersectable : intersectables) {
-            newGeometries.add(intersectable.scale(scale));
+        for (Geometry geometry : geometries) {
+            newGeometries.add(geometry.scale(scale));
         }
-        return newGeometries;
+    }
+
+    /**
+     * Calculates the center of all geometries in the collection.
+     * This is determined as the centroid of the bounding boxes of all geometries.
+     *
+     * @return The center point of the geometries in the collection.
+     */
+    private Point getGeometriesCenter() {
+        if (geometries.isEmpty()) {
+            throw new IllegalStateException("Cannot calculate the center of an empty collection.");
+        }
+
+        double sumX = 0, sumY = 0, sumZ = 0;
+        int count = 0;
+
+        for (Geometry geometry : geometries) {
+            geometry.calculateAABB();
+            Point center = geometry.aabb.getCenterPoint();
+            sumX += center.getX();
+            sumY += center.getY();
+            sumZ += center.getZ();
+            count++;
+        }
+
+        return new Point(sumX / count, sumY / count, sumZ / count);
     }
 }

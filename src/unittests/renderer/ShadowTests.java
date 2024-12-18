@@ -1,5 +1,6 @@
 package renderer;
 
+import geometries.Geometry;
 import geometries.Intersectable;
 import geometries.Sphere;
 import geometries.Triangle;
@@ -43,7 +44,7 @@ public class ShadowTests {
     /**
      * The sphere in the tests
      */
-    private final Intersectable sphere = new Sphere(60d, new Point(0, 0, -200))
+    private final Geometry sphere = new Sphere(60d, new Point(0, 0, -200))
             .setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30).setEmission(new Color(BLUE)));
     /**
      * The material of the triangles in the tests

@@ -4,6 +4,8 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import java.util.List;
+
 import static primitives.Util.isZero;
 
 /**
@@ -64,4 +66,16 @@ public class Cylinder extends Tube {
         // For points on the curved surface, calculate the normal vector
         return pointOnSurface.subtract(closestPointOnAxis).normalize();
     }
+
+    @Override
+    protected void calculateAABBHelper() {
+
+    }
+
+    @Override
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+        // Implementation is not yet defined
+        return null;
+    }
+
 }
