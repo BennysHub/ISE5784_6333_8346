@@ -3,8 +3,8 @@ package renderer;
 import org.junit.jupiter.api.Test;
 import primitives.Point;
 import primitives.Vector;
-import scene.JsonSceneParser;
 import scene.Scene;
+import scene.SceneJsonParser;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,6 +13,17 @@ import java.util.concurrent.TimeUnit;
  * camera render configurations.
  */
 public class PerformanceComparisonTest {
+
+    Scene scene = new SceneJsonParser("src/unittests/renderer/json/snowGlobe.json", "Test Scene");
+    Camera.Builder cameraBase = Camera.builder()
+            .setPosition(new Point(-75, 60, -90))
+            .setOrientation(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
+            .setViewPlaneDistance(150)
+            .setViewPlaneSize(300, 300)
+            .setScene(scene)
+            .enableSoftShadows(false)
+            .setResolution(600, 600)
+            .setImageName("snowGlobeBuildTime");
 
     /**
      * Tests the performance of various camera configurations and prints the execution time
@@ -80,18 +91,6 @@ public class PerformanceComparisonTest {
         return String.format("%02d:%02d:%02d:%03d", hours, minutes, seconds, milliseconds);
     }
 
-    Scene scene = new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json", "Test Scene");
-
-    Camera.Builder cameraBase = Camera.getBuilder()
-            .setLocation(new Point(-75, 60, -90))
-            .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
-            .setVpDistance(150)
-            .setVpSize(300, 300)
-            .setScene(scene)
-            .setSoftShadows(false)
-            .setResolution(600, 600)
-            .setImageName("snowGlobeBuildTime");
-
     /**
      * Renders the image using the base camera configuration.
      */
@@ -104,7 +103,7 @@ public class PerformanceComparisonTest {
      * Renders the image using the multi-threading camera configuration.
      */
     private void multiThreading() {
-        Camera camera = cameraBase.setMultiThreading(true).setThreadsCount(16).build();
+        Camera camera = cameraBase.enableMultiThreading(true).setThreadsCount(16).build();
         camera.renderImage();
     }
 
@@ -112,7 +111,7 @@ public class PerformanceComparisonTest {
      * Renders the image using the CBR camera configuration.
      */
     private void cbr() {
-        Camera camera = cameraBase.setCBR(true).build();
+        Camera camera = cameraBase.enableCBR(true).build();
         camera.renderImage();
     }
 
@@ -120,7 +119,7 @@ public class PerformanceComparisonTest {
      * Renders the image using the BVH camera configuration.
      */
     private void bvh() {
-        Camera camera = cameraBase.setBVH(true).build();
+        Camera camera = cameraBase.enableBVH(true).build();
         camera.renderImage();
     }
 
@@ -129,10 +128,10 @@ public class PerformanceComparisonTest {
      */
     private void bvhPlusMultiThreading() {
         Camera camera = cameraBase
-                .setScene(new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json", "Test Scene"))  // build BVH again
-                .setMultiThreading(true)
+                .setScene(new SceneJsonParser("src/unittests/renderer/json/snowGlobe.json", "Test Scene"))  // build BVH again
+                .enableMultiThreading(true)
                 .setThreadsCount(16)
-                .setBVH(true)
+                .enableBVH(true)
                 .build();
         camera.renderImage();
     }
@@ -142,9 +141,9 @@ public class PerformanceComparisonTest {
      */
     private void bvhPlusParallelStreams() {
         Camera camera = cameraBase
-                .setScene(new JsonSceneParser("src/unittests/renderer/json/snowGlobe.json", "Test Scene"))  // build BVH again
-                .setParallelStreams(true)
-                .setBVH(true)
+                .setScene(new SceneJsonParser("src/unittests/renderer/json/snowGlobe.json", "Test Scene"))  // build BVH again
+                .enableParallelStreams(true)
+                .enableBVH(true)
                 .build();
         camera.renderImage();
     }

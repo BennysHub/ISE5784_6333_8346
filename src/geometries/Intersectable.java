@@ -8,20 +8,30 @@ import java.util.List;
 
 /**
  * An abstract class representing geometric shapes that can be intersected by a ray.
- * Implementing classes will provide the logic to find intersection points.
+ * <p>
+ * This class provides methods to find intersection points with a given ray, both in terms of
+ * geometric points and points associated with specific geometries.
+ * It also supports bounding volume
+ * hierarchy (BVH) optimization through an axis-aligned bounding box (AABB).
+ * <p>
+ * Subclasses must implement the {@link #findGeoIntersectionsHelper(Ray, double)} method to define the
+ * specific logic for finding intersections.
  */
-public abstract class Intersectable {
+public abstract class Intersectable implements Transformable {
     /**
-     * Axis-Aligned Bounding Box for BVH
+     * Axis-Aligned Bounding Box (AABB) for bounding volume hierarchy (BVH).
      */
     protected AABB aabb;
 
     /**
-     * build AABB for the Intersectable
+     * Builds the AABB for the intersectable geometry.
+     * This method should be overridden by subclasses to calculate their specific AABB.
      */
-    protected void calculateAABBHelper() {
-    }
+    protected abstract void calculateAABBHelper();
 
+    /**
+     * Ensures the AABB is calculated if it has not been already.
+     */
     public void calculateAABB() {
         if (aabb == null) calculateAABBHelper();
     }
@@ -29,9 +39,9 @@ public abstract class Intersectable {
     /**
      * Finds the intersection points of a given ray with this geometric shape.
      *
-     * @param ray         the ray to intersect with this geometric shape
-     * @param maxDistance the maximum distance within which to search for intersections
-     * @return a list of intersection points, or null if there are no intersections
+     * @param ray         the ray to intersect with this geometric shape.
+     * @param maxDistance the maximum distance within which to search for intersections.
+     * @return a list of intersection points, or {@code null} if there are no intersections.
      */
     public final List<Point> findIntersections(Ray ray, double maxDistance) {
         List<GeoPoint> geoList = findGeoIntersections(ray, maxDistance);
@@ -41,22 +51,21 @@ public abstract class Intersectable {
 
     /**
      * Finds the intersection points of a given ray with this geometric shape.
-     * This version of the method uses the default maximum distance (Double.POSITIVE_INFINITY).
+     * This version of the method uses the default maximum distance ({@link Double#POSITIVE_INFINITY}).
      *
-     * @param ray the ray to intersect with this geometric shape
-     * @return a list of intersection points, or null if there are no intersections
+     * @param ray the ray to intersect with this geometric shape.
+     * @return a list of intersection points, or {@code null} if there are no intersections.
      */
     public final List<Point> findIntersections(Ray ray) {
         return findIntersections(ray, Double.POSITIVE_INFINITY);
     }
 
-
     /**
      * Finds the geometric intersection points of a given ray with this geometric shape.
-     * This method uses the helper method implemented by subclasses.
+     * This method delegates to {@link #findGeoIntersectionsHelper(Ray, double)}.
      *
-     * @param ray the ray to intersect with this geometric shape
-     * @return a list of geometric intersection points, or null if there are no intersections
+     * @param ray the ray to intersect with this geometric shape.
+     * @return a list of geometric intersection points, or {@code null} if there are no intersections.
      */
     public final List<GeoPoint> findGeoIntersections(Ray ray) {
         return findGeoIntersections(ray, Double.POSITIVE_INFINITY);
@@ -64,11 +73,11 @@ public abstract class Intersectable {
 
     /**
      * Finds the geometric intersection points of a given ray with this geometric shape.
-     * This method uses the helper method implemented by subclasses.
+     * If an AABB is present, it checks for intersection with the AABB first.
      *
-     * @param ray         the ray to intersect with this geometric shape
-     * @param maxDistance the maximum distance within which to search for intersections
-     * @return a list of geometric intersection points, or null if there are no intersections
+     * @param ray         the ray to intersect with this geometric shape.
+     * @param maxDistance the maximum distance within which to search for intersections.
+     * @return a list of geometric intersection points, or {@code null} if there are no intersections.
      */
     public final List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
         return aabb != null && !aabb.intersects(ray) ? null : findGeoIntersectionsHelper(ray, maxDistance);
@@ -78,45 +87,31 @@ public abstract class Intersectable {
      * Finds the geometric intersection points of a given ray with this geometric shape.
      * This method must be implemented by subclasses.
      *
-     * @param ray         the ray to intersect with this geometric shape
-     * @param maxDistance the maximum distance within which to search for intersections
-     * @return a list of geometric intersection points, or null if there are no intersections
+     * @param ray         the ray to intersect with this geometric shape.
+     * @param maxDistance the maximum distance within which to search for intersections.
+     * @return a list of geometric intersection points, or {@code null} if there are no intersections.
      */
     protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance);
 
-    public Intersectable duplicateObject(Vector vector) {
-        return duplicateObjectHelper(vector);
-    }
-
-    protected abstract Intersectable duplicateObjectHelper(Vector vector);
-
-
-
 
     /**
-     * A class representing a geometric point of intersection.
+     * A record representing a geometric point of intersection.
+     * <p>
+     * Each {@code GeoPoint} contains the specific geometry associated with the intersection
+     * and the 3D point where the intersection occurs.
+     *
+     * @param geometry the geometry associated with the intersection.
+     * @param point    the intersection point in 3D space.
      */
-    public static class GeoPoint {
-        /**
-         * The geometry associated with this intersection point
-         */
-        public final Geometry geometry;
+    public record GeoPoint(Geometry geometry, Point point) {
 
         /**
-         * The point of intersection
-         */
-        public final Point point;
-
-        /**
-         * Constructs a GeoPoint with the specified geometry and intersection point.
+         * Constructs a {@code GeoPoint} with the specified geometry and intersection point.
          *
-         * @param geometry the geometry of the intersection
-         * @param point    the intersection point
+         * @param geometry the geometry associated with the intersection.
+         * @param point    the intersection point in 3D space.
          */
-        public GeoPoint(Geometry geometry, Point point) {
-            this.geometry = geometry;
-            this.point = point;
-        }
+        public GeoPoint {}
 
         @Override
         public String toString() {
@@ -126,11 +121,8 @@ public abstract class Intersectable {
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
-            if (!(obj instanceof GeoPoint other)) return false;
-            return other.geometry == geometry && other.point.equals(point);
+            if (!(obj instanceof GeoPoint(Geometry geometry1, Point point1))) return false;
+            return geometry1 == geometry && point1.equals(point);
         }
-
-
     }
-
 }

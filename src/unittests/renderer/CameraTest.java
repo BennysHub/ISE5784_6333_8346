@@ -3,8 +3,6 @@ package renderer;
 import primitives.Point;
 import primitives.Vector;
 import scene.Scene;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 //import scene.Scene;
 
 /**
@@ -17,13 +15,13 @@ class CameraTest {
      * Camera builder for the tests
      */
 
-    private final Camera.Builder cameraBuilder = Camera.getBuilder()
-            .setLocation(Point.ZERO)
-            .setDirection(new Vector(0, 0, -1), new Vector(0, -1, 0))
+    private final Camera.Builder cameraBuilder = Camera.builder()
+            .setPosition(Point.ZERO)
+            .setOrientation(new Vector(0, 0, -1), new Vector(0, -1, 0))
             .setScene(new Scene("Test"))
             .setImageName("Test")
             .setResolution(4, 4)
-            .setVpDistance(10);
+            .setViewPlaneDistance(10);
 
     /**
      * Test method for

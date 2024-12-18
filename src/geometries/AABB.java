@@ -7,22 +7,49 @@ import java.util.Collection;
 
 /**
  * Represents an Axis-Aligned Bounding Box (AABB) used for bounding volumes in geometric computations.
+ * <p>
+ * An AABB is a rectangular cuboid aligned with the coordinate axes.
+ * It is commonly used in
+ * 3D graphics and physics engines to optimize intersection tests and spatial partitioning.
+ * </p>
+ *
+ * <p>The AABB can be dynamically expanded or merged with other AABBs and supports intersection tests
+ * with both rays and other AABBs.</p>
+ *
+ * @author Benny Avrahami
  */
 public class AABB {
-    private Point min;
-    private Point max;
+
     /**
-     * the first Geometry center is only updated in the AABB(Point min, Point max) constructor after marge or
+     * The minimum corner of the AABB, representing the smallest x, y, and z coordinates.
+     */
+    private Point min;
+
+    /**
+     * The maximum corner of the AABB, representing the largest x, y, and z coordinates.
+     */
+    private Point max;
+
+    /**
+     * The center of the AABB, calculated lazily and stored for optimization.
      */
     private double[] center;
+
+    /**
+     * Indicates whether the center value is valid and up to date.
+     */
     private boolean isCenterValid = false;
 
     /**
-     * Default constructor to initialize an empty AABB with maximum possible values.
+     * Default constructor to initialize an empty AABB with extreme values.
+     * <p>
+     * The {@code min} point is set to positive infinity, and the {@code max} point is set to negative infinity.
+     * This allows later operations (e.g., {@link #expand(Point)}) to update the bounds correctly.
+     * </p>
      */
     public AABB() {
-        this.min = new Point(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-        this.max = new Point(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
+        this.min = Point.POSITIVE_INFINITY;
+        this.max = Point.NEGATIVE_INFINITY;
     }
 
     /**
@@ -34,14 +61,15 @@ public class AABB {
     public AABB(Point min, Point max) {
         this.min = min;
         this.max = max;
-        center = getCenter();
-        isCenterValid = true;
+        this.center = getCenter(); // Precompute the center
+        this.isCenterValid = true;
     }
 
     /**
-     * Copy constructor to initialize a new AABB as a copy of another AABB.
+     * Copy constructor to initialize a new AABB as a copy of another AABB, merged with an additional AABB.
      *
-     * @param other1 The AABB to copy.
+     * @param other1 The first AABB to copy.
+     * @param other2 The second AABB to merge with the first.
      */
     public AABB(AABB other1, AABB other2) {
         this.min = other1.min;
@@ -49,15 +77,13 @@ public class AABB {
         this.merge(other2);
     }
 
-
-
     /**
      * Constructor to initialize an AABB that encompasses all intersectables in the given collection.
      *
      * @param intersectables A collection of intersectable objects to encompass in the AABB.
      */
     public AABB(Collection<Intersectable> intersectables) {
-        this();
+        this(); // Initialize to an empty AABB
         for (Intersectable intersectable : intersectables) {
             intersectable.calculateAABB();
             this.merge(intersectable.aabb);
@@ -70,13 +96,20 @@ public class AABB {
      * @param point The point to include in the AABB.
      */
     public void expand(Point point) {
-        min = new Point(Math.min(min.getX(), point.getX()), Math.min(min.getY(), point.getY()), Math.min(min.getZ(), point.getZ()));
-        max = new Point(Math.max(max.getX(), point.getX()), Math.max(max.getY(), point.getY()), Math.max(max.getZ(), point.getZ()));
-        //center = getCenter();
+        min = new Point(
+                Math.min(min.getX(), point.getX()),
+                Math.min(min.getY(), point.getY()),
+                Math.min(min.getZ(), point.getZ())
+        );
+        max = new Point(
+                Math.max(max.getX(), point.getX()),
+                Math.max(max.getY(), point.getY()),
+                Math.max(max.getZ(), point.getZ())
+        );
     }
 
     /**
-     * Merges this AABB with another AABB.
+     * Merges this AABB with another AABB by expanding its bounds to encompass the other AABB.
      *
      * @param other The AABB to merge with this one.
      */
@@ -103,7 +136,6 @@ public class AABB {
      * @param other The other AABB to check for intersection.
      * @return {@code true} if the AABBs intersect, {@code false} otherwise.
      */
-    @SuppressWarnings("unused")
     public boolean intersects(AABB other) {
         return (this.max.getX() >= other.min.getX() && this.min.getX() <= other.max.getX()) &&
                 (this.max.getY() >= other.min.getY() && this.min.getY() <= other.max.getY()) &&
@@ -112,16 +144,24 @@ public class AABB {
 
     /**
      * Returns the center of the bounding box.
+     * <p>
+     * The center is computed lazily and cached for optimization.
+     * If the AABB is updated
+     * (e.g., by {@link #expand(Point)}), the center must be recomputed.
+     * </p>
      *
      * @return An array containing the x, y, and z coordinates of the AABB center.
      */
     public double[] getCenter() {
-        if (isCenterValid)
-            return center;//can improve if after update center again/
+        if (isCenterValid) {
+            return center;
+        }
         double centerX = (min.getX() + max.getX()) / 2;
         double centerY = (min.getY() + max.getY()) / 2;
         double centerZ = (min.getZ() + max.getZ()) / 2;
-        return new double[]{centerX, centerY, centerZ};
+        this.center = new double[]{centerX, centerY, centerZ};
+        this.isCenterValid = true;
+        return center;
     }
 
     /**
@@ -129,7 +169,6 @@ public class AABB {
      *
      * @return The minimum point of the AABB.
      */
-    @SuppressWarnings("unused")
     public Point getMin() {
         return min;
     }
@@ -139,7 +178,6 @@ public class AABB {
      *
      * @return The maximum point of the AABB.
      */
-    @SuppressWarnings("unused")
     public Point getMax() {
         return max;
     }
@@ -196,5 +234,10 @@ public class AABB {
     @Override
     public String toString() {
         return "AABB [min=" + min + ", max=" + max + "]";
+    }
+
+    public double[] getLengths() {
+        var lengthOfAxis = max.subtract(min);
+        return new double[]{lengthOfAxis.getX(), lengthOfAxis.getY(), lengthOfAxis.getZ()};
     }
 }

@@ -1,16 +1,5 @@
 package renderer;
 
-import geometries.Intersectable;
-import geometries.Plane;
-import geometries.Sphere;
-import geometries.Triangle;
-import org.junit.jupiter.api.Test;
-import primitives.Point;
-import primitives.Vector;
-import scene.Scene;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 /**
  * Tests the Camera class's ability to calculate intersections with various geometries.
  */

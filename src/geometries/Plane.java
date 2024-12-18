@@ -11,24 +11,27 @@ import static primitives.Util.isZero;
 
 /**
  * Represents a plane in 3D space, defined by a point on the plane and a normal vector.
- * The plane is assumed to be infinite in an extent.
+ * The plane is assumed to be infinite.
+ *
+ * <p>Common uses include defining infinite surfaces and aiding in intersection calculations.</p>
  *
  * @author Benny Avrahami
  */
 public class Plane extends Geometry {
     /**
-     * A point on the plane.
+     * A reference point on the plane.
      */
-    private final Point planePoint;
+    private final Point referencePoint;
 
     /**
      * The normalized vector perpendicular to the plane.
      */
-    private final Vector planeNormalizedVector;
+    private final Vector normalVector;
 
     /**
-     * Constructs a Plane through three points in space.
-     * The points must not be collinear and must not be the same.
+     * Constructs a Plane through three non-collinear points in space.
+     *
+     * <p>The order of points determines the direction of the normal vector.</p>
      *
      * @param p1 The first point on the plane.
      * @param p2 The second point on the plane.
@@ -36,23 +39,29 @@ public class Plane extends Geometry {
      * @throws IllegalArgumentException If the points are collinear or not distinct.
      */
     public Plane(Point p1, Point p2, Point p3) {
-        // An exception will be thrown when creating vectors if points are similar or all on the same line.
-        Vector vector1 = p2.subtract(p1);
-        Vector vector2 = p3.subtract(p1);
-        Vector vector3 = vector1.crossProduct(vector2);
-        planePoint = p1;
-        planeNormalizedVector = vector3.normalize();
+        Vector edge1 = p2.subtract(p1);
+        Vector edge2 = p3.subtract(p1);
+
+        // Cross-product of edges to compute the normal vector
+        Vector normalCandidate = edge1.crossProduct(edge2);
+
+        if (isZero(normalCandidate.length())) {
+            throw new IllegalArgumentException("The points must not be collinear.");
+        }
+
+        this.referencePoint = p1;
+        this.normalVector = normalCandidate.normalize();
     }
 
     /**
      * Constructs a Plane with a point on the plane and a normal vector.
      *
-     * @param planePoint        A point on the plane.
-     * @param planeNormal The normal vector of the plane, which will be normalized.
+     * @param referencePoint A point on the plane.
+     * @param normalVector   The normal vector of the plane. It will be normalized automatically.
      */
-    public Plane(Point planePoint, Vector planeNormal) {
-        this.planePoint = planePoint;
-        this.planeNormalizedVector = planeNormal.normalize();
+    public Plane(Point referencePoint, Vector normalVector) {
+        this.referencePoint = referencePoint;
+        this.normalVector = normalVector.normalize();
     }
 
     /**
@@ -61,70 +70,54 @@ public class Plane extends Geometry {
      * @return The normalized normal vector of the plane.
      */
     public Vector getNormal() {
-        return planeNormalizedVector;
-    }
-
-    @Override
-    protected Intersectable duplicateObjectHelper(Vector vector){
-        return new Plane(planePoint.add(vector), planeNormalizedVector).setMaterial(this.getMaterial());
+        return normalVector;
     }
 
 
-
     @Override
-    public Vector getNormal(Point planePoint) {
-        return getNormal(); // The normal is the same everywhere on an infinite plane.
+    public Vector getNormal(Point point) {
+        // The normal is the same everywhere on an infinite plane.
+        return getNormal();
     }
 
     @Override
-    public Geometry move(Vector translation) {
+    protected Geometry translateHelper(Vector translationVector) {
+        return new Plane(referencePoint, normalVector);
+    }
+
+    @Override
+    protected Geometry rotateHelper(Vector axis, double angleInRadians) {
         return null;
     }
 
     @Override
-    public Geometry scale(Vector scale) {
-        return null;
+    protected Geometry scaleHelper(Vector scale) {
+        return this;
     }
 
-    @Override
-    public Geometry rotate(Vector rotation) {
-        return null;
-    }
-
-    @Override
-    public Geometry moveX(double dx) {
-        return null;
-    }
-
-    @Override
-    public Geometry moveY(double dy) {
-        return null;
-    }
-
-    @Override
-    public Geometry moveZ(double dz) {
-        return null;
-    }
 
     @Override
     protected void calculateAABBHelper() {
-        aabb = new AABB();
+        aabb = new AABB(); // Infinite planes have no bounding box
     }
 
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
-        Point p0 = ray.getOrigin();
-        if (planePoint.equals(p0)) return null;
-
-        Vector dir = ray.getDirection();
+        Point rayOrigin = ray.getOrigin();
+        Vector rayDirection = ray.getDirection();
 
         // Check if the ray is parallel to the plane
-        double nv = planeNormalizedVector.dotProduct(dir);
-        if (isZero(nv)) return null; // The ray is parallel to the plane
+        double normalDotDirection = normalVector.dotProduct(rayDirection);
+        if (isZero(normalDotDirection)) {
+            return null; // Ray is parallel to the plane
+        }
 
-        double t = planeNormalizedVector.dotProduct(planePoint.subtract(p0)) / nv;
-        return alignZero(t) <= 0 || alignZero(t - maxDistance) >= 0 ? null // The intersection is behind the ray's start point
-                : List.of(new GeoPoint(this, ray.getPoint(t)));
+        // Compute the t parameter for the intersection point
+        double t = normalVector.dotProduct(referencePoint.subtract(rayOrigin)) / normalDotDirection;
+
+        // Check if the intersection point lies beyond the ray's origin or within maxDistance
+        return alignZero(t) > 0 && alignZero(t - maxDistance) < 0
+                ? List.of(new GeoPoint(this, ray.getPoint(t)))
+                : null;
     }
 }
-

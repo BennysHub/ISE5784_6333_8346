@@ -1,42 +1,37 @@
 package primitives;
 
-import geometries.Geometry;
-
 /**
  * Class representing the material properties of a surface in a 3D scene.
  * Includes diffuse and specular reflection coefficients and shininess factor.
+ *
+ * @author Benny Avrahami
  */
 public class Material {
-
-    /**
-     * The emission color of the material, default is black.
-     */
-    protected Color emission = Color.BLACK;
 
     /**
      * The diffuse reflection coefficient, default is zero.
      */
     public Double3 kD = Double3.ZERO;
-
     /**
      * The specular reflection coefficient, default is zero.
      */
     public Double3 kS = Double3.ZERO;
-
     /**
      * The transmission coefficient, default is zero.
      */
     public Double3 kT = Double3.ZERO;
-
     /**
      * The reflection coefficient, default is zero.
      */
     public Double3 kR = Double3.ZERO;
-
     /**
      * The shininess factor, default is zero.
      */
     public int shininess = 0;
+    /**
+     * The emission color of the material, default is black.
+     */
+    protected Color emission = Color.BLACK;
 
     /**
      * Gets the emission color of the geometry.

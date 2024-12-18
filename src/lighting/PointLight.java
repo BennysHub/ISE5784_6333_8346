@@ -1,7 +1,6 @@
 package lighting;
 
 import primitives.Color;
-import primitives.Double2;
 import primitives.Point;
 import primitives.Vector;
 import renderer.QualityLevel;
@@ -11,52 +10,73 @@ import static primitives.Util.isZero;
 
 /**
  * Class representing a point light source in a 3D scene.
- * A point light has a position and its intensity decreases with distance.
+ * A point light emits light equally in all directions and is defined by its position and intensity.
+ * Supports advanced lighting effects such as soft shadows through sampling.
+ *
+ * <p>This light source can attenuate light intensity over distance using constant, linear, and quadratic factors,
+ * providing flexibility in creating realistic lighting effects.</p>
+ *
+ * <p>The class also supports soft shadows by allowing the light to be sampled as an area light.
+ * The sampling quality can be overridden per light or set globally for the scene.</p>
+ *
+ * <p>Usage Example:</p>
+ * <pre>
+ *     PointLight light = new PointLight(new Color(255, 255, 255), new Point(0, 10, 0))
+ *         .setKc(1)
+ *         .setKl(0.1)
+ *         .setKq(0.01)
+ *         .setRadius(5)
+ *         .setSamplingQuality(QualityLevel.HIGH);
+ * </pre>
+ *
+ * @author Benny Avrahami
  */
-public class PointLight extends Light implements LightSource {
-
+public class PointLight extends LightSource {
 
     /**
      * The position of the light source.
      */
     protected final Point position;
 
-    protected QualityLevel lightSampleQuality = null;
-
-    private Double2[] lightSamples = null;
-
     /**
-     * Size of the light. Use for soft shadows
+     * The radius of the light source, used for generating soft shadows.
      */
     protected double radius = 0d;
 
-
-
+    /**
+     * Constant attenuation factor.
+     */
     private double kC = 1;
+
+    /**
+     * Linear attenuation factor.
+     */
     private double kL = 0;
+
+    /**
+     * Quadratic attenuation factor.
+     */
     private double kQ = 0;
 
     /**
      * Constructs a point light with the specified intensity and position.
+     * By default, the light behaves as a point source with no radius or attenuation.
      *
-     * @param intensity the color representing the light intensity
-     * @param position  the position of the light source
+     * @param intensity The color representing the light intensity.
+     * @param position  The position of the light source in the scene.
      */
     public PointLight(Color intensity, Point position) {
         super(intensity);
         this.position = position;
-    }
-
-    public PointLight(Color intensity, Point position, double radius) {
-        this(intensity, position);
-        this.radius = radius;
+        samplePoints = new Point[]{position}; // Default to a single point source
     }
 
     /**
      * Sets the constant attenuation factor.
+     * This factor reduces the light intensity regardless of distance.
      *
-     * @param kc the constant attenuation factor
-     * @return the current PointLight instance for chaining
+     * @param kc The constant attenuation factor.
+     * @return The current {@code PointLight} instance for chaining.
      */
     public PointLight setKc(double kc) {
         this.kC = kc;
@@ -65,9 +85,10 @@ public class PointLight extends Light implements LightSource {
 
     /**
      * Sets the linear attenuation factor.
+     * This factor reduces the light intensity proportionally to the distance.
      *
-     * @param kl the linear attenuation factor
-     * @return the current PointLight instance for chaining
+     * @param kl The linear attenuation factor.
+     * @return The current {@code PointLight} instance for chaining.
      */
     public PointLight setKl(double kl) {
         this.kL = kl;
@@ -76,9 +97,10 @@ public class PointLight extends Light implements LightSource {
 
     /**
      * Sets the quadratic attenuation factor.
+     * This factor reduces the light intensity proportionally to the square of the distance.
      *
-     * @param kq the quadratic attenuation factor
-     * @return the current PointLight instance for chaining
+     * @param kq The quadratic attenuation factor.
+     * @return The current {@code PointLight} instance for chaining.
      */
     public PointLight setKq(double kq) {
         this.kQ = kq;
@@ -86,46 +108,67 @@ public class PointLight extends Light implements LightSource {
     }
 
     /**
-     * Gets the size/radius of the light.
+     * Sets the radius of the light source, enabling it to act as an area light.
+     * The radius determines the size of the light and the area over which soft shadows are computed.
      *
-     * @return the size of the light
+     * @param radius The radius of the light source.
+     * @return The current {@code PointLight} instance for chaining.
      */
-    public Double getRadius() {
-        return radius;
-    }
-
-    public PointLight setLightSampleQuality(QualityLevel sampleQuality){
-        lightSampleQuality = sampleQuality;
+    public PointLight setRadius(double radius) {
+        this.radius = radius;
         return this;
     }
 
-    @Override
-    public void setLightSample(QualityLevel sampleQuality) {
-        lightSamples = Blackboard.getCirclePoints(radius,
-                lightSampleQuality != null ? lightSampleQuality : sampleQuality);
-
+    /**
+     * Overrides the sampling quality for this specific light source.
+     * If this method is not called, the global scene quality will be used when computing samples.
+     *
+     * @param quality The desired quality level for sampling this light source.
+     * @return The current {@code PointLight} instance for chaining.
+     */
+    public PointLight setSamplingQuality(QualityLevel quality) {
+        this.samplingQuality = quality;
+        return this;
     }
 
+    /**
+     * Precomputes sample points for the light source based on the radius and sampling quality.
+     * <p>
+     * If the radius is zero, the light behaves as a point source and no additional samples are generated.
+     * </p>
+     *
+     * @param samplingQuality The global quality level to use for sampling if no local quality is set.
+     */
     @Override
-    public Color getIntensity(Point p, Point lightPoint) {
-        //what if the point is inside the light sphere??
-        double d = p.distance(lightPoint);
+    public void computeSamples(QualityLevel samplingQuality) {
+        if (isZero(radius)) return; // Single point light behavior if radius is zero
+
+        // Compute samples based on the effective quality level
+        samplePoints = Blackboard.getSpherePoints(position, radius, this.samplingQuality != null ? this.samplingQuality : samplingQuality);
+    }
+
+    /**
+     * Computes the light intensity at a given surface point, considering the attenuation factors.
+     *
+     * @param surfacePoint     The point on the surface where the intensity is evaluated.
+     * @param lightSourcePoint A specific sample point on the light source.
+     * @return The computed intensity of the light at the surface point.
+     */
+    @Override
+    public Color computeIntensity(Point surfacePoint, Point lightSourcePoint) {
+        double d = surfacePoint.distance(lightSourcePoint);
         return intensity.reduce(kC + (kL * d) + (kQ * d * d));
     }
 
+    /**
+     * Computes the direction vector of light from the light source to a target point.
+     *
+     * @param targetPoint      The point where the direction is computed.
+     * @param lightSourcePoint A specific sample point on the light source.
+     * @return The normalized direction vector from the light source to the target point.
+     */
     @Override
-    public Point[] getLightSample(Point p) {
-        if (lightSamples == null || isZero(radius))
-            return new Point[]{position};
-
-        Vector normal = p.subtract(position).normalize();
-        Point[] diskPoints = Blackboard.convertTo3D( lightSamples, position, normal);
-        return Blackboard.addSphereDepth(diskPoints, position, radius, normal);
+    public Vector computeDirection(Point targetPoint, Point lightSourcePoint) {
+        return targetPoint.subtract(lightSourcePoint).normalize();
     }
-
-    @Override
-    public Vector getL(Point to, Point lightPoint) {
-        return to.subtract(lightPoint).normalize();
-    }
-
 }

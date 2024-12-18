@@ -28,8 +28,8 @@ public class ReflectionRefractionTests {
     /**
      * Camera builder for the tests with triangles
      */
-    private final Camera.Builder cameraBuilder = Camera.getBuilder()
-            .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
+    private final Camera.Builder cameraBuilder = Camera.builder()
+            .setOrientation(new Vector(0, 0, -1), new Vector(0, 1, 0))
             .setScene(scene);
 
     /**
@@ -46,8 +46,8 @@ public class ReflectionRefractionTests {
                 new SpotLight(new Color(1000, 600, 0), new Point(-100, -100, 500), new Vector(-1, -1, -2))
                         .setKl(0.0004).setKq(0.0000006));
 
-        cameraBuilder.setLocation(new Point(0, 0, 1000)).setVpDistance(1000)
-                .setVpSize(150, 150)
+        cameraBuilder.setPosition(new Point(0, 0, 1000)).setViewPlaneDistance(1000)
+                .setViewPlaneSize(150, 150)
                 .setResolution(500, 500)
                 .setImageName("refractionTwoSpheres")
                 .build()
@@ -68,17 +68,17 @@ public class ReflectionRefractionTests {
                         .setMaterial(new Material().setKd(0.25).setKs(0.25).setShininess(20).setEmission(new Color(100, 50, 20))),
                 new Triangle(new Point(1500, -1500, -1500), new Point(-1500, 1500, -1500),
                         new Point(670, 670, 3000))
-                        .setMaterial(new Material().setKr(1d) .setEmission(new Color(20, 20, 20))),
+                        .setMaterial(new Material().setKr(1d).setEmission(new Color(20, 20, 20))),
                 new Triangle(new Point(1500, -1500, -1500), new Point(-1500, 1500, -1500),
                         new Point(-1500, -1500, -2000))
-                        .setMaterial(new Material().setKr(new Double3(0.5, 0, 0.4)) .setEmission(new Color(20, 20, 20))));
+                        .setMaterial(new Material().setKr(new Double3(0.5, 0, 0.4)).setEmission(new Color(20, 20, 20))));
         scene.setAmbientLight(new AmbientLight(new Color(255, 255, 255), 0.1));
         scene.lights.add(new SpotLight(new Color(1020, 400, 400), new Point(-750, -750, -150), new Vector(-1, -1, -4))
                 .setKl(0.00001).setKq(0.000005));
 
-        cameraBuilder.setLocation(new Point(0, 0, 10000)).setVpDistance(10000)
-                .setVpSize(2500, 2500)
-                .setResolution( 500, 500)
+        cameraBuilder.setPosition(new Point(0, 0, 10000)).setViewPlaneDistance(10000)
+                .setViewPlaneSize(2500, 2500)
+                .setResolution(500, 500)
                 .setImageName("reflectionTwoSpheresMirrored")
                 .build()
                 .renderImage()
@@ -105,8 +105,8 @@ public class ReflectionRefractionTests {
                 new SpotLight(new Color(700, 400, 400), new Point(60, 50, 0), new Vector(0, 0, -1))
                         .setKl(4E-5).setKq(2E-7));
 
-        cameraBuilder.setLocation(new Point(0, 0, 1000)).setVpDistance(1000)
-                .setVpSize(200, 200)
+        cameraBuilder.setPosition(new Point(0, 0, 1000)).setViewPlaneDistance(1000)
+                .setViewPlaneSize(200, 200)
                 .setResolution(600, 600)
                 .setImageName("refractionShadow")
                 .build()

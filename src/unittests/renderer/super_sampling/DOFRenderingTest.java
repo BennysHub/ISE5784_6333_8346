@@ -1,10 +1,11 @@
-package renderer;
+package renderer.super_sampling;
 
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.DirectionalLight;
 import org.junit.jupiter.api.Test;
 import primitives.*;
+import renderer.Camera;
 import scene.Scene;
 
 class DOFRenderingTest {
@@ -13,14 +14,14 @@ class DOFRenderingTest {
     private final Scene scene = new Scene("Test scene");
 
 
-    private final Camera.Builder camera = Camera.getBuilder()
-            .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
-            .setLocation(new Point(0, 0, 700))
-            .setVpDistance(650)
-            .setVpSize(50, 300)
+    private final Camera.Builder camera = Camera.builder()
+            .setOrientation(new Vector(0, 0, -1), new Vector(0, 1, 0))
+            .setPosition(new Point(0, 0, 700))
+            .setViewPlaneDistance(650)
+            .setViewPlaneSize(50, 300)
             .setScene(scene)
-            .setParallelStreams(true)
-            .setDepthOfField(true)
+            .enableParallelStreams(true)
+            .enableDepthOfField(true)
             .setApertureSize(2)
             .setFocalLength(50)
             .setResolution(1800, 300);
@@ -33,13 +34,13 @@ class DOFRenderingTest {
 
         scene.geometries.add(
 
-                base.moveX(-105)
+                base.translateX(-105)
                         .setMaterial(new Material().setKd(new Double3(0.5, 0, 0)).setKs(new Double3(0.3, 0.3, 0.3)).setShininess(80)),
-                base.moveX(-35).moveZ(-100)
+                base.translateX(-35).translateZ(-100)
                         .setMaterial(new Material().setKd(new Double3(0, 0.5, 0)).setKs(new Double3(0.3, 0.3, 0.3)).setShininess(80)),
-                base.moveX(35).moveZ(-200)
+                base.translateX(35).translateZ(-200)
                         .setMaterial(new Material().setKd(new Double3(0, 0, 0.5)).setKs(new Double3(0.3, 0.3, 0.3)).setShininess(80)),
-                base.moveX(105).moveZ(-300)
+                base.translateX(105).translateZ(-300)
                         .setMaterial(new Material().setKd(new Double3(0.5, 0.5, 0)).setKs(new Double3(0.3, 0.3, 0.3)).setShininess(80))
 
         );
@@ -66,13 +67,13 @@ class DOFRenderingTest {
         Triangle base = new Triangle(new Point(0, 20, 0), new Point(18, -18, 0), new Point(-18, -18, 0));
 
         scene.geometries.add(
-                base.moveX(-105)
+                base.translateX(-105)
                         .setMaterial(new Material().setKd(new Double3(0.5, 0, 0)).setKs(new Double3(0.3, 0.3, 0.3)).setShininess(80)),
-                base.moveX(-35).moveZ(-100)
+                base.translateX(-35).translateZ(-100)
                         .setMaterial(new Material().setKd(new Double3(0, 0.5, 0)).setKs(new Double3(0.3, 0.3, 0.3)).setShininess(80)),
-                base.moveX(35).moveZ(-200)
+                base.translateX(35).translateZ(-200)
                         .setMaterial(new Material().setKd(new Double3(0, 0, 0.5)).setKs(new Double3(0.3, 0.3, 0.3)).setShininess(80)),
-                base.moveX(105).moveZ(-300)
+                base.translateX(105).translateZ(-300)
                         .setMaterial(new Material().setKd(new Double3(0.5, 0.5, 0)).setKs(new Double3(0.3, 0.3, 0.3)).setShininess(80))
         );
 
@@ -91,29 +92,14 @@ class DOFRenderingTest {
     }
 
     @Test
-    public void  somthingIntheRain(){
+    public void somthingIntheRain() {
 
-        Vector to = new Vector(1, 0, 0);
-        Vector up = new Vector(0,1,0);
-        Vector right = to.crossProduct(up);
+        Point center = new Point(3, 39, -432);
+        var a = Blackboard.generateFibonacciSphere(center, 3, 45);
+        for (Point p: a)
+            System.out.println( p + "  distance: " + p.distance(center));
 
-
-        Vector newTo = new Vector(0, 1, 0);
-
-        //Vector newTo = target.subtract(this.location).normalize();
-        //Vector axis = to.isParallel(newTo) ? originalNormal.perpendicular() : to.crossProduct(newTo);
-        Vector axis =  to.crossProduct(newTo);
-
-        double angle = Math.acos(to.dotProduct(newTo) / (to.length() * newTo.length()));
-        Matrix rotationMatrix = Matrix.rotationMatrix(axis, angle);
-        Vector newUp = rotationMatrix.multiply(up);
-        Vector newRight  = newTo.crossProduct(newUp);
-
-
-        System.out.println("to :" + to + "  up :" + up +  "  right :" + right + "\nto :" + newTo + "  up :" + newUp +  "  right :" + newRight);
     }
-
-
 
 
 }

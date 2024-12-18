@@ -10,86 +10,139 @@ import renderer.ViewPlane;
 
 import java.util.stream.IntStream;
 
+/**
+ * Implements 4X super sampling for antialiasing in rendering.
+ * This technique improves image quality by sampling multiple points within each pixel
+ * and averaging the results to reduce aliasing artifacts.
+ *
+ * <p>Supports both single-threaded and parallel rendering.</p>
+ */
 public class SSAA4X extends Render {
 
-    protected ViewPlane viewPlaneHelper = new ViewPlane(viewPlane.right, viewPlane.up, viewPlane.direction, viewPlane.vpHeight + viewPlane.pixelHeight, viewPlane.vpWidth + viewPlane.pixelWidth, viewPlane.center, viewPlane.nX + 1, viewPlane.nY + 1);
+    /**
+     * Array storing colors calculated for each super sampled pixel.
+     */
+    protected Color[][] superSampledColors;
 
-
-    Color[][] pixelColors = new Color[viewPlaneHelper.nX][viewPlaneHelper.nY];
-
-    public SSAA4X(ImageWriter imageWriter, ViewPlane viewPlane, RayTracerBase rayTracer, Point camaraLocation) {
-        super(imageWriter, viewPlane, rayTracer, camaraLocation);
+    /**
+     * Constructs a renderer with 4X super sampling for antialiasing.
+     *
+     * <p>The view plane is adjusted to support super sampling by adding extra rows and columns.</p>
+     *
+     * @param imageWriter    The image writer to output the rendered image.
+     * @param viewPlane      The view plane for the rendering process.
+     * @param rayTracer      The ray tracer for tracing rays through the scene.
+     * @param cameraPosition The position of the camera in the scene.
+     */
+    public SSAA4X(ImageWriter imageWriter, ViewPlane viewPlane, RayTracerBase rayTracer, Point cameraPosition) {
+        super(
+                imageWriter,
+                new ViewPlane(
+                        viewPlane.right,
+                        viewPlane.up,
+                        viewPlane.direction,
+                        viewPlane.vpHeight + viewPlane.pixelHeight,
+                        viewPlane.vpWidth + viewPlane.pixelWidth,
+                        viewPlane.center,
+                        viewPlane.nX + 1,
+                        viewPlane.nY + 1
+                ),
+                rayTracer,
+                cameraPosition
+        );
+        superSampledColors = new Color[this.viewPlane.nX][this.viewPlane.nY];
     }
-
 
     @Override
     public void parallelStreamsRender() {
-        parallelStreamsRender(viewPlaneHelper.nX, viewPlaneHelper.nY);
-        writePixelsParallel();
+        renderPixelsParallel(viewPlane.nX, viewPlane.nY);
+        writeSuperSampledPixelsParallel();
     }
 
     @Override
     public void render() {
-        render(viewPlaneHelper.nX, viewPlaneHelper.nY);
-        writePixels();
+        renderPixels(viewPlane.nX, viewPlane.nY);
+        writeSuperSampledPixels();
     }
 
-    protected void parallelStreamsRender(int nX, int nY) {
-        IntStream.range(0, nY).parallel()
-                .forEach(i -> IntStream.range(0, nX).parallel()
-                        .forEach(j -> calcColor(j, i)));
+    private void renderPixelsParallel(int nX, int nY) {
+        IntStream.range(0, nX * nY).parallel().forEach(index -> {
+            int x = index % nX;
+            int y = index / nX;
+            calculatePixelColor(x, y);
+        });
     }
 
-    private void render(int nX, int nY) {
-        for (int i = 0; i < nY; i++) {
-            for (int j = 0; j < nX; j++) {
-                calcColor(j, i);
+    private void renderPixels(int nX, int nY) {
+        for (int y = 0; y < nY; y++) {
+            for (int x = 0; x < nX; x++) {
+                calculatePixelColor(x, y);
             }
         }
     }
 
-
-    protected void calcColor(int x, int y) {
-        Ray ray = new Ray(camaraLocation, viewPlaneHelper.getPixelCenter(x, y));
-        pixelColors[x][y] = rayTracer.traceRay(ray);
+    /**
+     * Calculates the color for a super sampled pixel at the given coordinates.
+     *
+     * @param x The x-coordinate of the pixel.
+     * @param y The y-coordinate of the pixel.
+     */
+    protected void calculatePixelColor(int x, int y) {
+        Ray ray = new Ray(cameraPosition, viewPlane.getPixelCenter(x, y));
+        superSampledColors[x][y] = rayTracer.traceRay(ray);
     }
 
-    public void writePixelsParallel() {
+    private void writeSuperSampledPixelsParallel() {
         int nX = imageWriter.getNx();
         int nY = imageWriter.getNy();
 
-        IntStream.range(0, nX).parallel().forEach(x -> {
-            IntStream.range(0, nY).parallel().forEach(y -> {
-                imageWriter.writePixel(x, y, pixelColors[x][y]
-                        .add(pixelColors[x + 1][y], pixelColors[x][y + 1], pixelColors[x + 1][y + 1])
-                        .reduce(4));
-            });
+        IntStream.range(0, nX * nY).parallel().forEach(index -> {
+            int x = index % nX;
+            int y = index / nX;
+            imageWriter.writePixel(x, y, calculatePixelAverageColor(x, y));
         });
     }
 
-    public void writePixels() {
-        for (int x = 0; x < imageWriter.getNx(); x++)
-            for (int y = 0; y < imageWriter.getNy(); y++)
-                imageWriter.writePixel(x, y, pixelAvrageColor(x, y));
+    private void writeSuperSampledPixels() {
+        int nX = imageWriter.getNx();
+        int nY = imageWriter.getNy();
+
+        for (int y = 0; y < nY; y++) {
+            for (int x = 0; x < nX; x++) {
+                imageWriter.writePixel(x, y, calculatePixelAverageColor(x, y));
+            }
+        }
     }
 
-    protected Color pixelAvrageColor(int x, int y) {
-        return Color.average(pixelLeftUpSample(x, y), pixelRightUpSample(x, y), pixelLeftDownSample(x, y), pixelRightDownSample(x, y));
+    /**
+     * Computes the average color for a pixel based on its super-sampled colors.
+     *
+     * @param x The x-coordinate of the pixel.
+     * @param y The y-coordinate of the pixel.
+     * @return The average color for the pixel.
+     */
+    protected Color calculatePixelAverageColor(int x, int y) {
+        return Color.average(
+                pixelTopLeftSample(x, y),
+                pixelTopRightSample(x, y),
+                pixelBottomLeftSample(x, y),
+                pixelBottomRightSample(x, y)
+        );
     }
 
-    protected Color pixelLeftUpSample(int x, int y) {
-        return pixelColors[x][y];
+    protected Color pixelTopLeftSample(int x, int y) {
+        return superSampledColors[x][y];
     }
 
-    protected Color pixelRightUpSample(int x, int y) {
-        return pixelColors[x][y + 1];
+    protected Color pixelTopRightSample(int x, int y) {
+        return superSampledColors[x][y + 1];
     }
 
-    protected Color pixelLeftDownSample(int x, int y) {
-        return pixelColors[x + 1][y];
+    protected Color pixelBottomLeftSample(int x, int y) {
+        return superSampledColors[x + 1][y];
     }
 
-    protected Color pixelRightDownSample(int x, int y) {
-        return pixelColors[x + 1][y + 1];
+    protected Color pixelBottomRightSample(int x, int y) {
+        return superSampledColors[x + 1][y + 1];
     }
 }

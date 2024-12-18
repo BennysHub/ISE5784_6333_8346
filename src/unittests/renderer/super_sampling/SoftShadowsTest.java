@@ -1,4 +1,4 @@
-package renderer;
+package renderer.super_sampling;
 
 import geometries.Geometry;
 import geometries.Plane;
@@ -10,6 +10,8 @@ import lighting.PointLight;
 import lighting.SpotLight;
 import org.junit.jupiter.api.Test;
 import primitives.*;
+import renderer.Camera;
+import renderer.QualityLevel;
 import scene.Scene;
 
 import static java.awt.Color.BLUE;
@@ -38,7 +40,7 @@ public class SoftShadowsTest {
 
     private final Scene scene = new Scene("soft shadow");
 
-    private final LightSource pointLight = new SpotLight(new Color(java.awt.Color.white), new Point(0, 0, 50), new Vector(0, 0, -1), 2)
+    private final LightSource pointLight = new SpotLight(new Color(java.awt.Color.white), new Point(0, 0, 50), new Vector(0, 0, -1)).setRadius(2)
             .setKl(0.02).setKc(0);
 
     private final Geometry plane = new Plane(Point.ZERO, new Vector(0, 0, 1))
@@ -47,12 +49,13 @@ public class SoftShadowsTest {
     private final Geometry triangle = new Triangle(new Point(10, 10, 40), new Point(-10, -10, 40), new Point(-10, 10, 40))
             .setMaterial(new Material().setKd(KD3).setKs(KS3).setShininess(SHININESS).setKt(0.5));
 
-    private final Camera.Builder camera1 = Camera.getBuilder()
-            .setSoftShadows(true)
+    private final Camera.Builder camera1 = Camera.builder()
+            .enableSoftShadows(true)
             .setScene(scene)
-            .setLocation(new Point(0, 0, 1000))
-            .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
-            .setVpSize(150, 150).setVpDistance(1000);
+            .setPosition(new Point(0, 0, 1000))
+            .setOrientation(new Vector(0, 0, -1), new Vector(0, 1, 0))
+            .setViewPlaneSize(150, 150)
+            .setViewPlaneDistance(1000);
 
     /**
      * Tests the basic soft shadow rendering.
@@ -61,7 +64,7 @@ public class SoftShadowsTest {
     public void softShadowBase() {
         scene.geometries.add(plane, triangle);
         scene.lights.add(pointLight);
-        camera1.setResolution( 600, 600)
+        camera1.setResolution(600, 600)
                 .setImageName("softShadowBase")
                 .build()
                 .renderImage()
@@ -83,12 +86,12 @@ public class SoftShadowsTest {
                         .setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30).setEmission(new Color(BLUE)))
         );
         scene.setAmbientLight(new AmbientLight(new Color(WHITE), 0.15));
-        scene.lights.add(new SpotLight(new Color(700, 400, 400), new Point(40, 40, 115), new Vector(-1, -1, -4), 4)
+        scene.lights.add(new SpotLight(new Color(700, 400, 400), new Point(40, 40, 115), new Vector(-1, -1, -4)).setRadius(4)
                 .setKl(4E-4).setKq(2E-5));
 
-        camera1.setResolution( 600, 600)
+        camera1.setResolution(600, 600)
                 .setImageName("softShadowTrianglesSphere")
-                .setSoftShadows(true)
+                .enableSoftShadows(true)
                 .build()
                 .renderImage()
                 .writeToImage();
@@ -109,22 +112,21 @@ public class SoftShadowsTest {
 
 
         scene.lights.add(
-                new SpotLight(new Color(255, 255, 255), new Point(20, -1, 0), new Point(0, 1, 0).subtract(new Point(20, -1, 0)), 5)
-                        .setKl(0.02).setKc(0).setLightSampleQuality(QualityLevel.LOW)
+                new SpotLight(new Color(255, 255, 255), new Point(20, -1, 0), new Point(0, 1, 0).subtract(new Point(20, -1, 0)))
+                        .setRadius(5).setSamplingQuality(QualityLevel.ULTRA).setKl(0.02).setKc(0)
         );
 
-        final Camera.Builder camera2 = Camera.getBuilder()
-                .setSoftShadows(true)
+        final Camera.Builder camera2 = Camera.builder()
+                .enableParallelStreams(true)
+                .enableSoftShadows(true)
                 .setSoftShadowsQuality(QualityLevel.ULTRA)
-                .setAntiAliasing(false)
+                .enableAntiAliasing(false)
                 .setAntiAliasingQuality(QualityLevel.ULTRA)
                 .setScene(scene)
-                .setLocation(new Point(-1, 6, -1))
-                .setTarget(Point.ZERO)
-                .setVpSize(150, 150)
-                .setVpDistance(30);
-
-
+                .setPosition(new Point(-1, 6, -1))
+                .setOrientation(Point.ZERO, Vector.UNIT_Y)
+                .setViewPlaneSize(150, 150)
+                .setViewPlaneDistance(30);
 
 
         camera2.setResolution(1080, 1080)
@@ -145,18 +147,20 @@ public class SoftShadowsTest {
         scene.setAmbientLight(new AmbientLight(new Color(255, 191, 191), new Double3(0.15, 0.15, 0.3)));
 
         scene.lights.add(
-                new PointLight(new Color(255, 255, 255), new Point(20, -1, 0), 3).setKl(0.02).setKc(0)
+                new PointLight(new Color(255, 255, 255), new Point(20, -1, 0)).setKl(0.02).setKc(0).setRadius(3)
         );
 
-        final Camera.Builder camera2 = Camera.getBuilder()
-                .setSoftShadows(true)
+        final Camera.Builder camera2 = Camera.builder()
+                .enableSoftShadows(true)
+                .setSoftShadowsQuality(QualityLevel.ULTRA)
                 .setScene(scene)
-                .setLocation(new Point(-1, 6, -1))
-                .setTarget(Point.ZERO)
-                .setParallelStreams(true)
-                .setVpSize(150, 150).setVpDistance(30)
-                .setAntiAliasing(false)
-                .setAntiAliasingQuality(QualityLevel.HIGH);
+                .setPosition(new Point(-1, 6, -1))
+                .setOrientation(Point.ZERO, Vector.UNIT_Y)
+                .enableParallelStreams(true)
+                .setViewPlaneSize(150, 150)
+                .setViewPlaneDistance(30)
+                .enableAntiAliasing(true)
+                .setAntiAliasingQuality(QualityLevel.ULTRA);
 
 
         camera2.setResolution(1080, 1080)

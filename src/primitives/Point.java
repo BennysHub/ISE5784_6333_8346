@@ -11,7 +11,17 @@ public class Point {
      */
     public static final Point ZERO = new Point(0, 0, 0);
 
+    /**
+     * A constant representing a point at positive infinity
+     * (Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY).
+     */
     public static final Point POSITIVE_INFINITY = new Point(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+
+    /**
+     * A constant representing a point at negative infinity
+     * (Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY).
+     */
+    public static final Point NEGATIVE_INFINITY = new Point(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
 
     /**
      * The x, y, and z coordinates of the point, encapsulated in a Double3 object.
@@ -48,6 +58,10 @@ public class Point {
         return new Point(xyz.add(vector.xyz));
     }
 
+    public Point scale(Vector vector) {
+        return new Point(xyz.d1 * vector.getX(), xyz.d2 * vector.getY(), xyz.d3 * vector.getZ());
+    }
+
     /**
      * Subtracts the coordinates of the given point from this point and returns the resulting vector.
      *
@@ -78,7 +92,7 @@ public class Point {
         double dx = xyz.d1 - point.xyz.d1;
         double dy = xyz.d2 - point.xyz.d2;
         double dz = xyz.d3 - point.xyz.d3;
-        return dx * dx + dy * dy + dz * dz;//simple 3d distance squared
+        return dx * dx + dy * dy + dz * dz; //simple 3d distance squared
     }
 
     /**
@@ -108,12 +122,32 @@ public class Point {
         return this.xyz.d3;
     }
 
-
-    @Override
-    public String toString() {
-        return  String.valueOf(xyz);
+    /**
+     * Converts this point to a vector from the origin.
+     *
+     * @return A vector from the origin to this point.
+     */
+    public Vector toVector() {
+        return new Vector(xyz.d1, xyz.d2, xyz.d3);
     }
 
+    /**
+     * Returns a string representation of the Point object in the format (x, y, z).
+     *
+     * @return A string representing the coordinates of the point.
+     */
+    @Override
+    public String toString() {
+        return String.valueOf(xyz);
+    }
+
+    /**
+     * Compares this point to another object for equality.
+     * Two points are considered equal if they have the same coordinates.
+     *
+     * @param obj The object to compare this point with.
+     * @return true if the object is a Point and has the same coordinates, false otherwise.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

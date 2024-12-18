@@ -10,84 +10,79 @@ import java.util.List;
  * Represents a tube in 3D space, defined by its axis ray and radius.
  * Inherits the radius property from RadialGeometry.
  *
+ * <p>A tube is essentially a cylinder with an infinite length.</p>
+ *
  * @author Benny Avrahami
  */
 public class Tube extends RadialGeometry {
     /**
      * The axis ray of the tube, which is a line that runs through its center.
      */
-    protected final Ray axis;
+    protected final Ray axisRay;
 
     /**
      * Constructs a Tube with the specified radius and axis ray.
      *
-     * @param radius The radius of the tube.
-     * @param axis   The axis ray of the tube.
+     * @param radius  The radius of the tube.
+     * @param axisRay The axis ray of the tube.
      */
-    public Tube(double radius, Ray axis) {
+    public Tube(double radius, Ray axisRay) {
         super(radius);
-        this.axis = axis;
+        this.axisRay = axisRay;
     }
 
     @Override
-    public Vector getNormal(Point p) {
+    public Vector getNormal(Point pointOnSurface) {
+        // The origin point of the tube's axis ray
+        Point rayOrigin = axisRay.getOrigin();
 
-        // The Point where the Ray of Tube Start
-        Point p0 = axis.getOrigin();
+        // The direction of the axis ray, which is normalized
+        Vector rayDirection = axisRay.getDirection();
 
-        // The dir of the ray it's also normalized
-        Vector dir = axis.getDirection();
+        // Vector from the ray origin to the point on the surface
+        Vector vectorToSurface = pointOnSurface.subtract(rayOrigin);
 
-        // Vector from p0 to p
-        Vector pMinusP0 = p.subtract(p0);
+        // Projection of vectorToSurface onto rayDirection
+        double distanceAlongRay = vectorToSurface.dotProduct(rayDirection);
 
-        // projection of pMinusP0 onto dir(unit vector) we get the distance from p0 to point1 (p1)
-        // p1 is the point on the ray where the vector (p1-p0) is orthogonal to vector (p-p1)
-        // if projection is zero it means dir and pMinusP0 are orthogonal
-        double projection = pMinusP0.dotProduct(dir);
+        // The closest point on the axis ray to the given surface point
+        Point closestPointOnAxis = axisRay.getPoint(distanceAlongRay);
 
-        //p1 as mention above (create a 90-degree triangle between p, p0, p1)
-        //point p1 will be equal p0 if dir and pMinusP0 are orthogonal
-        Point p1 = axis.getPoint(projection);
+        // The normal vector at the surface point
+        Vector surfaceNormal = pointOnSurface.subtract(closestPointOnAxis);
 
-        //normal is the vector normal at point p
-        Vector normal = p.subtract(p1);
+        return surfaceNormal.normalize();
+    }
 
-        return normal.normalize();
+    @Override
+    protected void calculateAABBHelper() {
+
     }
 
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+        // Implementation is not yet defined
+        return null;
+    }
+
+
+    @Override
+    protected Geometry translateHelper(Vector translationVector) {
         return null;
     }
 
     @Override
-    public Geometry move(Vector translation) {
+    protected Geometry rotateHelper(Vector axis, double angleInRadians) {
         return null;
     }
 
     @Override
-    public Geometry scale(Vector scale) {
+    protected Geometry scaleHelper(Vector scale) {
         return null;
     }
 
     @Override
-    public Geometry rotate(Vector rotation) {
-        return null;
-    }
-
-    @Override
-    public Geometry moveX(double dx) {
-        return null;
-    }
-
-    @Override
-    public Geometry moveY(double dy) {
-        return null;
-    }
-
-    @Override
-    public Geometry moveZ(double dz) {
+    public Geometry scale(double scale) {
         return null;
     }
 

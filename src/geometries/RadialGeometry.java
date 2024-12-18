@@ -14,7 +14,7 @@ public abstract class RadialGeometry extends Geometry {
      */
     protected final double radius;
     /**
-     * The radius of the geometry.
+     * The radius squared of the geometry.
      */
     protected final double radiusSquared;
 
@@ -26,11 +26,6 @@ public abstract class RadialGeometry extends Geometry {
     public RadialGeometry(double radius) {
         this.radius = radius;
         this.radiusSquared = radius * radius;
-    }
-
-    @Override
-    protected Intersectable duplicateObjectHelper(Vector vector){
-        return null;
     }
 
 }

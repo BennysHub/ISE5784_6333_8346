@@ -45,7 +45,6 @@
     "geometries": {
       "description": {
         "d1": "all geometries can have a emission and a material, both optional",
-
         "material(all fields are optional)": {
           "kD (Double3)": 0.2,
           "kS (Double3)": "0.8",

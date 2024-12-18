@@ -7,7 +7,6 @@ import primitives.Vector;
 import java.util.List;
 
 import static primitives.Util.alignZero;
-import static primitives.Util.random;
 
 /**
  * Represents a sphere in 3D space, defined by its center point and radius.
@@ -38,34 +37,25 @@ public class Sphere extends RadialGeometry {
         return spherePoint.subtract(center).normalize();
     }
 
+
     @Override
-    public Geometry move(Vector translation) {
-        return new Sphere(radius, center.add(translation));
+    protected Geometry translateHelper(Vector translationVector) {
+        return new Sphere(radius, center.add(translationVector));
     }
 
     @Override
-    public Geometry scale(Vector scale) {
-        return null;
+    protected Geometry rotateHelper(Vector axis, double angleInRadians) {
+        return this;
     }
 
     @Override
-    public Geometry rotate(Vector rotation) {
-        return null;
+    protected Geometry scaleHelper(Vector scale) {
+        return scale(scale.getX());
     }
 
     @Override
-    public Geometry moveX(double dx) {
-        return move(new Vector(dx, 0, 0));
-    }
-
-    @Override
-    public Geometry moveY(double dy) {
-        return move(new Vector(0, dy, 0));
-    }
-
-    @Override
-    public Geometry moveZ(double dz) {
-        return move(new Vector(0, 0, dz));
+    public Geometry scale(double scale) {
+        return new Sphere(radius * scale, center).setMaterial(getMaterial());
     }
 
     @Override
@@ -115,11 +105,5 @@ public class Sphere extends RadialGeometry {
         else
             return t1 > 0 ? List.of(new GeoPoint(this, ray.getPoint(t1))) : null;
     }
-
-    @Override
-    protected Intersectable duplicateObjectHelper(Vector vector) {
-        return new Sphere(radius, center.add(vector)).setMaterial(this.getMaterial());
-    }
-
 
 }

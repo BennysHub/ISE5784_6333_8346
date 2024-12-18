@@ -5,8 +5,8 @@ import geometries.Triangle;
 import lighting.AmbientLight;
 import org.junit.jupiter.api.Test;
 import primitives.*;
-import scene.JsonSceneParser;
 import scene.Scene;
+import scene.SceneJsonParser;
 
 import static java.awt.Color.*;
 
@@ -23,11 +23,11 @@ public class RenderingTests {
     /**
      * Camera builder of the tests
      */
-    private final Camera.Builder camera = Camera.getBuilder()
+    private final Camera.Builder camera = Camera.builder()
             .setScene(scene)
-            .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
-            .setVpDistance(100)
-            .setVpSize(500, 500);
+            .setPosition(Point.ZERO).setOrientation(new Vector(0, 0, -1), new Vector(0, 1, 0))
+            .setViewPlaneDistance(100)
+            .setViewPlaneSize(500, 500);
 
 
 //    private final Camera.Builder camera = Camera.getBuilder()
@@ -95,7 +95,7 @@ public class RenderingTests {
             camera
 
 
-                    .changeTarget(new Point(0, 0, -100), new Point(x, 0, y))
+                    .keepInFocus(new Point(0, 0, -100), new Point(x, 0, y))
                     .setImageName("color render test" + (int) (t * 100))
                     .build()
                     .renderImage()
@@ -110,13 +110,13 @@ public class RenderingTests {
      */
     @Test
     public void basicRenderJson() {
-        final Scene scene1 = new JsonSceneParser("src/unittests/renderer/json/twoColorJson.json", "testScene");
+        final Scene scene1 = new SceneJsonParser("src/unittests/renderer/json/twoColorJson.json", "testScene");
 
-        final Camera.Builder camera = Camera.getBuilder()
+        final Camera.Builder camera = Camera.builder()
                 .setScene(scene1)
-                .setLocation(Point.ZERO).setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0)) //changed
-                .setVpDistance(100)
-                .setVpSize(500, 500);
+                .setPosition(Point.ZERO).setOrientation(new Vector(0, 0, -1), new Vector(0, 1, 0)) //changed
+                .setViewPlaneDistance(100)
+                .setViewPlaneSize(500, 500);
 
         camera.setResolution(1000, 1000)
                 .setImageName("json render test")

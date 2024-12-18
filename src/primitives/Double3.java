@@ -3,7 +3,11 @@ package primitives;
 import static primitives.Util.isZero;
 
 /**
- * This class will serve all primitive classes based on three numbers
+ * This class represents a 3D vector or point, consisting of three double values: d1, d2, and d3.
+ * It provides operations to manipulate 3D vectors or points such as addition, subtraction, scaling, and comparison.
+ * <p>
+ * The {@link Double3} class can be used in 3D geometric computations, vector math, and in scenarios where
+ * three-dimensional data (e.g., RGB color values) need to be represented and manipulated.
  *
  * @author Dan Zilberstein
  */
@@ -12,29 +16,33 @@ public class Double3 {
      * Zero triad (0,0,0)
      */
     public static final Double3 ZERO = new Double3(0, 0, 0);
+
     /**
      * One's triad (1,1,1)
      */
     public static final Double3 ONE = new Double3(1, 1, 1);
+
     /**
-     * First number
+     * First number (X component).
      */
     final double d1;
+
     /**
-     * Second number
+     * Second number (Y component).
      */
     final double d2;
+
     /**
-     * Third number
+     * Third number (Z component).
      */
     final double d3;
 
     /**
-     * Constructor to initialize a Double3 based object with its three number values
+     * Constructor to initialize a Double3 object with its three number values.
      *
-     * @param d1 first number value
-     * @param d2 second number value
-     * @param d3 third number value
+     * @param d1 the first number value
+     * @param d2 the second number value
+     * @param d3 the third number value
      */
     public Double3(double d1, double d2, double d3) {
         this.d1 = d1;
@@ -43,9 +51,9 @@ public class Double3 {
     }
 
     /**
-     * Constructor to initialize a Double3 based object the same number values
+     * Constructor to initialize a Double3 object where all three values are the same.
      *
-     * @param value number value for all three numbers
+     * @param value the number value for all three components (d1, d2, d3)
      */
     public Double3(double value) {
         this.d1 = value;
@@ -53,6 +61,14 @@ public class Double3 {
         this.d3 = value;
     }
 
+    /**
+     * Checks if this Double3 object is equal to another object.
+     * Two Double3 objects are considered equal if their components are equal within a tolerance,
+     * using {@link Util#isZero} for floating-point comparisons.
+     *
+     * @param obj the object to compare with
+     * @return true if the object is an instance of Double3 and all components are equal, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -62,90 +78,94 @@ public class Double3 {
                 && isZero(d3 - other.d3);
     }
 
+    /**
+     * Returns a hash code for the Double3 object based on its components.
+     * The hash code is calculated by summing the components and rounding the result.
+     *
+     * @return a hash code for this object
+     */
     @Override
     public int hashCode() {
         return (int) Math.round(d1 + d2 + d3);
     }
 
+    /**
+     * Returns a string representation of the Double3 object in the format "(d1, d2, d3)".
+     *
+     * @return a string representation of the Double3 object
+     */
     @Override
     public String toString() {
         return "(" + d1 + "," + d2 + "," + d3 + ")";
     }
 
     /**
-     * Sum two floating point triads into a new triad where each couple of numbers
-     * is summarized
+     * Adds two Double3 objects component-wise and returns a new Double3 object with the result.
      *
-     * @param rhs right-hand side operand for addition
-     * @return result of adding
+     * @param rhs the right-hand side operand for addition
+     * @return a new Double3 object representing the result of the addition
      */
     public Double3 add(Double3 rhs) {
         return new Double3(d1 + rhs.d1, d2 + rhs.d2, d3 + rhs.d3);
     }
 
     /**
-     * Subtract two floating point triads into a new triad where each couple of
-     * numbers is subtracted
+     * Subtracts one Double3 object from another component-wise and returns a new Double3 object with the result.
      *
-     * @param rhs right-hand side operand for addition
-     * @return result of adding
+     * @param rhs the right-hand side operand for subtraction
+     * @return a new Double3 object representing the result of the subtraction
      */
     public Double3 subtract(Double3 rhs) {
         return new Double3(d1 - rhs.d1, d2 - rhs.d2, d3 - rhs.d3);
     }
 
     /**
-     * Scale (multiply) floating point triad by a number into a new triad where
-     * each
-     * number is multiplied by the number
+     * Scales (multiplies)
+     * the components of this Double3 object by a scalar value and returns a new Double3 object with the result.
      *
-     * @param rhs right-hand side operand for scaling
-     * @return result of scale
+     * @param rhs the scalar value to multiply with
+     * @return a new Double3 object representing the scaled vector
      */
     public Double3 scale(double rhs) {
         return new Double3(d1 * rhs, d2 * rhs, d3 * rhs);
     }
 
     /**
-     * Reduce (divide) floating point triad by a number into a new triad where each
-     * number is divided by the number
+     * Reduces (divides)
+     * the components of this Double3 object by a scalar value and returns a new Double3 object with the result.
      *
-     * @param rhs right-hand side operand for reducing
-     * @return result of scale
+     * @param rhs the scalar value to divide by
+     * @return a new Double3 object representing the reduced vector
      */
     public Double3 reduce(double rhs) {
         return new Double3(d1 / rhs, d2 / rhs, d3 / rhs);
     }
 
     /**
-     * Product two floating point triads into a new triad where each couple of
-     * numbers is multiplied
+     * Multiplies two Double3 objects component-wise and returns a new Double3 object with the result.
      *
-     * @param rhs right-hand side operand for product
-     * @return result of product
+     * @param rhs the right-hand side operand for multiplication
+     * @return a new Double3 object representing the result of the multiplication
      */
     public Double3 product(Double3 rhs) {
         return new Double3(d1 * rhs.d1, d2 * rhs.d2, d3 * rhs.d3);
     }
 
     /**
-     * Checks whether all the numbers are lower than a test number
+     * Checks if all components of this Double3 object are less than a specified value.
      *
-     * @param k the test number
-     * @return true if all the numbers are less than k, false otherwise
+     * @param k the value to compare the components to
+     * @return true if all components are less than the specified value, false otherwise
      */
-
     public boolean lowerThan(double k) {
         return d1 < k && d2 < k && d3 < k;
     }
 
     /**
-     * Checks whether all the numbers are lower than three numbers in another triad
+     * Checks if all components of this Double3 object are less than the corresponding components in another Double3 object.
      *
-     * @param other another triad
-     * @return true if all the numbers are less that appropriate numbers in
-     * another
-     * triad, false otherwise
+     * @param other the other Double3 object to compare with
+     * @return true if all components of this object are less than those in the other object, false otherwise
      */
     public boolean lowerThan(Double3 other) {
         return d1 < other.d1 && d2 < other.d2 && d3 < other.d3;

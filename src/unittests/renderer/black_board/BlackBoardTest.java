@@ -1,12 +1,15 @@
 package renderer.black_board;
 
+import geometries.Sphere;
+import lighting.AmbientLight;
+import lighting.PointLight;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import primitives.Double2;
-import primitives.Point;
-import primitives.Vector;
+import primitives.*;
+import renderer.Camera;
 import renderer.QualityLevel;
 import renderer.super_sampling.Blackboard;
+import scene.Scene;
 
 import java.util.Arrays;
 
@@ -126,7 +129,7 @@ public class BlackBoardTest {
     @Test
     public void testRotatePointsOnSphere() {
 
-        Point[] points = Blackboard.getSpherePoints(center2, 3, normal, QualityLevel.HIGH);
+        Point[] points = Blackboard.getHalfSpherePoints(center2, 3, normal, QualityLevel.HIGH);
 
         // Test case 1: Rotate from up to down
 
@@ -143,13 +146,51 @@ public class BlackBoardTest {
 
 
     private void testRotation(Point[] points, Vector from, Vector to, Point center) {
-        Point[] expectedPoints = Blackboard.getSpherePoints(center, 3, to, QualityLevel.HIGH);
+        Point[] expectedPoints = Blackboard.getHalfSpherePoints(center, 3, to, QualityLevel.HIGH);
         Point[] actualPoints = Blackboard.rotatePointsOnSphere(points, from, to, center);
 
         // Sort the arrays
         sortPoints(expectedPoints);
         sortPoints(actualPoints);
         assertArrayEquals(expectedPoints, actualPoints, "Sphere points rotation is incorrect.");
+    }
+
+
+    @Test
+    public void visualFibonacciSphere() {
+        Scene scene = new Scene("fibonacciSphere");
+
+        double div = 100;
+
+        Material materialRed = new Material().setKs(new Double3(2)).setKd(new Double3(175/div, 255/div, 30/div)).setShininess(30);
+        Material materialBlue = new Material().setKs(new Double3(2)).setKd(new Double3(2, 2, 2)).setShininess(30).setEmission(new Color(50, 50, 100));
+
+        scene.geometries.add(new Sphere(20, Point.ZERO).setMaterial(materialRed));
+
+        Point[] sphereSampled = Blackboard.generateFibonacciSphere(Point.ZERO, 20, 10000);
+
+        for (Point spherePoint : sphereSampled)
+            scene.geometries.add(new Sphere(0.1, spherePoint).setMaterial(materialBlue));
+
+        //scene.ambientLight = new AmbientLight(new Color(java.awt.Color.WHITE), 0.2);
+
+        PointLight pointLight = new PointLight(new Color(50, 50, 50), new Point(1560, 0, 0));
+
+        scene.lights.add(pointLight);
+
+        Camera.Builder camaraBuilder = Camera.builder()
+                .setPosition(new Point(100, 0, 0))
+                .setOrientation(Point.ZERO, Vector.UNIT_Z)
+                .setViewPlaneSize(25, 25)
+                .setResolution(2560, 2560)
+                .setViewPlaneDistance(50)
+                .setScene(scene)
+                .enableBVH(true)
+                .setImageName("fibonacciSphere")
+                .enableParallelStreams(true);
+
+        camaraBuilder.build().renderImage().writeToImage();
+
     }
 
 

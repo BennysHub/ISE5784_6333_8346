@@ -271,7 +271,7 @@ class VectorTest {
 
         // TC02: Rejecting from a non-parallel, non-perpendicular vector where 90 < x < 180 degrees
         rejection = v1.reject(v6);
-        Vector expectedRejectionTC02 = v1.subtract(new Vector(1,0,0)); // Since they are collinear but in opposite directions
+        Vector expectedRejectionTC02 = v1.subtract(new Vector(1, 0, 0)); // Since they are collinear but in opposite directions
         assertEquals(expectedRejectionTC02, rejection, "Rejection from a vector where 90 < angle < 180 degrees did not match the expected vector.");
 
         // =============== Boundary Values Tests ==================
@@ -283,7 +283,7 @@ class VectorTest {
         assertThrows(IllegalArgumentException.class, () -> v1.reject(v2), "Rejection from a parallel opposite vector should throw an exception.");
 
         // TC13: Rejecting from a perpendicular vector
-        assertThrows(IllegalArgumentException.class, () -> v1.reject(v3), "Rejection from a perpendicular vector should throw an exception.");
+        assertEquals(v1, v1.reject(v3), "Rejection from a perpendicular vector should return original vector.");
 
         // TC14: Rejecting from a non-parallel, non-perpendicular vector
         rejection = v1.reject(v4);

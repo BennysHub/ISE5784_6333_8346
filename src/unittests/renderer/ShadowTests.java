@@ -13,8 +13,8 @@ import primitives.Color;
 import primitives.Material;
 import primitives.Point;
 import primitives.Vector;
-import scene.JsonSceneParser;
 import scene.Scene;
+import scene.SceneJsonParser;
 
 import static java.awt.Color.*;
 
@@ -31,13 +31,13 @@ public class ShadowTests {
     /**
      * Camera builder of the tests
      */
-    private final Camera.Builder camera = Camera.getBuilder()
-            .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
-            .setLocation(new Point(0, 0, 1000))
-            .setVpDistance(1000)
-            .setVpSize(162, 288)
-            .setSoftShadows(false)
-            .setAntiAliasing(false)
+    private final Camera.Builder camera = Camera.builder()
+            .setOrientation(new Vector(0, 0, -1), new Vector(0, 1, 0))
+            .setPosition(new Point(0, 0, 1000))
+            .setViewPlaneDistance(1000)
+            .setViewPlaneSize(162, 288)
+            .enableSoftShadows(false)
+            .enableAntiAliasing(false)
             .setScene(scene);
 
     /**
@@ -155,19 +155,19 @@ public class ShadowTests {
     @Test
     @Disabled("not good")
     public void stlShadow() {
-        Scene scene = new JsonSceneParser("src/unittests/renderer/json/stlJson.json", "Test Scene");
+        Scene scene = new SceneJsonParser("src/unittests/renderer/json/stlJson.json", "Test Scene");
 
         scene.lights.add(new PointLight(new Color(255, 255, 255).reduce(2), new Point(20, 15, 300)));
         scene.lights.add(new DirectionalLight(new Color(255, 255, 255).reduce(2), new Vector(-0.3, -0.3, 0)));
-        scene.lights.add(new SpotLight(new Color(YELLOW), new Point(0, 100, 0), new Vector(0, -1, 0)).setNarrowBeam(3));
+        scene.lights.add(new SpotLight(new Color(YELLOW), new Point(0, 100, 0), new Vector(0, -1, 0)).setBeamFocus(3));
 
-        Camera.Builder camera = Camera.getBuilder()
-                .setDirection(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
-                .setLocation(new Point(0, 220, 1000)).setVpDistance(1000)
-                .setVpSize(200, 200)
+        Camera.Builder camera = Camera.builder()
+                .setOrientation(new Vector(0, -0.2, -1), new Vector(0, 1, -0.2))
+                .setPosition(new Point(0, 220, 1000)).setViewPlaneDistance(1000)
+                .setViewPlaneSize(200, 200)
                 .setScene(scene);
 
-        camera.setResolution( 600, 600)
+        camera.setResolution(600, 600)
                 .setImageName("stlTurnaround/stlShadow")
                 .build()
                 .renderImage()

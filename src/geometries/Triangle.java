@@ -1,6 +1,7 @@
 package geometries;
 
 import primitives.Point;
+import primitives.Quaternion;
 import primitives.Ray;
 import primitives.Vector;
 
@@ -11,133 +12,146 @@ import static primitives.Util.isZero;
 
 /**
  * Represents a triangle in 3D space, defined by three vertices.
- * Inherits all properties and methods from the Polygon class.
+ * Inherits properties and methods from the {@link Polygon} class,
+ * providing additional implementations for geometry-specific operations
+ * like translation, rotation, and scaling.
+ *
+ * <p>The triangle is a fundamental geometry and is often used
+ * in rendering pipelines, collision detection, and 3D modeling.</p>
  *
  * @author Benny Avrahami
  */
 public class Triangle extends Polygon {
 
     /**
-     * Constructor for Triangle that accepts three Point objects.
+     * Constructs a Triangle with the specified three vertices.
      *
-     * @param p1 The first vertex of the triangle.
-     * @param p2 The second vertex of the triangle.
-     * @param p3 The third vertex of the triangle.
+     * @param vertex1 The first vertex of the triangle.
+     * @param vertex2 The second vertex of the triangle.
+     * @param vertex3 The third vertex of the triangle.
      */
-    public Triangle(Point p1, Point p2, Point p3) {
-        // Call the constructor of the superclass Polygon with exactly three points
-        super(p1, p2, p3);
+    public Triangle(Point vertex1, Point vertex2, Point vertex3) {
+        super(vertex1, vertex2, vertex3);
     }
 
-
-    @Override
-    protected Intersectable duplicateObjectHelper(Vector vector) {
-        return new Triangle(vertices.getFirst().add(vector), vertices.get(1).add(vector), vertices.get(2).add(vector)).setMaterial(this.getMaterial());
-    }
-
+    /**
+     * Calculates the Axis-Aligned Bounding Box (AABB) for the triangle.
+     * The AABB is a box that tightly bounds the triangle.
+     */
     @Override
     protected void calculateAABBHelper() {
-        Point p1 = vertices.getFirst();
-        Point p2 = vertices.get(1);
-        Point p3 = vertices.get(2);
-        double minX = Math.min(p1.getX(), Math.min(p2.getX(), p3.getX()));
-        double minY = Math.min(p1.getY(), Math.min(p2.getY(), p3.getY()));
-        double minZ = Math.min(p1.getZ(), Math.min(p2.getZ(), p3.getZ()));
+        Point v0 = polygonVertices[0];
+        Point v1 = polygonVertices[1];
+        Point v2 = polygonVertices[2];
 
-        double maxX = Math.max(p1.getX(), Math.max(p2.getX(), p3.getX()));
-        double maxY = Math.max(p1.getY(), Math.max(p2.getY(), p3.getY()));
-        double maxZ = Math.max(p1.getZ(), Math.max(p2.getZ(), p3.getZ()));
+        // Compute minimum and maximum bounds along each axis
+        double minX = Math.min(v0.getX(), Math.min(v1.getX(), v2.getX()));
+        double minY = Math.min(v0.getY(), Math.min(v1.getY(), v2.getY()));
+        double minZ = Math.min(v0.getZ(), Math.min(v1.getZ(), v2.getZ()));
 
+        double maxX = Math.max(v0.getX(), Math.max(v1.getX(), v2.getX()));
+        double maxY = Math.max(v0.getY(), Math.max(v1.getY(), v2.getY()));
+        double maxZ = Math.max(v0.getZ(), Math.max(v1.getZ(), v2.getZ()));
+
+        // Create the AABB using min and max points
         Point min = new Point(minX, minY, minZ);
         Point max = new Point(maxX, maxY, maxZ);
         aabb = new AABB(min, max);
     }
 
-
+    /**
+     * Finds the intersections of a given ray with this triangle.
+     *
+     * @param ray         The ray to intersect with the triangle.
+     * @param maxDistance The maximum distance for valid intersections.
+     * @return A list of intersection points (if any), or {@code null} if no intersections exist.
+     */
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
-        // Extract relevant information from the input
-        Vector rayDirection = ray.getDirection(); // Direction vector of the ray
-        Point rayOrigin = ray.getOrigin(); // Origin point of the ray
-        Point vertex0 = vertices.getFirst(); // First vertex of the triangle
+        Vector direction = ray.getDirection();
+        Point origin = ray.getOrigin();
 
-        // Check if the ray direction is parallel to the triangle's plane
-        if (isZero(this.plane.getNormal().dotProduct(rayDirection)) || rayOrigin.equals(vertex0))
-            // If parallel or starting from the vertex, no intersection
+        Point v0 = polygonVertices[0];
+        Point v1 = polygonVertices[1];
+        Point v2 = polygonVertices[2];
+
+        // Check if the ray is parallel to the triangle's plane
+        if (isZero(polygonPlane.getNormal().dotProduct(direction)) || origin.equals(v0)) {
             return null;
+        }
 
-        // Retrieve the other two vertices of the triangle
-        Point vertex1 = vertices.get(1);
-        Point vertex2 = vertices.get(2);
+        // Compute edges and determinant
+        Vector edge01 = v1.subtract(v0);
+        Vector edge02 = v2.subtract(v0);
+        Vector directionCrossEdge02 = direction.crossProduct(edge02);
+        double det = edge01.dotProduct(directionCrossEdge02);
 
-        // Compute-edge vectors
-        Vector edge1 = vertex1.subtract(vertex0); // Edge from vertex0 to vertex1
-        Vector edge2 = vertex2.subtract(vertex0); // Edge from vertex0 to vertex2
+        if (isZero(det)) return null; // Ray is parallel to the triangle
+        double invDet = 1d / det;
 
-        // Compute the cross-product of a ray direction and edge2
-        Vector rayCrossEdge2 = rayDirection.crossProduct(edge2);
+        // Compute barycentric coordinates
+        Vector originToV0 = origin.subtract(v0);
+        double u = invDet * originToV0.dotProduct(directionCrossEdge02);
+        if (alignZero(u) <= 0 || alignZero(u - 1d) >= 0) return null;
 
-        // Calculate the determinant (used for inverse determinant later)
-        double det = rayCrossEdge2.dotProduct(edge1);
-        double invDet = 1d / det; // Inverse determinant
+        Vector originToV0CrossEdge01 = originToV0.crossProduct(edge01);
+        double v = invDet * direction.dotProduct(originToV0CrossEdge01);
+        if (alignZero(v) <= 0 || alignZero(u + v - 1d) >= 0) return null;
 
-        // Compute vector 's' from ray origin to vertex0
-        Vector s = rayOrigin.subtract(vertex0);
-        // Calculate barycentric coordinate 'u'
-        double u = invDet * s.dotProduct(rayCrossEdge2);
+        // Compute t parameter
+        double t = invDet * edge02.dotProduct(originToV0CrossEdge01);
 
-        // Check if 'u' is within valid range (0, 1)
-        if (alignZero(u) <= 0 || alignZero(u - 1d) >= 0)
-            // Outside valid range, no intersection
-            return null;
-
-        // Compute vector 'q' (cross product of 's' and edge1)
-        Vector q = s.crossProduct(edge1);//TODO possible vector zero?
-        // Calculate barycentric coordinate 'v'
-        double v = invDet * rayDirection.dotProduct(q);
-
-        // Check if 'v' is within valid range (0, 1) and u + v < 1
-        if (alignZero(v) <= 0 || alignZero(u + v - 1d) >= 0)
-            // Outside valid range, no intersection
-            return null;
-
-        // Compute parameter "t" to find the intersection point on the line
-        double t = invDet * edge2.dotProduct(q);
+        // Check if t is within the valid range
         return alignZero(t) > 0 && alignZero(t - maxDistance) < 0
-                // Ray intersection: Compute the actual intersection point
                 ? List.of(new GeoPoint(this, ray.getPoint(t)))
-                // Line intersection but not a ray intersection
                 : null;
     }
 
-
+    /**
+     * Translates the triangle by a given translation vector.
+     *
+     * @param translationVector The vector by which to translate the triangle.
+     * @return A new {@code Triangle} instance representing the translated triangle.
+     */
     @Override
-    public Geometry move(Vector translation) {
-        return new Triangle(vertices.getFirst().add(translation), vertices.get(1).add(translation), vertices.get(2).add(translation));
+    protected Geometry translateHelper(Vector translationVector) {
+        return new Triangle(
+                polygonVertices[0].add(translationVector),
+                polygonVertices[1].add(translationVector),
+                polygonVertices[2].add(translationVector)
+        );
     }
 
+    /**
+     * Rotates the triangle around a specified axis by a given angle.
+     *
+     * @param axis             The axis of rotation.
+     * @param angleInRadians   The rotation angle in radians.
+     * @return A new {@code Triangle} instance representing the rotated triangle.
+     */
     @Override
-    public Geometry scale(Vector scale) {
-         return null;
+    protected Geometry rotateHelper(Vector axis, double angleInRadians) {
+        Quaternion rotation = Quaternion.fromAxisAngle(axis, angleInRadians);
+
+        return new Triangle(
+                rotation.rotate(polygonVertices[0].toVector()),
+                rotation.rotate(polygonVertices[1].toVector()),
+                rotation.rotate(polygonVertices[2].toVector())
+        );
     }
 
+    /**
+     * Scales the triangle by a given scale vector.
+     *
+     * @param scale The scale vector containing scaling factors for each axis.
+     * @return A new {@code Triangle} instance representing the scaled triangle.
+     */
     @Override
-    public Geometry rotate(Vector rotation) {
-        return null;
-    }
-
-    @Override
-    public Geometry moveX(double dx) {
-        return move(new Vector(dx, 0, 0));
-    }
-
-    @Override
-    public Geometry moveY(double dy) {
-        return move(new Vector(0, dy, 0));
-    }
-
-    @Override
-    public Geometry moveZ(double dz) {
-        return move(new Vector(0, 0, dz));
+    protected Geometry scaleHelper(Vector scale) {
+        return new Triangle(
+                polygonVertices[0].scale(scale),
+                polygonVertices[1].scale(scale),
+                polygonVertices[2].scale(scale)
+        );
     }
 }

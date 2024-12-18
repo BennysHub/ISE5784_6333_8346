@@ -57,19 +57,19 @@ public class LightsTests {
     /**
      * First camera builder for some tests
      */
-    private final Camera.Builder camera1 = Camera.getBuilder()
+    private final Camera.Builder camera1 = Camera.builder()
             .setScene(scene1)
-            .setLocation(new Point(0, 0, 1000))
-            .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
-            .setVpSize(150, 150).setVpDistance(1000);
+            .setPosition(new Point(0, 0, 1000))
+            .setOrientation(new Vector(0, 0, -1), new Vector(0, 1, 0))
+            .setViewPlaneSize(150, 150).setViewPlaneDistance(1000);
     /**
      * Second camera builder for some tests
      */
-    private final Camera.Builder camera2 = Camera.getBuilder()
+    private final Camera.Builder camera2 = Camera.builder()
             .setScene(scene2)
-            .setLocation(new Point(0, 0, 1000))
-            .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
-            .setVpSize(200, 200).setVpDistance(1000);
+            .setPosition(new Point(0, 0, 1000))
+            .setOrientation(new Vector(0, 0, -1), new Vector(0, 1, 0))
+            .setViewPlaneSize(200, 200).setViewPlaneDistance(1000);
     /**
      * Material for some geometries in the tests
      */
@@ -178,7 +178,7 @@ public class LightsTests {
         scene1.lights.add(new SpotLight(sphereLightColor, sphereLightPosition, sphereLightDirection)
                 .setKl(0.001).setKq(0.0001));
 
-        camera1.setResolution( 500, 500)
+        camera1.setResolution(500, 500)
                 .setImageName("lightSphereSpot")
                 .build()
                 .renderImage()
@@ -193,7 +193,7 @@ public class LightsTests {
         scene2.geometries.add(triangle1, triangle2);
         scene2.lights.add(new DirectionalLight(trianglesLightColor, trianglesLightDirection));
 
-        camera2.setResolution( 500, 500)
+        camera2.setResolution(500, 500)
                 .setImageName("lightTrianglesDirectional")
                 .build()
                 .renderImage()
@@ -209,7 +209,7 @@ public class LightsTests {
         scene2.lights.add(new PointLight(trianglesLightColor, trianglesLightPosition)
                 .setKl(0.001).setKq(0.0002));
 
-        camera2.setResolution( 500, 500)
+        camera2.setResolution(500, 500)
                 .setImageName("lightTrianglesPoint")
                 .build()
                 .renderImage()
@@ -246,7 +246,7 @@ public class LightsTests {
                         new DirectionalLight(trianglesLightColor.reduce(5), trianglesLightDirection),
                         new PointLight(trianglesLightColor, trianglesLightPosition.subtract(new Point(25, 25, 10))).setKl(0.0020).setKq(0.0008)));
 
-        camera2.setResolution( 500, 500)
+        camera2.setResolution(500, 500)
                 .setImageName("allLightsTriangles")
                 .build()
                 .renderImage()
@@ -282,10 +282,10 @@ public class LightsTests {
     public void sphereSpotSharp() {
         scene1.geometries.add(sphere);
         scene1.lights
-                .add(new SpotLight(sphereLightColor, sphereLightPosition, new Vector(1, 1, -0.5)).setNarrowBeam(10)
+                .add(new SpotLight(sphereLightColor, sphereLightPosition, new Vector(1, 1, -0.5)).setBeamFocus(10)
                         .setKl(0.001).setKq(0.00004));
 
-        camera1.setResolution( 500, 500)
+        camera1.setResolution(500, 500)
                 .setImageName("lightSphereSpotSharp")
                 .build()
                 .renderImage()
@@ -298,11 +298,11 @@ public class LightsTests {
     @Test
     public void trianglesSpotSharp() {
         scene2.geometries.add(triangle1, triangle2);
-        scene2.lights.add(new SpotLight(trianglesLightColor, trianglesLightPosition, trianglesLightDirection).setNarrowBeam(10)
+        scene2.lights.add(new SpotLight(trianglesLightColor, trianglesLightPosition, trianglesLightDirection).setBeamFocus(10)
                 .setKl(0.001).setKq(0.00004));
 
 
-        camera2.setResolution( 500, 500)
+        camera2.setResolution(500, 500)
                 .setImageName("lightTrianglesSpotSharp")
                 .build()
                 .renderImage()

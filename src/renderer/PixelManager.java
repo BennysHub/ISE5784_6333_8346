@@ -3,7 +3,7 @@ package renderer;
 /**
  * PixelManager is a helper class. It is used for multi-threading in the
  * renderer and
- * for follow up its progress.<br/>
+ * to follow up its progress.<br/>
  * A Camera uses one pixel manager object and several Pixel objects - one in
  * each thread.
  *
@@ -14,6 +14,16 @@ class PixelManager {
      * Printing format
      */
     private static final String PRINT_FORMAT = "%5.1f%%\r";
+    /**
+     * Mutual exclusion object for synchronizing next pixel allocation between
+     * threads
+     */
+    private final Object mutexNext = new Object();
+    /**
+     * Mutual exclusion object for printing progress percentage in a console window
+     * by different threads
+     */
+    private final Object mutexPixels = new Object();
     /**
      * Maximum rows of pixels
      */
@@ -26,7 +36,6 @@ class PixelManager {
      * Total number of pixels in the generated image
      */
     private long totalPixels = 0L;
-
     /**
      * Currently processed row of pixels
      */
@@ -43,7 +52,6 @@ class PixelManager {
      * Last printed progress update percentage
      */
     private volatile int lastPrinted = 0;
-
     /**
      * Flag of debug printing progress percentage
      */
@@ -52,16 +60,6 @@ class PixelManager {
      * Progress percentage printing interval
      */
     private long printInterval = 100L;
-    /**
-     * Mutual exclusion object for synchronizing next pixel allocation between
-     * threads
-     */
-    private final Object mutexNext = new Object();
-    /**
-     * Mutual exclusion object for printing progress percentage in a console window
-     * by different threads
-     */
-    private final Object mutexPixels = new Object();
 
     /**
      * Initialize pixel manager data for multi-threading
@@ -80,7 +78,7 @@ class PixelManager {
     }
 
     /**
-     * Function for thread-safe manipulating of main follow-up Pixel object - this
+     * Function for thread-safe manipulating of the main follow-up Pixel object - this
      * function is a critical section for all the threads, and the pixel manager data
      * is the shared data of this critical section.<br/>
      * The function provides the next available pixel number for each call.

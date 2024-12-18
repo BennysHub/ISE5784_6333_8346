@@ -8,7 +8,7 @@
     "geometries": {
       "mesh": [
         {
-          "path": "src/unittests/renderer/snowGlobeStl/snowGlobeBase.stl",
+          "path": "src/unittests_resources/snowGlobeStl/snowGlobeBase.stl",
           "scale": 10,
           "material": {
             "kD": "0.271 0.184 0.027",
@@ -17,7 +17,7 @@
           }
         },
         {
-          "path": "src/unittests/renderer/snowGlobeStl/snowGlobeHouse.stl",
+          "path": "src/unittests_resources/snowGlobeStl/snowGlobeHouse.stl",
           "scale": 10,
           "no-emission": "0 216 230",
           "material": {
@@ -27,27 +27,27 @@
           }
         },
         {
-          "path": "src/unittests/renderer/snowGlobeStl/snowGlobeRoof.stl",
+          "path": "src/unittests_resources/snowGlobeStl/snowGlobeRoof.stl",
           "scale": 10,
           "no-emission": "0 216 230",
           "material": {
-            "kD": "0.8 0.263 0.145",
+            "kD": "0.7 0 0",
             "kS": 0.1,
             "shininess": 15
           }
         },
         {
-          "path": "src/unittests/renderer/snowGlobeStl/snowGlobeTreeTop.stl",
+          "path": "src/unittests_resources/snowGlobeStl/snowGlobeTreeTop.stl",
           "scale": 10,
           "no-emission": "0 216 230",
           "material": {
-            "kD": "0.216 0.471 0.071",
+            "kD": "0.05 0.320 0.02",
             "kS": 0.1,
             "shininess": 15
           }
         },
         {
-          "path": "src/unittests/renderer/snowGlobeStl/snowGlobeTreeTrunk.stl",
+          "path": "src/unittests_resources/snowGlobeStl/snowGlobeTreeTrunk.stl",
           "scale": 10,
           "no-emission": "0 216 230",
           "material": {
@@ -62,31 +62,66 @@
           "center": "0 40 0",
           "radius": "60",
           "material": {
-            "kD": 0,
-            "kS": 0.9,
+            "kD": 0.05,
+            "kS": 0.1,
             "kT": 0.9,
-            "kR": 0.2,
+            "kR": 0.1,
             "shininess": 30
           }
         }
       ]
     },
     "lights": {
-      "PointLight": [
+      "pointLight": [
         {
-          "intensity": "255 255 255 3",
-          "position": "-28.5 27 -3",
-          "size": 8
+          "intensity": "255 255 255 0.5",
+          "position": "200 80 -200",
+          "size": 4,
+          "kC": 0,
+          "kL": 0.001,
+          "kQ": 0.00001
         },
         {
-          "intensity": "255 255 255 1",
-          "position": "3 27 -33"
+          "intensity": "255 255 255 0.5",
+          "position": "-200 80 200",
+          "size": 4,
+          "kC": 0,
+          "kL": 0.001,
+          "kQ": 0.00001
+        },
+        {
+          "intensity": "255 255 255 0.5",
+          "position": "-200 80 -200",
+          "size": 4,
+          "kC": 0,
+          "kL": 0.001,
+          "kQ": 0.00001
+        },
+        {
+          "intensity": "255 255 255 0.5",
+          "position": "200 80 200",
+          "size": 4,
+          "kC": 0,
+          "kL": 0.001,
+          "kQ": 0.00001
         }
       ],
-      "directionalLight": [
+      "directionalLight-off": [
+        {
+          "intensity": "150 150 150 1",
+          "direction": "0 -1 0"
+        }
+      ],
+      "spotLight": [
         {
           "intensity": "255 255 255 1",
-          "direction": "-1 -1 0"
+          "position": "0 150 0",
+          "direction": "0 -1 0",
+          "size": 4,
+          "kC": 0,
+          "kL": 0.001,
+          "kQ": 0.00001,
+          "sampleQuality": "low"
         }
       ]
     }
