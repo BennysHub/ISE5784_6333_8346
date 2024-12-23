@@ -59,9 +59,9 @@ public class Geometries implements Intersectable {
      * Builds the BVH (Bounding Volume Hierarchy) for the geometries in this collection.
      * Uses the Surface Area Heuristic (SAH) method for optimal node splitting.
      */
-    public void buildBVH() {
+    public void buildBVH(BVHNode.BVHBuildMethod bvhBuildMethod) {
         if (!geometries.isEmpty()) {
-            bvhRoot = new BVHNode(geometries, BVHNode.BVHBuildMethod.LINEAR_BVH);
+            bvhRoot = new BVHNode(geometries, bvhBuildMethod);
         }
     }
 
@@ -107,11 +107,12 @@ public class Geometries implements Intersectable {
      *
      * @param translationVector The vector by which to translate the geometries.
      */
-    public void translate(Vector translationVector) {
+    public Geometries translate(Vector translationVector) {
         Geometries newGeometries = new Geometries();
         for (Geometry geometry : geometries) {
             newGeometries.add(geometry.translate(translationVector));
         }
+        return newGeometries;
     }
 
     /**
@@ -121,7 +122,7 @@ public class Geometries implements Intersectable {
      * @param axis             The axis of rotation.
      * @param angleInRadians   The angle of rotation in radians.
      */
-    public void rotate(Vector axis, double angleInRadians) {
+    public Geometries rotate(Vector axis, double angleInRadians) {
         calculateAABB(); // Ensure the AABB is calculated to find the center
         Point center = getGeometriesCenter();
 
@@ -137,6 +138,7 @@ public class Geometries implements Intersectable {
                             .translate(backToOriginalPosition)
             );
         }
+        return newGeometries;
     }
 
     /**
@@ -144,11 +146,12 @@ public class Geometries implements Intersectable {
      *
      * @param scale The scaling vector containing factors for each axis.
      */
-    public void scale(Vector scale) {
+    public Geometries scale(Vector scale) {
         Geometries newGeometries = new Geometries();
         for (Geometry geometry : geometries) {
             newGeometries.add(geometry.scale(scale));
         }
+        return newGeometries;
     }
 
     /**

@@ -39,8 +39,8 @@ public class Plane extends Geometry {
      * @throws IllegalArgumentException If the points are collinear or not distinct.
      */
     public Plane(Point p1, Point p2, Point p3) {
-        Vector edge1 = p2.subtract(p1);
-        Vector edge2 = p3.subtract(p1);
+        Vector edge1 = p2.subtract(p1);// TODO: vector zero case
+        Vector edge2 = p3.subtract(p1);// TODO: vector zero case
 
         // Cross-product of edges to compute the normal vector
         Vector normalCandidate = edge1.crossProduct(edge2);
@@ -113,7 +113,7 @@ public class Plane extends Geometry {
         }
 
         // Compute the t parameter for the intersection point
-        double t = normalVector.dotProduct(referencePoint.subtract(rayOrigin)) / normalDotDirection;
+        double t = normalVector.dotProduct(referencePoint.subtract(rayOrigin)) / normalDotDirection;// TODO: vector zero case
 
         // Check if the intersection point lies beyond the ray's origin or within maxDistance
         return alignZero(t) > 0 && alignZero(t - maxDistance) < 0

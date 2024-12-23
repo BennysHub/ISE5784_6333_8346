@@ -1,5 +1,7 @@
 package renderer;
 
+import geometries.BVHNode;
+
 /**
  * The {@code RenderSettings} class contains configuration settings for rendering operations.
  * These settings control various features like shadows, antialiasing, depth of field,
@@ -59,7 +61,7 @@ public class RenderSettings {
     /**
      * The maximum recursion level for color calculations.
      */
-    static public final int MAX_CALC_COLOR_LEVEL = 5;
+    static public final int MAX_CALC_COLOR_LEVEL = 4;
     /**
      * The minimum value for the reflection/refraction coefficient in color calculations.
      */
@@ -73,7 +75,9 @@ public class RenderSettings {
      * Indicates whether BVH is enabled.
      */
     static boolean BVHIsEnabled = false;
-    static boolean SAHIsEnabled = false;
+
+    static BVHNode.BVHBuildMethod bvhBuildMethod = BVHNode.BVHBuildMethod.MEDIAN_SPLIT;
+
     static boolean CBRIsEnabled = false;
     /**
      * Indicates whether soft shadows are enabled.

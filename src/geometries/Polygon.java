@@ -67,8 +67,8 @@ public class Polygon extends Geometry {
         }
 
         Vector polygonNormal = polygonPlane.getNormal();
-        Vector previousEdge = vertices[vertices.length - 1].subtract(vertices[vertices.length - 2]);
-        Vector currentEdge = vertices[0].subtract(vertices[vertices.length - 1]);
+        Vector previousEdge = vertices[vertices.length - 1].subtract(vertices[vertices.length - 2]);// TODO: vector zero case
+        Vector currentEdge = vertices[0].subtract(vertices[vertices.length - 1]);// TODO: vector zero case
 
         // Determine if the polygon is convex by checking edge orientation
         boolean isConvexDirectionPositive = previousEdge.crossProduct(currentEdge).dotProduct(polygonNormal) > 0;
@@ -102,7 +102,7 @@ public class Polygon extends Geometry {
     @Override
     protected Geometry rotateHelper(Vector axis, double angleInRadians) {
         Quaternion rotation = Quaternion.fromAxisAngle(axis, angleInRadians);
-        return new Polygon(Arrays.stream(polygonVertices).map(point ->  rotation.rotate(point.toVector())).toArray(Point[]::new));
+        return new Polygon(Arrays.stream(polygonVertices).map(rotation::rotate).toArray(Point[]::new));
     }
 
     @Override

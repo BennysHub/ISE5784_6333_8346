@@ -8,7 +8,6 @@ import primitives.Vector;
 import java.util.List;
 
 import static primitives.Util.alignZero;
-import static primitives.Util.isZero;
 
 /**
  * Represents a triangle in 3D space, defined by three vertices.
@@ -32,7 +31,17 @@ public class Triangle extends Polygon {
      */
     public Triangle(Point vertex1, Point vertex2, Point vertex3) {
         super(vertex1, vertex2, vertex3);
+
+        Point v0 = polygonVertices[0];
+        Point v1 = polygonVertices[1];
+        Point v2 = polygonVertices[2];
+
+        edge01 = v1.subtract(v0);
+        edge02 = v2.subtract(v0);
     }
+
+    Vector edge01;
+    Vector edge02;
 
     /**
      * Calculates the Axis-Aligned Bounding Box (AABB) for the triangle.
@@ -76,7 +85,7 @@ public class Triangle extends Polygon {
         Point v2 = polygonVertices[2];
 
         // Check if the ray is parallel to the triangle's plane
-        if (isZero(polygonPlane.getNormal().dotProduct(direction)) || origin.equals(v0)) {
+        if (polygonPlane.getNormal().isPerpendicular(direction) || origin.equals(v0)) {// TODO: vector zero case
             return null;
         }
 
@@ -86,7 +95,7 @@ public class Triangle extends Polygon {
         Vector directionCrossEdge02 = direction.crossProduct(edge02);
         double det = edge01.dotProduct(directionCrossEdge02);
 
-        if (isZero(det)) return null; // Ray is parallel to the triangle
+        // if (isZero(det)) return null; // Ray is parallel to the triangle
         double invDet = 1d / det;
 
         // Compute barycentric coordinates
@@ -126,8 +135,8 @@ public class Triangle extends Polygon {
     /**
      * Rotates the triangle around a specified axis by a given angle.
      *
-     * @param axis             The axis of rotation.
-     * @param angleInRadians   The rotation angle in radians.
+     * @param axis           The axis of rotation.
+     * @param angleInRadians The rotation angle in radians.
      * @return A new {@code Triangle} instance representing the rotated triangle.
      */
     @Override
@@ -135,9 +144,9 @@ public class Triangle extends Polygon {
         Quaternion rotation = Quaternion.fromAxisAngle(axis, angleInRadians);
 
         return new Triangle(
-                rotation.rotate(polygonVertices[0].toVector()),
-                rotation.rotate(polygonVertices[1].toVector()),
-                rotation.rotate(polygonVertices[2].toVector())
+                rotation.rotate(polygonVertices[0]),
+                rotation.rotate(polygonVertices[1]),
+                rotation.rotate(polygonVertices[2])
         );
     }
 

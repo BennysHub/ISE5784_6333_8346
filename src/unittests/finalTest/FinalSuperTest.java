@@ -29,7 +29,8 @@ public class FinalSuperTest {
         //scene.geometries.translate(new Vector(0, 0, 50));
        // scene.geometries.scale(new Vector(1, 0, 3));
 
-        //scene.geometries.rotate(Vector.UNIT_Y, Math.PI/4);
+        scene.setGeometries(scene.geometries.rotate(Vector.UNIT_Y, 2 * Math.PI/2));
+
 
         //snow cover
 //        Vector down = new Vector(0, -1, 0);
@@ -47,10 +48,10 @@ public class FinalSuperTest {
                 .setViewPlaneSize(320, 320)
                 .setResolution(1440, 1440)
                 .enableParallelStreams(true)
-                .enableSoftShadows(true)
+                .enableSoftShadows(false)
                 .setSoftShadowsQuality(QualityLevel.MEDIUM)
-                .enableAntiAliasing(false)
-                .setAntiAliasingQuality(QualityLevel.HIGH)
+                .enableAntiAliasing(true)
+                .setAntiAliasingQuality(QualityLevel.LOW)
                 .setScene(scene)
                 .enableBVH(true);
 

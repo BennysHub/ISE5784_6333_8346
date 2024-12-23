@@ -63,7 +63,7 @@ public class Quaternion {
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public Vector rotate(Vector vector) {
+    public Vector rotate(Point vector) {
         Quaternion vectorQuaternion = new Quaternion(0, vector.getX(), vector.getY(), vector.getZ());
         Quaternion result = this.multiply(vectorQuaternion).multiply(this.conjugate());
         return new Vector(result.x, result.y, result.z);

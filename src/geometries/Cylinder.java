@@ -43,7 +43,7 @@ public class Cylinder extends Tube {
         Vector rayDirection = axisRay.getDirection();
 
         // If the point is at the origin of the axis ray
-        if (pointOnSurface.equals(rayOrigin))
+        if (pointOnSurface.equals(rayOrigin))// TODO: vector zero case
             return rayDirection.scale(-1); // Normal vector points opposite to the ray direction
 
         // Vector from the ray's origin to the point on the surface

@@ -47,7 +47,7 @@ public class Vector extends Point {
      */
     public Vector(double c1, double c2, double c3) {
         super(c1, c2, c3);
-        if (xyz.equals(Double3.ZERO)) {
+        if (xyz.equals(Double3.ZERO)) {// TODO: vector zero case
             throw new IllegalArgumentException("Vector Zero is not allowed.");
         }
         this.isNormalized = false;
@@ -172,7 +172,7 @@ public class Vector extends Point {
      * @return the rejection of this vector from the given vector.
      */
     public Vector reject(Vector other) {
-        return other.isPerpendicular(this) ? this : this.subtract(this.project(other));
+        return other.isPerpendicular(this) ? this : this.subtract(this.project(other));// TODO: vector zero case
     }
 
     /**

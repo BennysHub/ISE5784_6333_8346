@@ -67,7 +67,7 @@ public class DOFRendering extends Render {
         Point focalPoint = focalPlane.getPixelCenter(x, y);
 
         // Adjust aperture sample points relative to the pixel center
-        Point[] shiftedAperturePoints = Blackboard.movePoints(apertureSamplePoints, pixelCenter.subtract(viewPlane.center));
+        Point[] shiftedAperturePoints = Blackboard.movePoints(apertureSamplePoints, pixelCenter.subtract(viewPlane.center));// TODO: vector zero case
 
         // Aggregate color contributions from rays
         Color accumulatedColor = Color.BLACK;

@@ -1,7 +1,6 @@
 package renderer;
 
-import geometries.Geometries;
-import lighting.LightSource;
+import geometries.BVHNode;
 import primitives.Color;
 import primitives.Matrix;
 import primitives.Point;
@@ -144,7 +143,7 @@ public class Camera {
          * @return The current {@code Builder} instance for chaining.
          */
         public Builder setOrientation(Point target, Vector up) {
-            this.forward = target.subtract(this.position).normalize();
+            this.forward = target.subtract(this.position).normalize();// TODO: vector zero case
 
             if (up.isParallel(forward)) {
                 throw new IllegalArgumentException("The 'up' vector cannot be parallel to the 'forward' vector.");
@@ -387,6 +386,11 @@ public class Camera {
             return this;
         }
 
+        public Builder setBVHBuildMethod(BVHNode.BVHBuildMethod bvhBuildMethod) {
+            RenderSettings.bvhBuildMethod = bvhBuildMethod;
+            return this;
+        }
+
         public Builder setSoftShadowsQuality(QualityLevel qualityLevel) {
             RenderSettings.softShadowQuality = qualityLevel;
             return this;
@@ -419,8 +423,10 @@ public class Camera {
             if (RenderSettings.antiAliasingEnabled) {
                 switch (RenderSettings.antiAliasingQuality) {
                     case LOW -> renderEngine = new SSAA4X(imageWriter, viewPlane, rayTracer, position);
-                    case MEDIUM -> throw new UnsupportedOperationException("Anti-aliasing quality 'MEDIUM' is not supported.");
-                    case HIGH, ULTRA -> renderEngine = new SuperSamplingAntiAliasing(imageWriter, viewPlane, rayTracer, position);
+                    case MEDIUM ->
+                            throw new UnsupportedOperationException("Anti-aliasing quality 'MEDIUM' is not supported.");
+                    case HIGH, ULTRA ->
+                            renderEngine = new SuperSamplingAntiAliasing(imageWriter, viewPlane, rayTracer, position);
                 }
                 return;
             }
@@ -465,7 +471,7 @@ public class Camera {
             }
 
             if (RenderSettings.BVHIsEnabled && !bvhBuilt) {
-                rayTracer.scene.geometries.buildBVH();
+                rayTracer.scene.geometries.buildBVH(RenderSettings.bvhBuildMethod);
                 bvhBuilt = true;
             }
 

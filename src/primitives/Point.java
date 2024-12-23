@@ -123,15 +123,6 @@ public class Point {
     }
 
     /**
-     * Converts this point to a vector from the origin.
-     *
-     * @return A vector from the origin to this point.
-     */
-    public Vector toVector() {
-        return new Vector(xyz.d1, xyz.d2, xyz.d3);
-    }
-
-    /**
      * Returns a string representation of the Point object in the format (x, y, z).
      *
      * @return A string representing the coordinates of the point.

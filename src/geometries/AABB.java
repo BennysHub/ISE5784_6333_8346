@@ -1,9 +1,12 @@
 package geometries;
 
 import primitives.Point;
+import primitives.Quaternion;
 import primitives.Ray;
+import primitives.Vector;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Represents an Axis-Aligned Bounding Box (AABB) used for bounding volumes in geometric computations.
@@ -18,7 +21,7 @@ import java.util.Collection;
  *
  * @author Benny Avrahami
  */
-public class AABB {
+public class AABB  {
 
     /**
      * The minimum corner of the AABB, representing the smallest x, y, and z coordinates.
@@ -163,7 +166,7 @@ public class AABB {
 
     public Point getCenterPoint() {
         double[] center = getCenter();
-        return new Point (center[0], center[1], center[2]);
+        return new Point(center[0], center[1], center[2]);
     }
 
 
@@ -243,4 +246,6 @@ public class AABB {
         var lengthOfAxis = max.subtract(min);
         return new double[]{lengthOfAxis.getX(), lengthOfAxis.getY(), lengthOfAxis.getZ()};
     }
+
+
 }

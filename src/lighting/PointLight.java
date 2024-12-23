@@ -169,6 +169,6 @@ public class PointLight extends LightSource {
      */
     @Override
     public Vector computeDirection(Point targetPoint, Point lightSourcePoint) {
-        return targetPoint.subtract(lightSourcePoint).normalize();
+        return targetPoint.subtract(lightSourcePoint).normalize();// TODO: vector zero case
     }
 }
