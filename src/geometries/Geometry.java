@@ -1,44 +1,40 @@
 package geometries;
 
-import primitives.Material;
-import primitives.Point;
-import primitives.Ray;
-import primitives.Vector;
+import primitives.*;
 
 import java.util.List;
 
 /**
- * An abstract base class representing a geometric object in 3D space.
- *
- * <p>This class serves as a foundation for all geometric shapes, providing common properties and behavior:
+ * Abstract base class representing a geometric object in 3D space.
+ * <p>
+ * Provides common properties and behavior for geometric shapes, including:
  * <ul>
- *     <li>Material properties, which define the geometry's optical characteristics.</li>
+ *     <li>Material properties to define the optical characteristics.</li>
  *     <li>Axis-Aligned Bounding Box (AABB) for spatial optimizations.</li>
- *     <li>Methods for geometric transformations such as translation, scaling, and rotation.</li>
+ *     <li>Geometric transformations such as translation, rotation, and scaling.</li>
  *     <li>Intersection detection with rays.</li>
  * </ul>
- * Subclasses must implement specific geometric behavior for intersection detection, transformations,
- * and normal calculation.</p>
+ * Subclasses must implement specific behavior for transformations, intersection detection, and normal calculations.
+ * </p>
  *
  * @author
  * Benny Avrahami
  */
-public abstract class Geometry implements Transformable, Intersectable {
+public abstract class Geometry implements Intersectable, Transformable {
 
     /**
      * The Axis-Aligned Bounding Box (AABB) for the geometry.
-     * Used for spatial partitioning and intersection optimizations.
+     * Used for spatial partitioning and optimization.
      */
     protected AABB aabb;
 
     /**
-     * Material properties of the geometry, such as reflectivity, transparency, and shininess.
+     * The material properties of the geometry, such as reflectivity, transparency, and shininess.
      */
     private Material material = new Material();
 
     /**
-     * Calculates the AABB for the geometry.
-     * This is a lazy computation performed only when needed.
+     * Lazily calculates the AABB for the geometry if it has not been calculated yet.
      */
     public void calculateAABB() {
         if (aabb == null) {
@@ -47,31 +43,40 @@ public abstract class Geometry implements Transformable, Intersectable {
     }
 
     /**
-     * Helper method to calculate the AABB.
-     * Must be implemented by subclasses to define the geometry's specific bounding box.
+     * Calculates the AABB for the geometry.
+     * Must be implemented by subclasses to define the specific bounding box.
      */
     protected abstract void calculateAABBHelper();
 
+    /**
+     * Finds intersections of a ray with this geometry, considering a maximum distance.
+     * <p>
+     * The method skips intersection checks if the ray does not intersect the AABB.
+     * </p>
+     *
+     * @param ray         The ray to intersect with.
+     * @param maxDistance The maximum allowable distance for intersections.
+     * @return A list of intersection points or {@code null} if no intersections exist.
+     */
     @Override
     public List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
-        // Skip intersection checks if the ray does not intersect the AABB.
         return (aabb != null && !aabb.intersects(ray)) ? null : findGeoIntersectionsHelper(ray, maxDistance);
     }
 
     /**
-     * Finds the intersection points of a ray with this geometry, up to a maximum distance.
-     * Must be implemented by subclasses to define specific intersection behavior.
+     * Abstract method for finding intersections with a ray.
+     * Subclasses must implement this to define specific intersection logic.
      *
-     * @param ray         The ray to check for intersections.
-     * @param maxDistance The maximum distance for valid intersections.
-     * @return A list of intersection points, or {@code null} if none exist.
+     * @param ray         The ray to intersect with.
+     * @param maxDistance The maximum allowable distance for intersections.
+     * @return A list of intersection points or {@code null} if no intersections exist.
      */
     protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance);
 
     /**
-     * Retrieves the material properties of the geometry.
+     * Gets the material properties of the geometry.
      *
-     * @return The current {@link Material} of the geometry.
+     * @return The material of the geometry.
      */
     public Material getMaterial() {
         return material;
@@ -80,8 +85,8 @@ public abstract class Geometry implements Transformable, Intersectable {
     /**
      * Sets the material properties of the geometry.
      *
-     * @param material The new material to apply.
-     * @return The current {@code Geometry} instance for method chaining.
+     * @param material The material to set.
+     * @return The current geometry instance for method chaining.
      */
     public Geometry setMaterial(Material material) {
         this.material = material;
@@ -89,54 +94,97 @@ public abstract class Geometry implements Transformable, Intersectable {
     }
 
     /**
-     * Calculates the normal vector to the geometry at a given point.
+     * Calculates the normal vector at a specified point on the geometry.
      * Must be implemented by subclasses.
      *
-     * @param point The point on the geometry where the normal is to be calculated.
+     * @param point The point on the geometry.
      * @return The normal vector at the specified point.
      */
     public abstract Vector getNormal(Point point);
 
     @Override
-    public final Geometry translate(Vector translationVector) {
-        return translateHelper(translationVector).setMaterial(material);
+    public Geometry translate(Vector translationVector) {
+        Geometry translatedGeometry = translateHelper(translationVector);
+        translatedGeometry.setMaterial(material);
+
+        if (aabb != null) {
+            translatedGeometry.aabb = aabb.translate(translationVector);
+        }
+
+        return translatedGeometry;
     }
 
     @Override
-    public final Geometry rotate(Vector axis, double angleInRadians) {
-        return rotateHelper(axis, angleInRadians).setMaterial(material);
+    public Geometry rotate(Quaternion rotation) {
+        Geometry rotatedGeometry = rotateHelper(rotation);
+        rotatedGeometry.setMaterial(material);
+
+        if (aabb != null) {
+            // Since the exact rotation of AABB is not possible,
+            // calculate a new AABB that encloses the rotated geometry.
+
+            //rotatedGeometry.aabb = aabb.rotate(rotation);
+            rotatedGeometry.calculateAABB();
+        }
+
+        return rotatedGeometry;
     }
 
     @Override
-    public final Geometry scale(Vector scale) {
-        return scaleHelper(scale).setMaterial(material);
+    public Geometry scale(Vector scaleVector) {
+        Geometry scaledGeometry = scaleHelper(scaleVector);
+        scaledGeometry.setMaterial(material);
+
+        if (aabb != null) {
+            scaledGeometry.aabb = aabb.scale(scaleVector);
+        }
+
+        return scaledGeometry;
+    }
+
+    @Override
+    public Geometry scale(double scaleFactor) {
+        return scale(new Vector(scaleFactor, scaleFactor, scaleFactor));
+    }
+
+    @Override
+    public Geometry translateX(double dx) {
+        return translate(new Vector(dx, 0, 0));
+    }
+
+    @Override
+    public Geometry translateY(double dy) {
+        return translate(new Vector(0, dy, 0));
+    }
+
+    @Override
+    public Geometry translateZ(double dz) {
+        return translate(new Vector(0, 0, dz));
     }
 
     /**
-     * Helper method for translating the geometry.
-     * Must be implemented by subclasses to define translation behavior.
+     * Helper method to handle translation. Must be implemented by subclasses.
      *
-     * @param translationVector The vector defining the translation direction and magnitude.
-     * @return A new {@code Geometry} instance representing the translated geometry.
+     * @param translationVector The vector defining the translation.
+     * @return A new translated geometry.
      */
     protected abstract Geometry translateHelper(Vector translationVector);
 
     /**
-     * Helper method for rotating the geometry.
-     * Must be implemented by subclasses to define rotation behavior.
+     * Helper method to handle rotation. Must be implemented by subclasses.
      *
-     * @param axis           The axis of rotation.
-     * @param angleInRadians The angle of rotation in radians.
-     * @return A new {@code Geometry} instance representing the rotated geometry.
+     * @param rotation The quaternion representing the rotation.
+     * @return A new rotated geometry.
      */
-    protected abstract Geometry rotateHelper(Vector axis, double angleInRadians);
+    protected abstract Geometry rotateHelper(Quaternion rotation);
 
     /**
-     * Helper method for scaling the geometry.
-     * Must be implemented by subclasses to define scaling behavior.
+     * Helper method to handle scaling. Must be implemented by subclasses.
      *
-     * @param scale The scaling factors for each axis.
-     * @return A new {@code Geometry} instance representing the scaled geometry.
+     * @param scaleVector The vector defining the scaling factors along each axis.
+     * @return A new scaled geometry.
      */
-    protected abstract Geometry scaleHelper(Vector scale);
+    protected abstract Geometry scaleHelper(Vector scaleVector);
+
+
 }

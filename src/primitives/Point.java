@@ -11,6 +11,8 @@ public class Point {
      */
     public static final Point ZERO = new Point(0, 0, 0);
 
+    public static final Point ORIGIN = ZERO;
+
     /**
      * A constant representing a point at positive infinity
      * (Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY).
@@ -145,4 +147,14 @@ public class Point {
         return obj instanceof Point other
                 && xyz.equals(other.xyz);
     }
+
+    public double getCoordinate(int i) {
+        return switch (i) {
+            case 0 -> xyz.d1;
+            case 1 -> xyz.d2;
+            case 2 -> xyz.d3;
+            default -> throw new IllegalStateException("Unexpected index: " + i);
+        };
+    }
+
 }

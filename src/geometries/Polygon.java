@@ -8,7 +8,7 @@ import primitives.Vector;
 import java.util.Arrays;
 import java.util.List;
 
-import static primitives.Util.alignZero;
+import static utils.Util.alignZero;
 
 /**
  * Polygon class represents a two-dimensional polygon in a 3D Cartesian coordinate system.
@@ -67,8 +67,8 @@ public class Polygon extends Geometry {
         }
 
         Vector polygonNormal = polygonPlane.getNormal();
-        Vector previousEdge = vertices[vertices.length - 1].subtract(vertices[vertices.length - 2]);// TODO: vector zero case
-        Vector currentEdge = vertices[0].subtract(vertices[vertices.length - 1]);// TODO: vector zero case
+        Vector previousEdge = vertices[vertices.length - 1].subtract(vertices[vertices.length - 2]);
+        Vector currentEdge = vertices[0].subtract(vertices[vertices.length - 1]);
 
         // Determine if the polygon is convex by checking edge orientation
         boolean isConvexDirectionPositive = previousEdge.crossProduct(currentEdge).dotProduct(polygonNormal) > 0;
@@ -95,19 +95,27 @@ public class Polygon extends Geometry {
     }
 
     @Override
-    protected Geometry translateHelper(Vector translationVector) {
-        return new Polygon(Arrays.stream(polygonVertices).map(point -> point.add(translationVector)).toArray(Point[]::new));
+    protected Polygon rotateHelper(Quaternion rotation) {
+        Point[] rotatedVertices = Arrays.stream(polygonVertices)
+                .map(rotation::rotate)
+                .toArray(Point[]::new);
+        return new Polygon(rotatedVertices);
     }
 
     @Override
-    protected Geometry rotateHelper(Vector axis, double angleInRadians) {
-        Quaternion rotation = Quaternion.fromAxisAngle(axis, angleInRadians);
-        return new Polygon(Arrays.stream(polygonVertices).map(rotation::rotate).toArray(Point[]::new));
+    protected Polygon scaleHelper(Vector scaleVector) {
+        Point[] scaledVertices = Arrays.stream(polygonVertices)
+                .map(vertex -> vertex.scale(scaleVector))
+                .toArray(Point[]::new);
+        return new Polygon(scaledVertices);
     }
 
     @Override
-    protected Geometry scaleHelper(Vector scale) {
-        return new Polygon(Arrays.stream(polygonVertices).map(point -> point.scale(scale)).toArray(Point[]::new));
+    protected Polygon translateHelper(Vector translationVector) {
+        Point[] translatedVertices = Arrays.stream(polygonVertices)
+                .map(vertex -> vertex.add(translationVector))
+                .toArray(Point[]::new);
+        return new Polygon(translatedVertices);
     }
 
     @Override
@@ -131,19 +139,6 @@ public class Polygon extends Geometry {
         aabb = new AABB(min, max);
     }
 
-    /**
-     * Finds the intersections of a ray with the polygon.
-     * <p>This implementation works as follows:</p>
-     * <ol>
-     *     <li>Check if the ray intersects the polygon's plane.</li>
-     *     <li>If it does, perform a point-in-polygon test to ensure the intersection
-     *     lies within the polygon's boundaries.</li>
-     * </ol>
-     *
-     * @param ray         The ray to test for intersections.
-     * @param maxDistance The maximum distance for valid intersections.
-     * @return A list of intersection points (if any), or {@code null} if none exist.
-     */
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
         // Step 1: Check for intersection with the plane
@@ -175,4 +170,10 @@ public class Polygon extends Geometry {
         return List.of(new GeoPoint(this, intersectionPoint));
     }
 
+    public Point getVertices(int i) {
+        if (i >= polygonVertices.length)
+            throw new IllegalArgumentException("index is out of polygon Vertices range.");
+
+        return polygonVertices[i];
+    }
 }

@@ -3,7 +3,7 @@ package renderer;
 import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
-import renderer.super_sampling.Blackboard;
+import utils.Blackboard;
 
 /**
  * Implements Depth of Field (DOF) rendering, simulating a camera lens's focus and aperture effects.

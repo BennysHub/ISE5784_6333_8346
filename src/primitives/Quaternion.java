@@ -88,6 +88,26 @@ public class Quaternion {
         return new Quaternion(w / magnitude, x / magnitude, y / magnitude, z / magnitude);
     }
 
+    /**
+     * Converts this quaternion to a 3x3 rotation matrix.
+     *
+     * @return A 3x3 rotation matrix representing the same rotation as this quaternion.
+     */
+    public Matrix toRotationMatrix() {
+        double xx = x * x, yy = y * y, zz = z * z;
+        double xy = x * y, xz = x * z, yz = y * z;
+        double wx = w * x, wy = w * y, wz = w * z;
+
+        double[][] rotationData = {
+                {1 - 2 * (yy + zz), 2 * (xy - wz), 2 * (xz + wy)},
+                {2 * (xy + wz), 1 - 2 * (xx + zz), 2 * (yz - wx)},
+                {2 * (xz - wy), 2 * (yz + wx), 1 - 2 * (xx + yy)}
+        };
+
+        return new Matrix(rotationData);
+    }
+
+
     @Override
     public String toString() {
         return String.format("Quaternion{w=%.3f, x=%.3f, y=%.3f, z=%.3f}", w, x, y, z);

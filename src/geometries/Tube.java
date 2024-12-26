@@ -1,9 +1,11 @@
 package geometries;
 
 import primitives.Point;
+import primitives.Quaternion;
 import primitives.Ray;
 import primitives.Vector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,35 +57,69 @@ public class Tube extends RadialGeometry {
     }
 
     @Override
-    protected void calculateAABBHelper() {
+    public Tube rotateHelper(Quaternion rotation) {
+        Ray rotatedAxisRay = new Ray(
+                rotation.rotate( axisRay.getOrigin()),
+                rotation.rotate(axisRay.getDirection())
+        );
+        return new Tube(radius, rotatedAxisRay);
+    }
 
+    @Override
+    public Tube scaleHelper(Vector scaleVector) {
+        if (scaleVector.getX() != (scaleVector.getY()) || scaleVector.getX() != (scaleVector.getZ())) {
+            throw new UnsupportedOperationException("Non-uniform scaling is not supported for Tube.");
+        }
+        double scaledRadius = radius * scaleVector.getX();
+        return new Tube(scaledRadius, axisRay);
+    }
+
+    @Override
+    public Tube translateHelper(Vector translationVector) {
+        return new Tube(radius, new Ray(axisRay.getOrigin().add(translationVector), axisRay.getDirection()));
+    }
+
+    @Override
+    protected void calculateAABBHelper() {
+        aabb = new AABB();
     }
 
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
-        // Implementation is not yet defined
-        return null;
+        Vector v = axisRay.getDirection();
+        Point p0 = ray.getOrigin();
+        Vector dir = ray.getDirection();
+
+        Vector deltaP = p0.subtract(axisRay.getOrigin());
+
+        // Quadratic coefficients
+        double a = dir.subtract(v.scale(dir.dotProduct(v))).lengthSquared();
+        double b = 2 * dir.subtract(v.scale(dir.dotProduct(v))).dotProduct(deltaP.subtract(v.scale(deltaP.dotProduct(v))));
+        double c = deltaP.subtract(v.scale(deltaP.dotProduct(v))).lengthSquared() - radius * radius;
+
+        double discriminant = b * b - 4 * a * c;
+
+        if (discriminant < 0) {
+            return null; // No intersections
+        }
+
+        double sqrtDiscriminant = Math.sqrt(discriminant);
+        double t1 = (-b - sqrtDiscriminant) / (2 * a);
+        double t2 = (-b + sqrtDiscriminant) / (2 * a);
+
+        List<GeoPoint> intersections = new ArrayList<>();
+
+        if (t1 > 0 && t1 <= maxDistance) {
+            intersections.add(new GeoPoint(this, ray.getPoint(t1)));
+        }
+        if (t2 > 0 && t2 <= maxDistance) {
+            intersections.add(new GeoPoint(this, ray.getPoint(t2)));
+        }
+
+        return intersections.isEmpty() ? null : intersections;
     }
 
-
-    @Override
-    protected Geometry translateHelper(Vector translationVector) {
-        return null;
+    public Ray getAxisRay() {
+        return axisRay;
     }
-
-    @Override
-    protected Geometry rotateHelper(Vector axis, double angleInRadians) {
-        return null;
-    }
-
-    @Override
-    protected Geometry scaleHelper(Vector scale) {
-        return null;
-    }
-
-    @Override
-    public Geometry scale(double scale) {
-        return null;
-    }
-
 }

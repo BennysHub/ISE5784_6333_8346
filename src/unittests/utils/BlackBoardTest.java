@@ -1,21 +1,19 @@
-package renderer.black_board;
+package utils;
 
 import geometries.Sphere;
-import lighting.AmbientLight;
 import lighting.PointLight;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import primitives.*;
 import renderer.Camera;
 import renderer.QualityLevel;
-import renderer.super_sampling.Blackboard;
 import scene.Scene;
 
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static primitives.Util.alignZero;
-import static primitives.Util.isZero;
+import static utils.Util.alignZero;
+import static utils.Util.isZero;
 
 public class BlackBoardTest {
 

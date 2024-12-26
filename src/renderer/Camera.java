@@ -1,17 +1,15 @@
 package renderer;
 
 import geometries.BVHNode;
-import primitives.Color;
-import primitives.Matrix;
-import primitives.Point;
-import primitives.Vector;
+import geometries.Transformable;
+import primitives.*;
 import renderer.anti_aliasing_rendering.SSAA4X;
 import renderer.anti_aliasing_rendering.SuperSamplingAntiAliasing;
 import scene.Scene;
 
 import java.util.MissingResourceException;
 
-import static primitives.Util.alignZero;
+import static utils.Util.alignZero;
 
 /**
  * The {@code Camera} class represents a camera in a 3D scene.
@@ -23,7 +21,7 @@ import static primitives.Util.alignZero;
  *
  * @author TzviYisrael and Benny
  */
-public class Camera {
+public class Camera implements Transformable {
     private final Render renderEngine;
 
     /**
@@ -51,6 +49,42 @@ public class Camera {
     public void writeToImage() {
         renderEngine.writeToImage();
     }
+
+    @Override
+    public Camera scale(double scale){
+        return scale(new Vector(scale, scale, scale));
+    }
+
+
+    @Override
+    public Camera rotate(Vector axis, double angleInRadians)  {
+        renderEngine.rayTracer.scene.geometries.rotate(axis, angleInRadians);
+        return this;
+    }
+
+    @Override
+    public Transformable rotate(Quaternion rotation) {
+        return null;
+    }
+
+    @Override
+    public Camera scale(Vector scaleVector) {
+        renderEngine.rayTracer.scene.geometries.scale(scaleVector);
+        return this;
+    }
+
+    @Override
+    public Camera translate(Vector translationVector) {
+        renderEngine.rayTracer.scene.geometries.translate(translationVector);
+        return this;
+    }
+
+    @Override
+    public Camera translateY(double distanceY) {
+        return translate(new Vector(0, distanceY, 0));
+    }
+
+
 
     /**
      * Prints a grid overlay on the image.
@@ -92,6 +126,8 @@ public class Camera {
         private double vpHeight;
         private double vpWidth;
         private double vpDistance;
+        public double camaraFOV = 114;
+        private Point viewPlaneCenter;
         private ViewPlane viewPlane;
         private ImageWriter imageWriter;
         private int resolutionX;
@@ -100,9 +136,21 @@ public class Camera {
         private RayTracerBase rayTracer;
         private Render renderEngine;
         private boolean rayTracerSet = false;
+
         private boolean bvhBuilt = false;
         private double apertureSize;
         private double focalLength;
+
+
+        public Builder setViewPlaneCenter(Point center) {
+            viewPlaneCenter = center;
+            return this;
+        }
+
+        public Builder setCamaraFOV(double angle) {
+            camaraFOV = angle;
+            return this;
+        }
 
 
         /**
@@ -143,13 +191,13 @@ public class Camera {
          * @return The current {@code Builder} instance for chaining.
          */
         public Builder setOrientation(Point target, Vector up) {
-            this.forward = target.subtract(this.position).normalize();// TODO: vector zero case
+            forward = target.subtract(viewPlaneCenter != null ? viewPlaneCenter : position).normalize();// TODO: vector zero case
 
             if (up.isParallel(forward)) {
                 throw new IllegalArgumentException("The 'up' vector cannot be parallel to the 'forward' vector.");
             }
 
-            this.right = forward.crossProduct(up).normalize();
+            right = forward.crossProduct(up).normalize();
             this.up = right.crossProduct(forward);
             return this;
         }
@@ -407,7 +455,7 @@ public class Camera {
          * Configures the {@link ViewPlane} based on the current settings.
          */
         private void configureViewPlane() {
-            Point vpCenter = position.add(forward.scale(vpDistance));
+            Point vpCenter = viewPlaneCenter == null ? position.add(forward.scale(vpDistance)) : viewPlaneCenter;
             viewPlane = new ViewPlane(right, up, forward, vpHeight, vpWidth, vpCenter, imageWriter.getNx(), imageWriter.getNy());
         }
 
@@ -441,7 +489,7 @@ public class Camera {
          * @throws MissingResourceException If any required configuration is missing or invalid.
          */
         public Camera build() {
-            if (position == null) {
+            if (position == null && viewPlaneCenter == null) {
                 throw new MissingResourceException("Camera position is missing.", Camera.class.getName(), "position");
             }
             if (right == null || up == null || forward == null) {
@@ -459,7 +507,7 @@ public class Camera {
             if (alignZero(vpHeight) <= 0 || alignZero(vpWidth) <= 0) {
                 throw new MissingResourceException("View plane dimensions are invalid.", Camera.class.getName(), "vpHeight/vpWidth");
             }
-            if (alignZero(vpDistance) <= 0) {
+            if (alignZero(vpDistance) <= 0 && viewPlaneCenter == null) {
                 throw new MissingResourceException("View plane distance is invalid.", Camera.class.getName(), "vpDistance");
             }
             if (rayTracer == null) {
@@ -481,9 +529,24 @@ public class Camera {
 
             configureImageWriter();
             configureViewPlane();
+            configureCamaraPosition();
             configureRenderEngine();
 
             return new Camera(this);
+        }
+
+        private void configureCamaraPosition() {
+            if (viewPlaneCenter == null)
+                return;
+            double fovRadians = Math.toRadians(camaraFOV);
+
+            // Calculate diagonal of the view plane
+            double viewPlaneDiagonal = Math.sqrt(vpWidth * vpWidth + vpHeight * vpHeight);
+
+            // Calculate camera distance using trigonometry
+            double cameraDistance = (viewPlaneDiagonal / 2) / Math.tan(fovRadians / 2);
+
+            position = viewPlaneCenter.add(forward.scale(cameraDistance * -1));
         }
     }
 }

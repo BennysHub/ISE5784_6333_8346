@@ -61,7 +61,7 @@ public class RenderSettings {
     /**
      * The maximum recursion level for color calculations.
      */
-    static public final int MAX_CALC_COLOR_LEVEL = 4;
+    static public final int MAX_CALC_COLOR_LEVEL = 5;
     /**
      * The minimum value for the reflection/refraction coefficient in color calculations.
      */

@@ -2,6 +2,7 @@ package geometries;
 
 import org.junit.jupiter.api.Test;
 import primitives.Point;
+import primitives.Quaternion;
 import primitives.Ray;
 import primitives.Vector;
 
@@ -116,4 +117,34 @@ class TriangleTest {
         var result9 = triangle.findGeoIntersections(new Ray(new Point(1, 1, 0), new Vector(0, 0, 1)));
         assertNull(result9, "Ray starts at the triangle and points away, should be no intersection");
     }
+
+
+    @Test
+    void testTransformations() {
+        Triangle triangle = new Triangle(
+                new Point(0, 0, 0),
+                new Point(1, 0, 0),
+                new Point(0, 1, 0)
+        );
+
+        // ============ Translation ==============
+        Triangle translatedTriangle = (Triangle) triangle.translate(new Vector(1, 1, 1));
+        assertEquals(new Point(1, 1, 1), translatedTriangle.getVertices(0), "Incorrect translation for vertex 0.");
+        assertEquals(new Point(2, 1, 1), translatedTriangle.getVertices(1), "Incorrect translation for vertex 1.");
+        assertEquals(new Point(1, 2, 1), translatedTriangle.getVertices(2), "Incorrect translation for vertex 2.");
+
+        // ============ Scaling ==============
+        Triangle scaledTriangle = (Triangle) triangle.scale(new Vector(2, 2, 2));
+        assertEquals(new Point(0, 0, 0), scaledTriangle.getVertices(0), "Incorrect scaling for vertex 0.");
+        assertEquals(new Point(2, 0, 0), scaledTriangle.getVertices(1), "Incorrect scaling for vertex 1.");
+        assertEquals(new Point(0, 2, 0), scaledTriangle.getVertices(2), "Incorrect scaling for vertex 2.");
+
+        // ============ Rotation ==============
+        Quaternion rotation = Quaternion.fromAxisAngle(new Vector(0, 0, 1), Math.toRadians(90));
+        Triangle rotatedTriangle = (Triangle) triangle.rotate(rotation);
+        assertEquals(new Point(0, 0, 0), rotatedTriangle.getVertices(0), "Incorrect rotation for vertex 0.");
+        assertEquals(new Point(0, 1, 0), rotatedTriangle.getVertices(1), "Incorrect rotation for vertex 1.");
+        assertEquals(new Point(-1, 0, 0), rotatedTriangle.getVertices(2), "Incorrect rotation for vertex 2.");
+    }
+
 }

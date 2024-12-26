@@ -2,7 +2,8 @@ package primitives;
 
 
 
-import geometries.GeoPoint;
+import geometries.Intersectable;
+import geometries.Intersectable.GeoPoint;
 
 import java.util.List;
 
@@ -105,11 +106,11 @@ public class Ray {
      * @param geoPointList A list of geometric intersection points.
      * @return The closest geometric intersection point to the ray's origin, or null if the list is empty or null.
      */
-    public GeoPoint findClosestGeoPoint(List<GeoPoint> geoPointList) {
+    public Intersectable.GeoPoint findClosestGeoPoint(List<Intersectable.GeoPoint> geoPointList) {
         if (geoPointList == null) return null;
-        GeoPoint closest = null;
+        Intersectable.GeoPoint closest = null;
         double shortestDistance = Double.POSITIVE_INFINITY;
-        for (GeoPoint gP : geoPointList) {
+        for (Intersectable.GeoPoint gP : geoPointList) {
             double distance = gP.point().distanceSquared(origin);
             if (distance < shortestDistance) {
                 closest = gP;

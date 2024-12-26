@@ -2,6 +2,7 @@ package geometries;
 
 import org.junit.jupiter.api.Test;
 import primitives.Point;
+import primitives.Quaternion;
 import primitives.Ray;
 import primitives.Vector;
 
@@ -24,7 +25,7 @@ class SphereTest {
 
     /**
      * Test method for {@link Sphere#getNormal(Point)}.
-     * Verifies that the normal at a given point on the sphere is calculated correctly.
+     * Verifies that the normal at a given point in the sphere is calculated correctly.
      */
     @Test
     void testGetNormal() {
@@ -66,7 +67,7 @@ class SphereTest {
         // TC02: Ray starts before and crosses the sphere (2 points)
         List<Point> intersectionPointsTC02 = sphere.findGeoIntersections(new Ray(p01, v310))
                 .stream()
-                .map(GeoPoint::point)
+                .map(Intersectable.GeoPoint::point)
                 .sorted(Comparator.comparingDouble(p -> p.distance(p01)))
                 .toList();
         assertEquals(2, intersectionPointsTC02.size(), "Incorrect number of intersection points.");
@@ -74,9 +75,9 @@ class SphereTest {
 
         // TC03: Ray starts inside the sphere (1 point)
         List<Point> insideIntersectionTC03 = sphere.findGeoIntersections(new Ray(new Point(1, 0.5, 0), v001))
-                .stream().map(GeoPoint::point).toList();
+                .stream().map(Intersectable.GeoPoint::point).toList();
         assertEquals(1, insideIntersectionTC03.size(), "Incorrect number of intersection points.");
-        assertEquals(gp3, insideIntersectionTC03.get(0), "Ray should intersect the sphere once from inside.");
+        assertEquals(gp3, insideIntersectionTC03.getFirst(), "Ray should intersect the sphere once from inside.");
 
         // TC04: Ray starts after the sphere (0 points)
         assertNull(
@@ -88,9 +89,9 @@ class SphereTest {
 
         // TC05: Ray starts on the sphere and goes inside (1 point)
         List<Point> startOnSphereInside = sphere.findGeoIntersections(new Ray(new Point(1, 0, -1), v001))
-                .stream().map(GeoPoint::point).toList();
+                .stream().map(Intersectable.GeoPoint::point).toList();
         assertEquals(1, startOnSphereInside.size(), "Incorrect number of intersection points.");
-        assertEquals(new Point(1, 0, 1), startOnSphereInside.get(0), "Ray should intersect inside the sphere.");
+        assertEquals(new Point(1, 0, 1), startOnSphereInside.getFirst(), "Ray should intersect inside the sphere.");
 
         // TC06: Ray starts on the sphere and goes outside (0 points)
         assertNull(
@@ -100,13 +101,13 @@ class SphereTest {
 
         // TC07: Ray starts at the sphere's center (1 point)
         List<Point> startAtCenter = sphere.findGeoIntersections(new Ray(p100, v001))
-                .stream().map(GeoPoint::point).toList();
+                .stream().map(Intersectable.GeoPoint::point).toList();
         assertEquals(1, startAtCenter.size(), "Incorrect number of intersection points.");
-        assertEquals(new Point(1, 0, 1), startAtCenter.get(0), "Ray should intersect the sphere once from the center.");
+        assertEquals(new Point(1, 0, 1), startAtCenter.getFirst(), "Ray should intersect the sphere once from the center.");
 
         // ============ Tangent Cases ==============
 
-        // TC08: Ray is tangent to the sphere, no intersection
+        // TC08: Ray is a tangent to the sphere, no intersection
         assertNull(
                 sphere.findGeoIntersections(new Ray(new Point(1, 0, 1), v100)),
                 "Ray tangent to the sphere should not intersect."
@@ -134,9 +135,28 @@ class SphereTest {
 
         // TC12: Ray starts inside the sphere and is orthogonal to the center line
         List<Point> orthogonalInside = sphere.findGeoIntersections(new Ray(new Point(0.5, 0, 0), v001))
-                .stream().map(GeoPoint::point).toList();
+                .stream().map(Intersectable.GeoPoint::point).toList();
         assertEquals(1, orthogonalInside.size(), "Incorrect number of intersection points.");
-        assertEquals(new Point(0.5, 0, Math.sqrt(3) / 2), orthogonalInside.get(0),
+        assertEquals(new Point(0.5, 0, Math.sqrt(3) / 2), orthogonalInside.getFirst(),
                 "Ray inside sphere and orthogonal to center line should intersect once.");
     }
+
+    @Test
+    void testTransformations() {
+        Sphere sphere = new Sphere(1, new Point(0, 0, 0));
+
+        // ============ Translation ==============
+        Sphere translatedSphere = (Sphere) sphere.translate(new Vector(1, 1, 1));
+        assertEquals(new Point(1, 1, 1), translatedSphere.getCenter(), "Incorrect translation for sphere center.");
+
+        // ============ Scaling ==============
+        Sphere scaledSphere = (Sphere) sphere.scale(new Vector(2, 2, 2));
+        assertEquals(2, scaledSphere.getRadius(), "Incorrect scaling for sphere radius.");
+
+        // ============ Rotation ==============
+        Quaternion rotation = Quaternion.fromAxisAngle(new Vector(0, 1, 0), Math.toRadians(90));
+        Sphere rotatedSphere = (Sphere) sphere.rotate(rotation);
+        assertEquals(new Point(0, 0, 0), rotatedSphere.getCenter(), "Rotation should not affect the center of a sphere.");
+    }
+
 }

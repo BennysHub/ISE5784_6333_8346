@@ -109,7 +109,7 @@ public class Matrix {
      * @param vector The vector to multiply with.
      * @return The resulting vector after multiplication.
      */
-    public Vector multiply(Vector vector) {
+    public Vector multiply(Point vector) {
         double[] result = new double[3];
         double[] vecData = {vector.getX(), vector.getY(), vector.getZ()};
 

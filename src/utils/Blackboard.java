@@ -1,4 +1,4 @@
-package renderer.super_sampling;
+package utils;
 
 import primitives.Double2;
 import primitives.Matrix;
@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.Math.sqrt;
-import static primitives.Util.isZero;
-import static primitives.Util.random;
+import static utils.Util.isZero;
+import static utils.Util.random;
 
 /**
  * The {@code Blackboard} class provides utility methods for generating and transforming sample points

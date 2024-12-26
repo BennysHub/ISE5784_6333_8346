@@ -1,6 +1,8 @@
 package primitives;
 
-import static primitives.Util.isZero;
+import utils.Util;
+
+import static utils.Util.isZero;
 
 /**
  * A 2D vector or point in the XY plane, represented by two double values: x and y.

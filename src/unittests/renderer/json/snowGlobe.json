@@ -74,50 +74,51 @@
     "lights": {
       "pointLight": [
         {
-          "intensity": "255 255 255 0.5",
-          "position": "200 80 -200",
-          "radius": 4,
+          "intensity": "255 255 255 0.2",
+          "position": "200 80 0",
           "kC": 0,
           "kL": 0.001,
           "kQ": 0.00001
         },
         {
-          "intensity": "255 255 255 0.5",
-          "position": "-200 80 200",
-          "radius": 4,
+          "intensity": "255 255 255 0.2",
+          "position": "-200 80 0",
           "kC": 0,
           "kL": 0.001,
           "kQ": 0.00001
         },
         {
-          "intensity": "255 255 255 0.5",
-          "position": "-200 80 -200",
-          "radius": 4,
+          "intensity": "255 255 255 0.2",
+          "position": "0 80 -200",
           "kC": 0,
           "kL": 0.001,
           "kQ": 0.00001
         },
         {
-          "intensity": "255 255 255 0.5",
-          "position": "200 80 200",
-          "radius": 4,
+          "intensity": "255 255 255 0.2",
+          "position": "0 80 200",
           "kC": 0,
           "kL": 0.001,
           "kQ": 0.00001
+        },
+        {
+          "intensity": "255 200 90 1",
+          "position": "0 25 0",
+          "kC": 1
         }
       ],
-      "directionalLight-off": [
+      "directionalLight off": [
         {
-          "intensity": "150 150 150 1",
+          "intensity": "150 150 150 2",
           "direction": "0 -1 0"
         }
       ],
       "spotLight": [
         {
-          "intensity": "255 255 255 1",
-          "position": "0 150 0",
+          "intensity": "255 255 255 1.5",
+          "position": "0 300 0",
           "direction": "0 -1 0",
-          "radius": 4,
+          "radius": 20,
           "kC": 0,
           "kL": 0.001,
           "kQ": 0.00001,

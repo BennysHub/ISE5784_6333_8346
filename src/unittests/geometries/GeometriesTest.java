@@ -74,7 +74,7 @@ class GeometriesTest {
         var result2 = g.findGeoIntersections(new Ray(new Point(-1, 0, 0), new Vector(1, 0, 0)));
         assertNotNull(result2, "TC04: Expected intersections with all geometries.");
         assertEquals(4, result2.size(), "TC04: Wrong number of intersections.");
-        assertTrue(result2.stream().map(GeoPoint::point).toList().containsAll(
+        assertTrue(result2.stream().map(Intersectable.GeoPoint::point).toList().containsAll(
                         List.of(new Point(0.5, 0, 0),
                                 new Point(2.5, 0, 0),
                                 new Point(3, 0, 0),
@@ -87,7 +87,7 @@ class GeometriesTest {
         var result3 = g.findGeoIntersections(new Ray(new Point(2.75, 0, 0), new Vector(1, 0, 0)));
         assertNotNull(result3, "TC05: Expected intersections with some geometries.");
         assertEquals(2, result3.size(), "TC05: Wrong number of intersections.");
-        assertTrue(result3.stream().map(GeoPoint::point).toList().containsAll(
+        assertTrue(result3.stream().map(Intersectable.GeoPoint::point).toList().containsAll(
                         List.of(new Point(3, 0, 0), new Point(4, 0, 0))),
                 "TC05: Wrong intersection points.");
     }

@@ -1,10 +1,13 @@
 package geometries;
 
 import primitives.Point;
+import primitives.Quaternion;
 import primitives.Ray;
 import primitives.Vector;
 
 import java.util.*;
+
+import static utils.Util.isZero;
 
 /**
  * Represents a collection of geometric objects that can be intersected by a ray.
@@ -14,15 +17,20 @@ import java.util.*;
  * and calculate intersection points with rays either using the BVH structure for optimization
  * or directly with individual geometries.</p>
  *
- * @author
- * Benny Avrahami
+ * @author Benny Avrahami
  */
-public class Geometries implements Intersectable {
+public class Geometries implements Intersectable, Transformable {
 
     /**
      * List of geometries contained in this collection.
      */
     private final List<Geometry> geometries;
+
+    /**
+     * The precomputed center of the geometries in the collection.
+     * Used for efficient transformations.
+     */
+    private Point geometriesCenter;
 
     /**
      * The root node of the Bounding Volume Hierarchy (BVH) for optimized intersections.
@@ -57,7 +65,8 @@ public class Geometries implements Intersectable {
 
     /**
      * Builds the BVH (Bounding Volume Hierarchy) for the geometries in this collection.
-     * Uses the Surface Area Heuristic (SAH) method for optimal node splitting.
+     *
+     * @param bvhBuildMethod The method to use for building the BVH.
      */
     public void buildBVH(BVHNode.BVHBuildMethod bvhBuildMethod) {
         if (!geometries.isEmpty()) {
@@ -65,14 +74,51 @@ public class Geometries implements Intersectable {
         }
     }
 
-    /**
-     * Finds the intersection points of a ray with the geometries in the collection.
-     * Uses the BVH for optimization if available.
-     *
-     * @param ray         The ray to intersect with the geometries.
-     * @param maxDistance The maximum distance for valid intersections.
-     * @return A list of {@link GeoPoint} objects representing the intersections, or {@code null} if none exist.
-     */
+    @Override
+    public Geometries translate(Vector translationVector) {
+        if (bvhRoot != null) {
+            bvhRoot.translate(translationVector);
+        } else {
+            geometries.replaceAll(geometry -> geometry.translate(translationVector));
+        }
+        return this;
+    }
+
+    @Override
+    public Geometries rotate(Vector axis, double angleInRadians) {
+        if (isZero(angleInRadians)) return this;
+
+        Quaternion rotation = Quaternion.fromAxisAngle(axis, angleInRadians);
+        return rotate(rotation);
+    }
+
+    @Override
+    public Geometries rotate(Quaternion rotation) {
+
+        calculateAABB();
+        Point center = getGeometriesCenter();
+
+        Vector toOrigin = Point.ZERO.subtract(center);
+        Vector backToOriginalPosition = toOrigin.scale(-1);
+
+        if (bvhRoot != null) {
+            bvhRoot.translate(toOrigin).rotate(rotation).translate(backToOriginalPosition);
+        } else {
+            geometries.replaceAll(geometry -> geometry.translate(toOrigin).rotate(rotation).translate(backToOriginalPosition));
+        }
+        return this;
+    }
+
+    @Override
+    public Geometries scale(Vector scale) {
+        if (bvhRoot != null) {
+            bvhRoot.scale(scale);
+        } else {
+            geometries.replaceAll(geometry -> geometry.scale(scale));
+        }
+        return this;
+    }
+
     @Override
     public List<GeoPoint> findGeoIntersections(Ray ray, double maxDistance) {
         if (bvhRoot != null) {
@@ -103,60 +149,8 @@ public class Geometries implements Intersectable {
     }
 
     /**
-     * Translates all geometries in the collection by the given vector.
-     *
-     * @param translationVector The vector by which to translate the geometries.
-     */
-    public Geometries translate(Vector translationVector) {
-        Geometries newGeometries = new Geometries();
-        for (Geometry geometry : geometries) {
-            newGeometries.add(geometry.translate(translationVector));
-        }
-        return newGeometries;
-    }
-
-    /**
-     * Rotates all geometries in the collection around a specified axis by a given angle.
-     * The rotation is performed relative to the center of the entire collection.
-     *
-     * @param axis             The axis of rotation.
-     * @param angleInRadians   The angle of rotation in radians.
-     */
-    public Geometries rotate(Vector axis, double angleInRadians) {
-        calculateAABB(); // Ensure the AABB is calculated to find the center
-        Point center = getGeometriesCenter();
-
-        // Translate geometries to the origin, rotate, and return them to the original position
-        Vector toOrigin = Point.ZERO.subtract(center);
-        Vector backToOriginalPosition = toOrigin.scale(-1);
-
-        Geometries newGeometries = new Geometries();
-        for (Geometry geometry : geometries) {
-            newGeometries.add(
-                    geometry.translate(toOrigin)
-                            .rotate(axis, angleInRadians)
-                            .translate(backToOriginalPosition)
-            );
-        }
-        return newGeometries;
-    }
-
-    /**
-     * Scales all geometries in the collection by the given scaling vector.
-     *
-     * @param scale The scaling vector containing factors for each axis.
-     */
-    public Geometries scale(Vector scale) {
-        Geometries newGeometries = new Geometries();
-        for (Geometry geometry : geometries) {
-            newGeometries.add(geometry.scale(scale));
-        }
-        return newGeometries;
-    }
-
-    /**
      * Calculates the center of all geometries in the collection.
-     * This is determined as the centroid of the bounding boxes of all geometries.
+     * This is determined as the centroid bounding boxes of all geometries.
      *
      * @return The center point of the geometries in the collection.
      */
@@ -165,18 +159,9 @@ public class Geometries implements Intersectable {
             throw new IllegalStateException("Cannot calculate the center of an empty collection.");
         }
 
-        double sumX = 0, sumY = 0, sumZ = 0;
-        int count = 0;
+        if (geometriesCenter != null) return geometriesCenter;
 
-        for (Geometry geometry : geometries) {
-            geometry.calculateAABB();
-            Point center = geometry.aabb.getCenterPoint();
-            sumX += center.getX();
-            sumY += center.getY();
-            sumZ += center.getZ();
-            count++;
-        }
-
-        return new Point(sumX / count, sumY / count, sumZ / count);
+        geometriesCenter = new AABB(geometries).getCenter();
+        return geometriesCenter;
     }
 }

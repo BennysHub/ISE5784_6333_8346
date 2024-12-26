@@ -4,9 +4,9 @@ import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
 import renderer.QualityLevel;
-import renderer.super_sampling.Blackboard;
+import utils.Blackboard;
 
-import static primitives.Util.isZero;
+import static utils.Util.isZero;
 
 /**
  * Class representing a point light source in a 3D scene.

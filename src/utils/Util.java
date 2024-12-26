@@ -1,4 +1,4 @@
-package primitives;
+package utils;
 
 /**
  * The {@code Util} class provides utility methods for mathematical operations and accuracy control.

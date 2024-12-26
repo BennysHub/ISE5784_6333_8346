@@ -1,6 +1,6 @@
 package primitives;
 
-import static primitives.Util.isZero;
+import static utils.Util.isZero;
 
 /**
  * Represents a vector in 3D space, extending the {@code Point} class with additional vector-specific operations.
@@ -47,9 +47,9 @@ public class Vector extends Point {
      */
     public Vector(double c1, double c2, double c3) {
         super(c1, c2, c3);
-        if (xyz.equals(Double3.ZERO)) {// TODO: vector zero case
-            throw new IllegalArgumentException("Vector Zero is not allowed.");
-        }
+//        if (xyz.equals(Double3.ZERO)) {// TODO: vector zero case
+//            throw new IllegalArgumentException("Vector Zero is not allowed.");
+//        }
         this.isNormalized = false;
     }
 
@@ -175,6 +175,11 @@ public class Vector extends Point {
         return other.isPerpendicular(this) ? this : this.subtract(this.project(other));// TODO: vector zero case
     }
 
+
+    public Vector  elementWiseMultiply(Vector other){
+        return new Vector(xyz.product(other.xyz));
+    }
+
     /**
      * Calculates the squared length of the vector.
      *
@@ -211,5 +216,14 @@ public class Vector extends Point {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         return obj instanceof Vector other && super.equals(other);
+    }
+
+    public Vector setCoordinate(int i, double value) {
+        return switch (i) {
+            case 0 -> new Vector(value, xyz.d2, xyz.d3);
+            case 1 -> new Vector(xyz.d1, value, xyz.d3);
+            case 2 -> new Vector(xyz.d1, xyz.d2, value);
+            default -> throw new IllegalStateException("Unexpected index: " + i);
+        };
     }
 }

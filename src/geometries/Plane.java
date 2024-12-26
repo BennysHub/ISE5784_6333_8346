@@ -1,13 +1,12 @@
 package geometries;
 
 import primitives.Point;
+import primitives.Quaternion;
 import primitives.Ray;
 import primitives.Vector;
 
 import java.util.List;
-
-import static primitives.Util.alignZero;
-import static primitives.Util.isZero;
+import static utils.Util.isZero;
 
 /**
  * Represents a plane in 3D space, defined by a point on the plane and a normal vector.
@@ -81,18 +80,18 @@ public class Plane extends Geometry {
     }
 
     @Override
-    protected Geometry translateHelper(Vector translationVector) {
-        return new Plane(referencePoint, normalVector);
+    protected Plane rotateHelper(Quaternion rotation ) {
+        return new Plane(rotation.rotate(referencePoint),  rotation.rotate(normalVector));
     }
 
     @Override
-    protected Geometry rotateHelper(Vector axis, double angleInRadians) {
-        return null;
-    }
-
-    @Override
-    protected Geometry scaleHelper(Vector scale) {
+    protected Plane scaleHelper(Vector scaleVector) {
         return this;
+    }
+
+    @Override
+    protected Plane translateHelper(Vector translationVector) {
+        return new Plane(referencePoint.add(translationVector), normalVector);
     }
 
 
@@ -108,7 +107,7 @@ public class Plane extends Geometry {
 
         // Check if the ray is parallel to the plane
         double normalDotDirection = normalVector.dotProduct(rayDirection);
-        if (isZero(normalDotDirection)) {
+        if (normalDotDirection == 0) {
             return null; // Ray is parallel to the plane
         }
 
@@ -116,7 +115,7 @@ public class Plane extends Geometry {
         double t = normalVector.dotProduct(referencePoint.subtract(rayOrigin)) / normalDotDirection;// TODO: vector zero case
 
         // Check if the intersection point lies beyond the ray's origin or within maxDistance
-        return alignZero(t) > 0 && alignZero(t - maxDistance) < 0
+        return t > 0 && t - maxDistance < 0
                 ? List.of(new GeoPoint(this, ray.getPoint(t)))
                 : null;
     }

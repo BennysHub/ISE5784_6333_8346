@@ -1,17 +1,88 @@
 package geometries;
 
+import primitives.Point;
+import primitives.Quaternion;
 import primitives.Ray;
-
+import primitives.Vector;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
 /**
  * Represents a node in a Bounding Volume Hierarchy (BVH).
  * BVH is used to optimize ray-object intersection tests by spatially partitioning geometry.
  */
-public class BVHNode {
+public class BVHNode implements Transformable {
+
+    @Override
+    public BVHNode translate(Vector translationVector) {
+        translateBVH(this, translationVector);
+        return this;
+    }
+
+    private void translateBVH(BVHNode curr, Vector translationVector) {
+        if (curr.geometries != null) {
+            curr.geometries = Arrays.stream(curr.geometries)
+                    .map(geometry -> geometry.translate(translationVector))
+                    .toArray(Geometry[]::new);
+            curr.aabb = new AABB(List.of(curr.geometries));
+            return;
+        }
+
+        translateBVH(curr.leftChild, translationVector);
+        translateBVH(curr.rightChild, translationVector);
+        curr.aabb.translate(translationVector);
+    }
+
+    @Override
+    public BVHNode rotate(Vector axis, double angleInRadians) {
+        Quaternion rotation = Quaternion.fromAxisAngle(axis, angleInRadians);
+        return rotate(rotation);
+    }
+
+    @Override
+    public BVHNode rotate(Quaternion rotation) {
+        rotateBVH(this, rotation);
+        return this;
+    }
+
+    private void rotateBVH(BVHNode curr, Quaternion rotation) {
+        if (curr.geometries != null) {
+            curr.geometries = Arrays.stream(curr.geometries)
+                    .map(geometry -> geometry.rotate(rotation))
+                    .toArray(Geometry[]::new);
+            curr.aabb = new AABB(List.of(curr.geometries));
+            return;
+        }
+
+        rotateBVH(curr.leftChild, rotation);
+        rotateBVH(curr.rightChild, rotation);
+      //  curr.aabb.rotate(rotation);
+        curr.aabb = new AABB(curr.leftChild.aabb, curr.rightChild.aabb);
+    }
+
+    @Override
+    public BVHNode scale(Vector scaleVector) {
+        scaleBVH(this, scaleVector);
+        return this;
+    }
+
+    private void scaleBVH(BVHNode curr, Vector scaleVector) {
+        if (curr.geometries != null) {
+            curr.geometries = Arrays.stream(curr.geometries)
+                    .map(geometry -> geometry.scale(scaleVector))
+                    .toArray(Geometry[]::new);
+            curr.aabb = new AABB(List.of(curr.geometries));
+            return;
+        }
+
+        scaleBVH(curr.leftChild, scaleVector);
+        scaleBVH(curr.rightChild, scaleVector);
+        curr.aabb.scale(scaleVector);
+    }
+
 
     /**
      * Enum defining the methods to build a BVH.
@@ -32,7 +103,7 @@ public class BVHNode {
     /**
      * Constructs a BVHNode from a list of geometries and a specified build method.
      *
-     * @param geometries The list of geometries to include in this node.
+     * @param geometries     The list of geometries to include in this node.
      * @param bvhBuildMethod The method used to build the BVH (e.g., SAH, median split).
      */
     public BVHNode(List<Geometry> geometries, BVHBuildMethod bvhBuildMethod) {
@@ -82,7 +153,7 @@ public class BVHNode {
             return;
         }
 
-        geometries.sort(Comparator.comparingDouble(geom -> geom.aabb.getCenter()[depth % 3]));
+        geometries.sort(Comparator.comparingDouble(geom -> geom.aabb.getCenter().getCoordinate(depth % 3)));
         int splitIndex = geometries.size() / 2;
 
         // Recursively build child nodes
@@ -121,7 +192,7 @@ public class BVHNode {
     }
 
     private void sortByAxis(List<Geometry> geometries, int sortAxis) {
-        geometries.sort(Comparator.comparingDouble(geometry -> geometry.aabb.getCenter()[sortAxis % 3]));
+        geometries.sort(Comparator.comparingDouble(geometry -> geometry.aabb.getCenter().getCoordinate(sortAxis % 3)));
     }
 
 
@@ -134,27 +205,27 @@ public class BVHNode {
     /**
      * Finds intersections with a given ray, optimized using the BVH.
      *
-     * @param ray The ray to test for intersections.
+     * @param ray         The ray to test for intersections.
      * @param maxDistance The maximum allowed intersection distance.
      * @return A list of intersection points.
      */
-    public List<GeoPoint> findIntersections(Ray ray, double maxDistance) {
-        List<GeoPoint> intersections = new ArrayList<>();
+    public List<Intersectable.GeoPoint> findIntersections(Ray ray, double maxDistance) {
+        List<Intersectable.GeoPoint> intersections = new ArrayList<>();
         findIntersectionsRecursive(ray, maxDistance, this, intersections);
         return intersections;
     }
 
-    private void findIntersectionsRecursive(Ray ray, double maxDistance, BVHNode node, List<GeoPoint> intersections) {
+    private void findIntersectionsRecursive(Ray ray, double maxDistance, BVHNode node, List<Intersectable.GeoPoint> intersections) {
         if (!node.aabb.intersects(ray)) {
             return;
         }
 
         if (node.geometries != null) {
             for (Geometry geometry : node.geometries) {
-                List<GeoPoint> geoPoints = geometry.findGeoIntersections(ray, maxDistance);
-                if (geoPoints != null) {
+                List<Intersectable.GeoPoint> geoPoints = geometry.findGeoIntersections(ray, maxDistance);
+                if (geoPoints != null)
                     intersections.addAll(geoPoints);
-                }
+
             }
             return;
         }
@@ -241,11 +312,11 @@ public class BVHNode {
         this.rightChild = root.rightChild;
     }
 
-    private long computeMortonCode(double[] center) {
+    private long computeMortonCode(Point center) {
         // Maps a 3D point to a 1D Morton code for spatial locality.
-        int x = (int) (center[0] * 1024); // Scale to a fixed grid
-        int y = (int) (center[1] * 1024);
-        int z = (int) (center[2] * 1024);
+        int x = (int) (center.getX() * 1024); // Scale to a fixed grid
+        int y = (int) (center.getY() * 1024);
+        int z = (int) (center.getZ() * 1024);
 
         return interleaveBits(x) | (interleaveBits(y) << 1) | (interleaveBits(z) << 2);
     }
@@ -258,5 +329,6 @@ public class BVHNode {
         return value;
     }
 
-    private record MortonCodeGeometry(Geometry geometry, long mortonCode) {}
+    private record MortonCodeGeometry(Geometry geometry, long mortonCode) {
+    }
 }

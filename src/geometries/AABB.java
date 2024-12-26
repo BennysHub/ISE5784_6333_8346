@@ -1,12 +1,8 @@
 package geometries;
 
-import primitives.Point;
-import primitives.Quaternion;
-import primitives.Ray;
-import primitives.Vector;
+import primitives.*;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Represents an Axis-Aligned Bounding Box (AABB) used for bounding volumes in geometric computations.
@@ -21,7 +17,7 @@ import java.util.List;
  *
  * @author Benny Avrahami
  */
-public class AABB  {
+public class AABB implements Transformable {
 
     /**
      * The minimum corner of the AABB, representing the smallest x, y, and z coordinates.
@@ -36,7 +32,7 @@ public class AABB  {
     /**
      * The center of the AABB, calculated lazily and stored for optimization.
      */
-    private double[] center;
+    private Point center;
 
     /**
      * Indicates whether the center value is valid and up to date.
@@ -152,21 +148,16 @@ public class AABB  {
      *
      * @return An array containing the x, y, and z coordinates of the AABB center.
      */
-    public double[] getCenter() {
+    public Point getCenter() {
         if (isCenterValid) {
             return center;
         }
         double centerX = (min.getX() + max.getX()) / 2;
         double centerY = (min.getY() + max.getY()) / 2;
         double centerZ = (min.getZ() + max.getZ()) / 2;
-        this.center = new double[]{centerX, centerY, centerZ};
+        center = new Point(centerX, centerY, centerZ);
         this.isCenterValid = true;
         return center;
-    }
-
-    public Point getCenterPoint() {
-        double[] center = getCenter();
-        return new Point(center[0], center[1], center[2]);
     }
 
 
@@ -242,10 +233,105 @@ public class AABB  {
         return "AABB [min=" + min + ", max=" + max + "]";
     }
 
-    public double[] getLengths() {
-        var lengthOfAxis = max.subtract(min);
-        return new double[]{lengthOfAxis.getX(), lengthOfAxis.getY(), lengthOfAxis.getZ()};
+    @Override
+    public AABB translate(Vector translationVector) {
+
+        min = min.add(translationVector);
+        max = max.add(translationVector);
+        isCenterValid = false;
+        return this;
+
+
+    }
+
+//    @Override
+//    public AABB rotate(Vector axis, double angleInRadians) {
+//        Quaternion rotation = Quaternion.fromAxisAngle(axis, angleInRadians);
+//        return rotate(rotation);
+//
+//    }
+
+    @Override
+    public AABB rotate(Vector axis, double angleInRadians) {
+        // Step 1: Compute the center and extents of the AABB
+        Point center = getCenter();
+        Vector extents = new Vector(
+                (max.getX() - min.getX()) / 2,
+                (max.getY() - min.getY()) / 2,
+                (max.getZ() - min.getZ()) / 2
+        );
+
+        // Step 2: Create the rotation matrix
+        Matrix rotationMatrix = Matrix.rotationMatrix(axis, angleInRadians);
+
+        // Step 3: Rotate the center
+        Point rotatedCenter = rotationMatrix.multiply(center);
+
+        // Step 4: Rotate the extents using the absolute value of the rotation matrix
+        Matrix absRotationMatrix = new Matrix(rotationMatrix.getData());
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                absRotationMatrix.set(i, j, Math.abs(absRotationMatrix.get(i, j)));
+            }
+        }
+        Vector rotatedExtents = absRotationMatrix.multiply(extents);
+
+        // Step 5: Compute the new min and max
+        Point newMin = rotatedCenter.subtract(rotatedExtents);
+        Point newMax = rotatedCenter.add(rotatedExtents);
+
+        // Step 6: Return the rotated AABB
+        min = newMin;
+        max = newMax;
+        this.center = rotatedCenter;
+
+        return this;
     }
 
 
+    @Override
+    public AABB rotate(Quaternion rotation) {
+        // Step 1: Compute the center and extents of the AABB
+        Point center = getCenter();
+        Vector extents = new Vector(
+                (max.getX() - min.getX()) / 2,
+                (max.getY() - min.getY()) / 2,
+                (max.getZ() - min.getZ()) / 2
+        );
+
+        // Step 2: Create the rotation matrix
+        Matrix rotationMatrix = rotation.toRotationMatrix();
+
+        // Step 3: Rotate the center
+        Point rotatedCenter = rotationMatrix.multiply(center);
+
+        // Step 4: Rotate the extents using the absolute value of the rotation matrix
+        Matrix absRotationMatrix = new Matrix(rotationMatrix.getData());
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                absRotationMatrix.set(i, j, Math.abs(absRotationMatrix.get(i, j)));
+            }
+        }
+        Vector rotatedExtents = absRotationMatrix.multiply(extents);
+
+        // Step 5: Compute the new min and max
+        Point newMin = rotatedCenter.subtract(rotatedExtents);
+        Point newMax = rotatedCenter.add(rotatedExtents);
+
+        // Step 6: Return the rotated AABB
+        min = newMin;
+        max = newMax;
+        this.center = rotatedCenter;
+
+        return this;
+    }
+
+    @Override
+    public AABB scale(Vector scale) {
+
+        min = min.scale(scale);
+        max = max.scale(scale);
+        isCenterValid = false;
+        return this;
+    }
 }

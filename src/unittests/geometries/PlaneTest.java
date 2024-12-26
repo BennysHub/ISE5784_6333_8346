@@ -79,7 +79,7 @@ class PlaneTest {
     }
 
     /**
-     * Test method for {@link Plane#findIntersections(Ray)}.
+     * Test method for {@link Plane#findGeoIntersections(Ray)}.
      * Verifies the intersection logic of a ray with a plane in various scenarios.
      */
     @Test
@@ -96,7 +96,7 @@ class PlaneTest {
                 new Point(1, 0, 1),
                 new Vector(1, 0, -1)));
         assertNotNull(result1, "TC01: Ray should intersect the plane.");
-        assertEquals(new Point(2, 0, 0), result1.get(0).point(),
+        assertEquals(new Point(2, 0, 0), result1.getFirst().point(),
                 "TC01: Intersection point is incorrect.");
 
         // TC02: Ray does not intersect the plane
@@ -114,7 +114,7 @@ class PlaneTest {
                 new Vector(1, 1, 0)));
         assertNull(result3, "TC10: Ray lies in the plane, no intersection.");
 
-        // TC20: Ray is parallel and not included in the plane
+        // TC20: Ray is parallel and not included on the plane
         var result4 = plane.findGeoIntersections(new Ray(
                 new Point(0, 0, 1),
                 new Vector(1, 1, 0)));
@@ -126,10 +126,10 @@ class PlaneTest {
                 new Point(1, 0, 1),
                 new Vector(0, 0, -1)));
         assertNotNull(result5, "TC30: Ray should intersect the plane.");
-        assertEquals(new Point(1, 0, 0), result5.get(0).point(),
+        assertEquals(new Point(1, 0, 0), result5.getFirst().point(),
                 "TC30: Intersection point is incorrect.");
 
-        // TC40: Ray starts in the plane
+        // TC40: Ray starts on the plane
         var result6 = plane.findGeoIntersections(new Ray(
                 new Point(1, 0, 0),
                 new Vector(0, 0, -1)));

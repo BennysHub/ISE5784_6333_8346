@@ -1,5 +1,6 @@
 package renderer;
 
+import geometries.Ellipsoid;
 import geometries.Sphere;
 import geometries.Triangle;
 import lighting.AmbientLight;

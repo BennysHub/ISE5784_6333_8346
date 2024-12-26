@@ -1,7 +1,13 @@
 package finalTest;
 
+import geometries.Ellipsoid;
+import geometries.Geometry;
+import geometries.Sphere;
+import lighting.AmbientLight;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import primitives.Color;
+import primitives.Material;
 import primitives.Point;
 import primitives.Vector;
 import renderer.Camera;
@@ -9,14 +15,11 @@ import renderer.QualityLevel;
 import scene.Scene;
 import scene.SceneJsonParser;
 
-import java.util.List;
-
 
 public class FinalSuperTest {
     private static final int SNOW_GLOBE_FRAMES = 1;
     int SNOW_AMOUNT = 100000;// 400000;
     Scene scene = new SceneJsonParser("src/unittests/renderer/json/snowGlobe.json", "Test Scene");
-
 
 
     /**
@@ -26,10 +29,6 @@ public class FinalSuperTest {
     public void bothSnowGlobe() {
 
         Point center = new Point(0, 40, 0); // Center of the circular path
-        //scene.geometries.translate(new Vector(0, 0, 50));
-       // scene.geometries.scale(new Vector(1, 0, 3));
-
-        scene.setGeometries(scene.geometries.rotate(Vector.UNIT_Y, 2 * Math.PI/2));
 
 
         //snow cover
@@ -44,7 +43,7 @@ public class FinalSuperTest {
 //        }
 
         Camera.Builder camera = Camera.builder()
-                .setViewPlaneDistance(150)
+                .setViewPlaneDistance(140)
                 .setViewPlaneSize(320, 320)
                 .setResolution(1440, 1440)
                 .enableParallelStreams(true)
@@ -134,6 +133,29 @@ public class FinalSuperTest {
 
         for (int i = 0; i < SNOW_GLOBE_FRAMES; ++i)
             camera.build().renderImage().writeToImage();
+    }
+
+    @Test
+    public void EllipsoidTest() {
+        Scene testScene = new Scene("ad");
+        Material material = new Material().setKd(0.05).setKs(0.1).setShininess(30).setEmission(new Color(java.awt.Color.BLUE));
+        Geometry ellipsoid = new Ellipsoid(Point.ORIGIN, new Vector(20, 40, 20)).setMaterial(material);
+        Geometry sphere = new Sphere(20, Point.ORIGIN).setMaterial(material);
+        testScene.geometries.add(ellipsoid);
+       // testScene.setAmbientLight(new AmbientLight(new Color(255,255,255), 1d));
+
+        Camera.Builder camera = Camera.builder()
+                .setPosition(new Point(200, 0, 0))
+                .setViewPlaneDistance(50)
+                .setOrientation(new Vector(-1, 0, 0), Vector.UNIT_Z)
+                .setViewPlaneSize(40, 40)
+                .setResolution(1080, 1080)
+                .setScene(testScene)
+                .setImageName("Ellipsoid");
+
+        camera.build().renderImage().writeToImage();
+
+
     }
 }
 

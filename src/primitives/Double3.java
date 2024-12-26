@@ -1,6 +1,8 @@
 package primitives;
 
-import static primitives.Util.isZero;
+import utils.Util;
+
+import static utils.Util.isZero;
 
 /**
  * This class represents a 3D vector or point, consisting of three double values: d1, d2, and d3.

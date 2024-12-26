@@ -3,7 +3,7 @@ package primitives;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static primitives.Util.isZero;
+import static utils.Util.isZero;
 
 /**
  * Unit tests for the primitives.Vector class.
