@@ -111,10 +111,16 @@ public class Geometries implements Intersectable, Transformable {
 
     @Override
     public Geometries scale(Vector scale) {
+        calculateAABB();
+        Point center = getGeometriesCenter();
+
+        Vector toOrigin = Point.ZERO.subtract(center);
+        Vector backToOriginalPosition = toOrigin.scale(-1);
+
         if (bvhRoot != null) {
             bvhRoot.scale(scale);
         } else {
-            geometries.replaceAll(geometry -> geometry.scale(scale));
+            geometries.replaceAll(geometry -> geometry.translate(toOrigin).scale(scale).translate(backToOriginalPosition));
         }
         return this;
     }
@@ -159,7 +165,7 @@ public class Geometries implements Intersectable, Transformable {
             throw new IllegalStateException("Cannot calculate the center of an empty collection.");
         }
 
-        if (geometriesCenter != null) return geometriesCenter;
+       // if (geometriesCenter != null) return geometriesCenter;
 
         geometriesCenter = new AABB(geometries).getCenter();
         return geometriesCenter;

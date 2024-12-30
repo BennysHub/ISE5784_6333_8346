@@ -65,7 +65,7 @@ public class Ellipsoid extends Geometry {
         // Solve quadratic equation
         double discriminant = b * b - 4 * a * c;
 
-        if (discriminant < 0) {
+        if (discriminant <= 0) {
             return null; // No intersection
         }
 
@@ -74,16 +74,16 @@ public class Ellipsoid extends Geometry {
         double t2 = (-b + sqrtDiscriminant) / (2 * a);
 
         // Filter intersections by distance
-        if (t1 > maxDistance || t2 < 0) {
+        if (t1 > maxDistance || t2 <= 0) {
             return null;
         }
 
         if (t2 <= maxDistance) {
-            return t1 >= 0
+            return t1 > 0
                     ? List.of(new GeoPoint(this, ray.getPoint(t1)), new GeoPoint(this, ray.getPoint(t2)))
                     : List.of(new GeoPoint(this, ray.getPoint(t2)));
         } else {
-            return t1 >= 0 ? List.of(new GeoPoint(this, ray.getPoint(t1))) : null;
+            return t1 > 0 ? List.of(new GeoPoint(this, ray.getPoint(t1))) : null;
         }
     }
 

@@ -48,15 +48,14 @@ public class TransformableTest {
     @Test
     void testRotation() {
 
-        int frames = 10;
+        int frames = 1;
 
-       // scene.geometries.scale(2);
+        scene.geometries.scale(2);
 
         for (int i = 0; i < frames; i++) {
             camera.setImageName("snowGlobeRotation" + i)
                     .build()
                     .rotate(Vector.UNIT_Y, 2 * Math.PI / frames)
-                    .scale(1.05)
                     .translateY(5)
                     .renderImage()
                     .writeToImage();

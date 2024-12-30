@@ -39,6 +39,8 @@ public class Ray {
     public Ray(Point point, Vector vector) {
         origin = point;
         direction = vector.normalize();
+        if(direction.equals(Vector.ZERO))
+            throw new IllegalArgumentException("Ray direction can't be defined by Vector Zero.");
     }
 
     /**
@@ -49,8 +51,7 @@ public class Ray {
      * @param p2 The target point used to calculate the direction.
      */
     public Ray(Point p1, Point p2) {
-        origin = p1;
-        direction = p2.subtract(p1).normalize();
+        this(p1, p2.subtract(p1)) ;
     }
 
     /**
@@ -63,9 +64,7 @@ public class Ray {
      * @param normal    The normal vector at the starting point.
      */
     public Ray(Point origin, Vector direction, Vector normal) {
-        this.direction = direction.normalize();
-        Vector epsVector = normal.scale(direction.dotProduct(normal) > 0 ? DELTA : -DELTA);
-        this.origin = origin.add(epsVector);
+        this(origin.add(normal.scale(direction.dotProduct(normal) > 0 ? DELTA : -DELTA)), direction);
     }
 
     /**
@@ -93,11 +92,7 @@ public class Ray {
      * @return A point on the ray at the specified distance.
      */
     public Point getPoint(double t) {
-        try {
-            return origin.add(direction.scale(t));
-        } catch (IllegalArgumentException ignore) {
-            return origin;
-        }
+            return origin.add(direction.scale(t));// TODO: vector zero case
     }
 
     /**

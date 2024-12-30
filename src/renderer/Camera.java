@@ -342,6 +342,7 @@ public class Camera implements Transformable {
          */
         public Builder setScene(Scene scene) {
             this.rayTracer = new SimpleRayTracer(scene);
+           // this.rayTracer = new PathTracer(scene);
             this.rayTracerSet = true;
             return this;
         }

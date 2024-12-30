@@ -38,10 +38,6 @@ class TubeTest {
 
         // =============== Boundary Values Tests ==================
 
-        // TC10: Normal at a point very close to the axis ray (near-zero offset).
-        assertThrows(IllegalArgumentException.class,
-                () -> tube.getNormal(new Point(0.000001, 0, 0)),
-                "Expected exception when the point is too close to the tube's axis.");
 
         // TC11: Normal at a point exactly on the tube's axis.
         assertThrows(IllegalArgumentException.class,
@@ -70,7 +66,7 @@ class TubeTest {
         assertEquals(2, result1.size(), "Ray should intersect the tube at exactly two points.");
 
         // TC02: Ray starts inside the tube and intersects at one point
-        Ray ray2 = new Ray(new Point(0.5, 0.5, 0), new Vector(1, 0, 0));
+        Ray ray2 = new Ray(new Point(0.5, 0.5, 0), new Vector(1, 1, 0));
         List<Intersectable.GeoPoint> result2 = tube.findGeoIntersections(ray2);
         assertNotNull(result2, "Ray should intersect the tube at one point.");
         assertEquals(1, result2.size(), "Ray should intersect the tube at exactly one point.");

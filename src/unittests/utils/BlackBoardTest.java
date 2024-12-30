@@ -163,9 +163,10 @@ public class BlackBoardTest {
         Material materialRed = new Material().setKs(new Double3(2)).setKd(new Double3(175/div, 255/div, 30/div)).setShininess(30);
         Material materialBlue = new Material().setKs(new Double3(2)).setKd(new Double3(2, 2, 2)).setShininess(30).setEmission(new Color(50, 50, 100));
 
-        scene.geometries.add(new Sphere(20, Point.ZERO).setMaterial(materialRed));
+       // scene.geometries.add(new Sphere(20, Point.ZERO).setMaterial(materialRed));
 
-        Point[] sphereSampled = Blackboard.generateFibonacciSphere(Point.ZERO, 20, 10000);
+      //  Point[] sphereSampled = Blackboard.generateFibonacciSphere(Point.ZERO, 20, 10000);
+        Point[] sphereSampled = Blackboard.generateFibonacciDisk(Point.ZERO, 20, Vector.UNIT_X, 10000);
 
         for (Point spherePoint : sphereSampled)
             scene.geometries.add(new Sphere(0.1, spherePoint).setMaterial(materialBlue));

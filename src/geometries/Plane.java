@@ -44,9 +44,9 @@ public class Plane extends Geometry {
         // Cross-product of edges to compute the normal vector
         Vector normalCandidate = edge1.crossProduct(edge2);
 
-        if (isZero(normalCandidate.length())) {
-            throw new IllegalArgumentException("The points must not be collinear.");
-        }
+        if (normalCandidate.equals(Vector.ZERO))
+            throw new IllegalArgumentException("Constructing a plane with 3 points, The points must not be collinear.");
+
 
         this.referencePoint = p1;
         this.normalVector = normalCandidate.normalize();

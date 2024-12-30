@@ -31,6 +31,8 @@ public class Vector extends Point {
      */
     public static final Vector UNIT_Z = new Vector(new Double3(0, 0, 1)).normalize();
 
+    public static final Vector ZERO = new Vector(new Double3(0));
+
     /**
      * Indicates whether this vector is normalized.
      */
@@ -47,9 +49,6 @@ public class Vector extends Point {
      */
     public Vector(double c1, double c2, double c3) {
         super(c1, c2, c3);
-//        if (xyz.equals(Double3.ZERO)) {// TODO: vector zero case
-//            throw new IllegalArgumentException("Vector Zero is not allowed.");
-//        }
         this.isNormalized = false;
     }
 
@@ -62,9 +61,6 @@ public class Vector extends Point {
      */
     public Vector(Double3 double3) {
         super(double3);
-        if (xyz.equals(Double3.ZERO)) {
-            throw new IllegalArgumentException("Vector Zero is not allowed.");
-        }
         this.isNormalized = false;
     }
 
@@ -172,11 +168,11 @@ public class Vector extends Point {
      * @return the rejection of this vector from the given vector.
      */
     public Vector reject(Vector other) {
-        return other.isPerpendicular(this) ? this : this.subtract(this.project(other));// TODO: vector zero case
+        return this.subtract(this.project(other));// TODO: vector zero case
     }
 
 
-    public Vector  elementWiseMultiply(Vector other){
+    public Vector elementWiseMultiply(Vector other) {
         return new Vector(xyz.product(other.xyz));
     }
 

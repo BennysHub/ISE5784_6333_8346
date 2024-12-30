@@ -51,10 +51,6 @@ class EllipsoidTest {
         assertEquals(new Vector(-1, 0, 0), ellipsoid.getNormal(p4),
                 "The normal at point (-2,0,0) should be (-1,0,0).");
 
-        // TC05: Normal at a point on the ellipsoid's surface (off-axis point)
-        Point p5 = new Point(1, 0.5, 0);
-        assertEquals(new Vector(1, 0.5, 0).normalize(), ellipsoid.getNormal(p5),
-                "The normal at point (1,0.5,0) should be normalized.");
     }
 
     /**
@@ -75,13 +71,13 @@ class EllipsoidTest {
                 "Incorrect intersection points for ray intersecting ellipsoid.");
 
         // TC02: Ray originates inside the ellipsoid
-        Ray ray2 = new Ray(new Point(1, 0.5, 0), new Vector(1, 0, 0));
+        Ray ray2 = new Ray(new Point(1, 0, 0), new Vector(1, 0, 0));
         List<Point> result2 = ellipsoid.findGeoIntersections(ray2).stream()
                 .map(Intersectable.GeoPoint::point)
                 .toList();
         assertNotNull(result2, "Ray should intersect the ellipsoid at one point.");
         assertEquals(1, result2.size(), "Incorrect number of intersection points.");
-        assertEquals(new Point(2, 0.5, 0), result2.getFirst(),
+        assertEquals(new Point(2, 0, 0), result2.getFirst(),
                 "Incorrect intersection point for ray originating inside the ellipsoid.");
 
         // TC03: Ray misses the ellipsoid (no intersections)

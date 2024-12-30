@@ -330,5 +330,48 @@ public final class Blackboard {
         return points;
     }
 
+    /**
+     * Generates a set of points distributed over a circular disk using the Fibonacci spiral method.
+     *
+     * @param center  The center of the disk.
+     * @param radius  The radius of the disk.
+     * @param normal  The normal vector of the disk.
+     * @param samples The number of sample points to generate.
+     * @return An array of {@link Point} objects representing the generated sample points.
+     */
+    public static Point[] generateFibonacciDisk(Point center, double radius, Vector normal, int samples) {
+        // Normalize the normal vector
+        normal = normal.normalize();
+
+        // Create two orthogonal vectors in the disk plane
+        Vector tangent = normal.perpendicular();
+        Vector bitangent = normal.crossProduct(tangent).normalize();
+
+        Point[] points = new Point[samples];
+
+        // Golden angle in radians
+        double goldenAngle = Math.PI * (3 - Math.sqrt(5));
+
+        for (int i = 0; i < samples; i++) {
+            // Radius factor and angle
+            double r = Math.sqrt((double) i / samples) * radius;
+            double theta = i * goldenAngle;
+
+            // Convert polar coordinates to Cartesian
+            double x = r * Math.cos(theta);
+            double y = r * Math.sin(theta);
+
+            // Transform the 2D coordinates to the 3D plane using tangent and bitangent
+            Vector offset = tangent.scale(x).add(bitangent.scale(y));
+
+            // Translate to the center of the disk
+            points[i] = center.add(offset);
+        }
+
+        return points;
+    }
+
+
+
 
 }

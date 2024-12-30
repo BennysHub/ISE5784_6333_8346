@@ -185,43 +185,104 @@ public class AABB implements Transformable {
      * @param ray The ray to check for intersection with the AABB.
      * @return {@code true} if the ray intersects the AABB, {@code false} otherwise.
      */
+//    public boolean intersects(Ray ray) {
+//        Point rayOrigin = ray.getOrigin();
+//        Point rayDir = ray.getDirection();
+//
+//        double tMin = (min.getX() - rayOrigin.getX()) / rayDir.getX();
+//        double tMax = (max.getX() - rayOrigin.getX()) / rayDir.getX();
+//        if (tMin > tMax) {
+//            double temp = tMin;
+//            tMin = tMax;
+//            tMax = temp;
+//        }
+//
+//        double tYMin = (min.getY() - rayOrigin.getY()) / rayDir.getY();
+//        double tYMax = (max.getY() - rayOrigin.getY()) / rayDir.getY();
+//        if (tYMin > tYMax) {
+//            double temp = tYMin;
+//            tYMin = tYMax;
+//            tYMax = temp;
+//        }
+//
+//        if ((tMin > tYMax) || (tYMin > tMax))
+//            return false;
+//
+//        if (tYMin > tMin)
+//            tMin = tYMin;
+//        if (tYMax < tMax)
+//            tMax = tYMax;
+//
+//        double tZMin = (min.getZ() - rayOrigin.getZ()) / rayDir.getZ();
+//        double tZMax = (max.getZ() - rayOrigin.getZ()) / rayDir.getZ();
+//        if (tZMin > tZMax) {
+//            double temp = tZMin;
+//            tZMin = tZMax;
+//            tZMax = temp;
+//        }
+//        return !((tMin > tZMax) || (tZMin > tMax));
+//    }
+
+
     public boolean intersects(Ray ray) {
         Point rayOrigin = ray.getOrigin();
-        Point rayDir = ray.getDirection();
+        Vector rayDir = ray.getDirection();
 
-        double tMin = (min.getX() - rayOrigin.getX()) / rayDir.getX();
-        double tMax = (max.getX() - rayOrigin.getX()) / rayDir.getX();
-        if (tMin > tMax) {
-            double temp = tMin;
-            tMin = tMax;
-            tMax = temp;
+        double tMin = Double.NEGATIVE_INFINITY;
+        double tMax = Double.POSITIVE_INFINITY;
+
+        // Check intersection on the X axis
+        double txMin = (min.getX() - rayOrigin.getX()) / rayDir.getX();
+        double txMax = (max.getX() - rayOrigin.getX()) / rayDir.getX();
+        if (txMin > txMax) {
+            double temp = txMin;
+            txMin = txMax;
+            txMax = temp;
         }
 
-        double tYMin = (min.getY() - rayOrigin.getY()) / rayDir.getY();
-        double tYMax = (max.getY() - rayOrigin.getY()) / rayDir.getY();
-        if (tYMin > tYMax) {
-            double temp = tYMin;
-            tYMin = tYMax;
-            tYMax = temp;
+        tMin = Math.max(tMin, txMin);
+        tMax = Math.min(tMax, txMax);
+
+        // If no intersection is possible on the X axis
+        if (tMin > tMax) return false;
+
+        // Check intersection on the Y axis
+        double tyMin = (min.getY() - rayOrigin.getY()) / rayDir.getY();
+        double tyMax = (max.getY() - rayOrigin.getY()) / rayDir.getY();
+        if (tyMin > tyMax) {
+            double temp = tyMin;
+            tyMin = tyMax;
+            tyMax = temp;
         }
 
-        if ((tMin > tYMax) || (tYMin > tMax))
-            return false;
+        tMin = Math.max(tMin, tyMin);
+        tMax = Math.min(tMax, tyMax);
 
-        if (tYMin > tMin)
-            tMin = tYMin;
-        if (tYMax < tMax)
-            tMax = tYMax;
+        // If no intersection is possible on the Y axis
+        if (tMin > tMax) return false;
 
-        double tZMin = (min.getZ() - rayOrigin.getZ()) / rayDir.getZ();
-        double tZMax = (max.getZ() - rayOrigin.getZ()) / rayDir.getZ();
-        if (tZMin > tZMax) {
-            double temp = tZMin;
-            tZMin = tZMax;
-            tZMax = temp;
+        // Check intersection on the Z axis
+        double tzMin = (min.getZ() - rayOrigin.getZ()) / rayDir.getZ();
+        double tzMax = (max.getZ() - rayOrigin.getZ()) / rayDir.getZ();
+        if (tzMin > tzMax) {
+            double temp = tzMin;
+            tzMin = tzMax;
+            tzMax = temp;
         }
-        return !((tMin > tZMax) || (tZMin > tMax));
+
+        tMin = Math.max(tMin, tzMin);
+        tMax = Math.min(tMax, tzMax);
+
+        // If no intersection is possible on the Z axis
+        if (tMin > tMax) return false;
+
+        // Additional check: Ensure the ray is pointing towards the AABB
+        return tMax >= 0;
     }
+
+
+
+
 
     /**
      * Returns a string representation of the AABB for debugging.

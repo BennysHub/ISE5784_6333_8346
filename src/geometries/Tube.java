@@ -99,7 +99,7 @@ public class Tube extends RadialGeometry {
 
         double discriminant = b * b - 4 * a * c;
 
-        if (discriminant < 0) {
+        if (discriminant <= 0) {
             return null; // No intersections
         }
 

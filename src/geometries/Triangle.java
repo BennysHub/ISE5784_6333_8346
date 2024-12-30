@@ -69,13 +69,6 @@ public class Triangle extends Polygon {
         Vector direction = ray.getDirection();
         Point origin = ray.getOrigin();
 
-
-        // Check if the ray is parallel to the triangle's plane
-        if (origin.equals(polygonVertices[0])) {// TODO: vector zero case
-            return null;
-        }
-
-
         Vector directionCrossEdge02 = direction.crossProduct(edge2);
         double det = edge1.dotProduct(directionCrossEdge02);
 

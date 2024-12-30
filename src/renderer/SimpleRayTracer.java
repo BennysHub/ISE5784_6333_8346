@@ -75,7 +75,9 @@ public class SimpleRayTracer extends RayTracerBase {
             Color lightColor = Color.BLACK;
             for (Point lightPoint : lightSample) {
                 Vector l = lightSource.computeDirection(intersection, lightPoint);
-                double nl = alignZero(n.dotProduct(l));
+              //  double nl = alignZero(n.dotProduct(l));
+
+                double nl = n.dotProduct(l);
 
 
                 if (compareSign(nl, nv)) {
@@ -88,17 +90,6 @@ public class SimpleRayTracer extends RayTracerBase {
                                 iL.scale(calcDiffusive(material, nl).add(calcSpecular(material, n, l, nl, v))));
                     }
                 }
-
-//
-//                if (compareSign(nl, nv)) {
-//                    Ray lightRay = new Ray(intersection, l.scale(-1), n);
-//                    Double3 ktr = transparency(intersection, lightPoint, lightRay);
-//
-//                    Color iL = lightSource.computeIntensity(intersection, lightPoint).scale(ktr);
-//                    lightColor = lightColor.add(
-//                            iL.scale(calcDiffusive(material, nl).add(calcSpecular(material, n, l, nl, v))));
-//
-//                }
             }
             totalColor = totalColor.add(lightColor.reduce(lightSample.length));
         }

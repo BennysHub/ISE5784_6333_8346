@@ -95,7 +95,7 @@ class SphereTest {
 
         // TC06: Ray starts on the sphere and goes outside (0 points)
         assertNull(
-                sphere.findGeoIntersections(new Ray(new Point(1, 0, 1), v001.scale(-1))),
+                sphere.findGeoIntersections(new Ray(new Point(1, 0, 1), v001)),
                 "Ray should start on the sphere and go outside."
         );
 

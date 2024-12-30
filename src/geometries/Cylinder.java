@@ -53,7 +53,7 @@ public class Cylinder extends Tube {
             return rayDirection; // Point is on the top base
         }
 
-        // Point is on the curved surface
+        //The Point is on the curved surface
         Point closestPointOnAxis = rayOrigin.add(rayDirection.scale(projection));
         return pointOnSurface.subtract(closestPointOnAxis).normalize();
     }
