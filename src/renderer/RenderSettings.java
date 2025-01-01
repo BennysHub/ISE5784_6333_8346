@@ -1,6 +1,8 @@
 package renderer;
 
 import geometries.BVHNode;
+import primitives.Double3;
+import primitives.Material;
 
 /**
  * The {@code RenderSettings} class contains configuration settings for rendering operations.
@@ -88,7 +90,7 @@ public class RenderSettings {
 
     static boolean multiThreadingEnabled = false;
 
-    static boolean parallelStreamsEnabled = false;
+    static boolean parallelStreamsEnabled = true;
 
     /**
      * Indicates whether antialiasing is enabled.
@@ -110,6 +112,12 @@ public class RenderSettings {
      * Indicates whether diffused glass effect is enabled.
      */
     static boolean DiffusedGlassEnabled = false;
+
+    static RayTracerBase.RayTracerMethod RAY_TRACER_METHOD = RayTracerBase.RayTracerMethod.BasicRayTracer;
+
+    static Material RAY_MARCHING_GLOBAL_MATERIAL = Material.DEFAULT;
+
+    static boolean RAY_MARCHING_SIMPLE_SHADING = false;
 
 
 }

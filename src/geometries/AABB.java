@@ -17,7 +17,7 @@ import java.util.Collection;
  *
  * @author Benny Avrahami
  */
-public class AABB implements Transformable {
+public class AABB implements Transformable, SignedDistance {
 
     /**
      * The minimum corner of the AABB, representing the smallest x, y, and z coordinates.
@@ -395,4 +395,19 @@ public class AABB implements Transformable {
         isCenterValid = false;
         return this;
     }
+
+    @Override
+    public double signedDistance(Point point) {
+//        Vector centerToPoint = point.subtract(getCenter());
+//        double[] halfDimensions = getHalfDimensions();
+//
+//        double dx = Math.max(0, Math.abs(centerToPoint.getX()) - halfDimensions[0]);
+//        double dy = Math.max(0, Math.abs(centerToPoint.getY()) - halfDimensions[1]);
+//        double dz = Math.max(0, Math.abs(centerToPoint.getZ()) - halfDimensions[2]);
+//
+//        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+        return 2;
+    }
+
 }

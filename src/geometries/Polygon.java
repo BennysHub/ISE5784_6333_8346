@@ -176,4 +176,9 @@ public class Polygon extends Geometry {
 
         return polygonVertices[i];
     }
+
+    @Override
+    public double signedDistance(Point point) {
+        return 0;
+    }
 }

@@ -24,6 +24,8 @@ import static utils.Util.alignZero;
 public class Camera implements Transformable {
     private final Render renderEngine;
 
+    private Point position;
+
     /**
      * Constructs a {@code Camera} using the provided {@code Builder}.
      *
@@ -31,8 +33,12 @@ public class Camera implements Transformable {
      */
     protected Camera(Builder builder) {
         this.renderEngine = builder.renderEngine;
+        this.position = builder.position;
     }
 
+    public Point getPosition() {
+        return position;
+    }
 
     /**
      * Creates a new {@code Builder} instance for configuring a {@code Camera}.
@@ -51,13 +57,13 @@ public class Camera implements Transformable {
     }
 
     @Override
-    public Camera scale(double scale){
+    public Camera scale(double scale) {
         return scale(new Vector(scale, scale, scale));
     }
 
 
     @Override
-    public Camera rotate(Vector axis, double angleInRadians)  {
+    public Camera rotate(Vector axis, double angleInRadians) {
         renderEngine.rayTracer.scene.geometries.rotate(axis, angleInRadians);
         return this;
     }
@@ -83,7 +89,6 @@ public class Camera implements Transformable {
     public Camera translateY(double distanceY) {
         return translate(new Vector(0, distanceY, 0));
     }
-
 
 
     /**
@@ -135,6 +140,7 @@ public class Camera implements Transformable {
         private String imageName;
         private RayTracerBase rayTracer;
         private Render renderEngine;
+        private Scene scene;
         private boolean rayTracerSet = false;
 
         private boolean bvhBuilt = false;
@@ -209,7 +215,7 @@ public class Camera implements Transformable {
         public Builder setDirection_(Point target, Vector up) {
             forward = target.subtract(this.position).normalize();
 
-            if (forward.isParallel(up))
+            if (forward.isParallel(up) || forward.equals(Vector.ZERO))
                 throw new IllegalArgumentException("Vector 'up' can't be parallel to vector 'to' ");
 
             this.up = up.reject(forward).normalize();
@@ -223,6 +229,9 @@ public class Camera implements Transformable {
 
             position = camaraLocation;
             Vector newTo = target.subtract(this.position).normalize();
+            if (newTo.equals(Vector.ZERO))
+                throw new IllegalArgumentException("invalid location/target");
+
             Vector axis = forward.isParallel(newTo) ? right : forward.crossProduct(newTo);
 
             double angle = Math.acos(forward.dotProduct(newTo) / (forward.length() * newTo.length()));
@@ -341,9 +350,7 @@ public class Camera implements Transformable {
          * @return The current {@code Builder} instance for chaining.
          */
         public Builder setScene(Scene scene) {
-            this.rayTracer = new SimpleRayTracer(scene);
-           // this.rayTracer = new PathTracer(scene);
-            this.rayTracerSet = true;
+            this.scene = scene;
             return this;
         }
 
@@ -483,6 +490,28 @@ public class Camera implements Transformable {
             renderEngine = new Render(imageWriter, viewPlane, rayTracer, position);
         }
 
+        private void configureRayTracer() {
+            switch (RenderSettings.RAY_TRACER_METHOD) {
+                case BasicRayTracer -> rayTracer = new SimpleRayTracer(scene);
+                case RayMarching -> rayTracer = new RayMarchingRenderer(scene);
+                case PathTracer -> rayTracer = new PathTracer(scene);
+            }
+        }
+
+        private void configureCamaraPosition() {
+            if (viewPlaneCenter == null)
+                return;
+            double fovRadians = Math.toRadians(camaraFOV);
+
+            // Calculate diagonal of the view plane
+            double viewPlaneDiagonal = Math.sqrt(vpWidth * vpWidth + vpHeight * vpHeight);
+
+            // Calculate camera distance using trigonometry
+            double cameraDistance = (viewPlaneDiagonal / 2) / Math.tan(fovRadians / 2);
+
+            position = viewPlaneCenter.add(forward.scale(cameraDistance * -1));
+        }
+
         /**
          * Builds and returns a {@link Camera} instance based on the current configuration.
          *
@@ -511,8 +540,8 @@ public class Camera implements Transformable {
             if (alignZero(vpDistance) <= 0 && viewPlaneCenter == null) {
                 throw new MissingResourceException("View plane distance is invalid.", Camera.class.getName(), "vpDistance");
             }
-            if (rayTracer == null) {
-                throw new MissingResourceException("Ray tracer is not set.", Camera.class.getName(), "rayTracer");
+            if (scene == null) {
+                throw new MissingResourceException("scene is not set.", Camera.class.getName(), "scene");
             }
 
             if (RenderSettings.CBRIsEnabled) {
@@ -531,23 +560,12 @@ public class Camera implements Transformable {
             configureImageWriter();
             configureViewPlane();
             configureCamaraPosition();
+            configureRayTracer();
             configureRenderEngine();
 
             return new Camera(this);
         }
 
-        private void configureCamaraPosition() {
-            if (viewPlaneCenter == null)
-                return;
-            double fovRadians = Math.toRadians(camaraFOV);
 
-            // Calculate diagonal of the view plane
-            double viewPlaneDiagonal = Math.sqrt(vpWidth * vpWidth + vpHeight * vpHeight);
-
-            // Calculate camera distance using trigonometry
-            double cameraDistance = (viewPlaneDiagonal / 2) / Math.tan(fovRadians / 2);
-
-            position = viewPlaneCenter.add(forward.scale(cameraDistance * -1));
-        }
     }
 }

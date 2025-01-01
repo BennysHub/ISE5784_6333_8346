@@ -141,4 +141,23 @@ public class Cylinder extends Tube {
 
         return intersections.isEmpty() ? null : intersections;
     }
+
+    @Override
+    public double signedDistance(Point point) {
+        Vector v = point.subtract(axisRay.getOrigin());
+        double projectedHeight = v.dotProduct(axisRay.getDirection());
+
+        if (projectedHeight < 0) {
+            // Below bottom cap
+            return v.length() - radius;
+        } else if (projectedHeight > height) {
+            // Above top cap
+            return point.subtract(axisRay.getPoint(height)).length() - radius;
+        }
+
+        // Distance to the curved surface
+        Vector perpendicular = v.subtract(axisRay.getDirection().scale(projectedHeight));
+        return perpendicular.length() - radius;
+    }
+
 }

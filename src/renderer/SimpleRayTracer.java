@@ -59,7 +59,7 @@ public class SimpleRayTracer extends RayTracerBase {
     protected Color calcColor(Intersectable.GeoPoint gp, Ray ray, int level, Double3 k) {
         Vector v = ray.getDirection();
         Vector n = gp.geometry().getNormal(gp.point());
-        double nv = alignZero(n.dotProduct(v));
+        double nv = n.dotProduct(v);
         if (nv == 0) return Color.BLACK;
 
         Color color = calcLocalEffects(gp.point(), gp.geometry().getMaterial(), v, n, nv, k);
@@ -75,8 +75,6 @@ public class SimpleRayTracer extends RayTracerBase {
             Color lightColor = Color.BLACK;
             for (Point lightPoint : lightSample) {
                 Vector l = lightSource.computeDirection(intersection, lightPoint);
-              //  double nl = alignZero(n.dotProduct(l));
-
                 double nl = n.dotProduct(l);
 
 

@@ -88,7 +88,7 @@ public class RenderingTests {
         double h = -0;  // x-coordinate of the center
         double k = -100;  // y-coordinate of the center
 
-        for (double t = 0; t <= 1; t += 0.01) {
+        for (double t = 0; t <= 1; t += 0.1) {
             double x = h + R * Math.cos(2 * Math.PI * t);
             double y = k + R * Math.sin(2 * Math.PI * t);
             System.out.println("Point on circle: (" + x + ", " + y + ")" + " distance: " + Math.sqrt((x - h) * (x - h) + (y - k) * (y - k)));

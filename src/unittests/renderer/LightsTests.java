@@ -48,7 +48,9 @@ public class LightsTests {
     /**
      * First scene for some tests
      */
-    private final Scene scene1 = new Scene("Test scene");
+    private final Scene scene1 = new Scene("Test scene")
+            .setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.15)));
+
     /**
      * Second scene for some tests
      */

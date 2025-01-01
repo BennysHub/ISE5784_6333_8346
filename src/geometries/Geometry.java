@@ -20,7 +20,7 @@ import java.util.List;
  * @author
  * Benny Avrahami
  */
-public abstract class Geometry implements Intersectable, Transformable {
+public abstract class Geometry implements Intersectable, Transformable, SignedDistance {
 
     /**
      * The Axis-Aligned Bounding Box (AABB) for the geometry.

@@ -176,6 +176,10 @@ public class Color {
         return new Color(rgb.scale(k));
     }
 
+    public Double3 toDouble3(){
+        return rgb;
+    }
+
     /**
      * Scales the color by a factor of 1/k, reducing each RGB component by this factor.
      *

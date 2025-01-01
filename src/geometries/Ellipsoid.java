@@ -130,10 +130,23 @@ public class Ellipsoid extends Geometry {
         return new Vector(nx, ny, nz).normalize();
     }
 
+
     @Override
     public String toString() {
         return String.format("Ellipsoid{center=%s, radii=%s}", center, radii);
     }
+
+
+    @Override
+    public double signedDistance(Point point) {
+        Vector normalizedPoint = new Vector(
+                point.getX() / radii.getX(),
+                point.getY() / radii.getY(),
+                point.getZ() / radii.getZ()
+        );
+        return normalizedPoint.length() - 1.0;
+    }
+
 
     public Vector getRadii() {
         return radii;

@@ -103,6 +103,11 @@ public class Sphere extends RadialGeometry {
     }
 
     @Override
+    public double signedDistance(Point point) {
+        return point.subtract(center).length() - radius;
+    }
+
+    @Override
     public String toString() {
         return String.format("Sphere{center=%s, radius=%f}", center, radius);
     }

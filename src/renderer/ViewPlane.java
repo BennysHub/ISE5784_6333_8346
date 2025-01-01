@@ -109,9 +109,6 @@ public class ViewPlane {
         final double yI = -(y - (nY - 1) / 2d) * ratioY;
 
         // Starting from the center, move to the pixel's position
-        Point pixelCenter = center;
-        if (xJ != 0) pixelCenter = pixelCenter.add(right.scale(xJ));
-        if (yI != 0) pixelCenter = pixelCenter.add(up.scale(yI));
-        return pixelCenter;
+        return center.add(right.scale(xJ)).add(up.scale(yI));
     }
 }

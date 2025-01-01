@@ -122,4 +122,16 @@ public class Tube extends RadialGeometry {
     public Ray getAxisRay() {
         return axisRay;
     }
+
+
+    @Override
+    public double signedDistance(Point point) {
+        Vector v = point.subtract(axisRay.getOrigin());
+        Vector projection = axisRay.getDirection().scale(v.dotProduct(axisRay.getDirection()));
+        Vector perpendicular = v.subtract(projection);
+        return perpendicular.length() - radius;
+    }
+
 }
+
+

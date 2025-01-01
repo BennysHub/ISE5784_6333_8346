@@ -33,5 +33,10 @@ public abstract class RayTracerBase {
      */
     public abstract Color traceRay(Ray ray);
 
+
+    public  enum RayTracerMethod {
+        BasicRayTracer, RayMarching, PathTracer
+    }
+
 }
 

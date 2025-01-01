@@ -160,4 +160,92 @@ public class Material {
         return this;
     }
 
+
+    // Predefined materials for common surfaces
+    public static final Material MATTE_PLASTIC = new Material()
+            .setKd(new Double3(0.8))
+            .setKs(new Double3(0.2))
+            .setShininess(10);
+
+    public static final Material GLOSSY_PLASTIC = new Material()
+            .setKd(new Double3(0.6))
+            .setKs(new Double3(0.8))
+            .setShininess(50);
+
+    public static final Material METAL = new Material()
+            .setKd(new Double3(0.1))
+            .setKs(new Double3(1.0))
+            .setKr(new Double3(0.9))
+            .setShininess(200);
+
+    public static final Material RUBBER = new Material()
+            .setKd(new Double3(0.7))
+            .setKs(new Double3(0.1))
+            .setShininess(10);
+
+    public static final Material MIRROR = new Material()
+            .setKd(Double3.ZERO)
+            .setKs(new Double3(1.0))
+            .setKr(new Double3(1.0))
+            .setShininess(300);
+
+    public static final Material GLASS = new Material()
+            .setKd(Double3.ZERO)
+            .setKs(new Double3(0.9))
+            .setKt(new Double3(0.9))
+            .setShininess(100);
+
+    public static final Material STONE = new Material()
+            .setKd(new Double3(0.8))
+            .setKs(new Double3(0.1))
+            .setShininess(20);
+
+    public static final Material WOOD = new Material()
+            .setKd(new Double3(0.6))
+            .setKs(new Double3(0.2))
+            .setShininess(5);
+
+    public static final Material WATER = new Material()
+            .setKd(new Double3(0.2))
+            .setKs(new Double3(0.8))
+            .setKt(new Double3(0.95))
+            .setShininess(300);
+
+    public static final Material GOLD = new Material()
+            .setKd(new Double3(0.3))
+            .setKs(new Double3(0.9))
+            .setKr(new Double3(0.7))
+            .setShininess(250);
+
+    public static final Material SILVER = new Material()
+            .setKd(new Double3(0.2))
+            .setKs(new Double3(1.0))
+            .setKr(new Double3(0.85))
+            .setShininess(200);
+
+    public static final Material DIAMOND = new Material()
+            .setKd(Double3.ZERO)
+            .setKs(new Double3(0.95))
+            .setKt(new Double3(0.98))
+            .setShininess(400);
+
+    public static final Material BRICK = new Material()
+            .setKd(new Double3(0.7))
+            .setKs(new Double3(0.1))
+            .setShininess(10);
+
+    public static final Material CONCRETE = new Material()
+            .setKd(new Double3(0.9))
+            .setKs(new Double3(0.05))
+            .setShininess(5);
+
+    public static final Material CERAMIC = new Material()
+            .setKd(new Double3(0.5))
+            .setKs(new Double3(0.6))
+            .setShininess(80);
+
+    public static final Material DEFAULT = new Material()
+            .setKd(new Double3(0.5))
+            .setKs(new Double3(0.5))
+            .setShininess(30);
 }

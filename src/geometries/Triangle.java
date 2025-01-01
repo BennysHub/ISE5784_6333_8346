@@ -28,16 +28,19 @@ public class Triangle extends Polygon {
      * @param vertex3 The third vertex of the triangle.
      */
     public Triangle(Point vertex1, Point vertex2, Point vertex3) {
-
         super(vertex1, vertex2, vertex3);
-        edge1 = polygonVertices[1].subtract(polygonVertices[0]);
-        edge2 = polygonVertices[2].subtract(polygonVertices[0]);
     }
 
     //edges of triangle use for findGeoIntersection
-    private final Vector edge1;
-    private final Vector edge2;
 
+
+    private final Point p1 = polygonVertices[0];
+    private final Point p2 = polygonVertices[1];
+    private final Point p3 = polygonVertices[2];
+
+    private final Vector edge1 = p2.subtract(p1);
+    private final Vector edge2 = p3.subtract(p1);
+    private final Vector edge3 = p3.subtract(p2);
 
     /**
      * Calculates the Axis-Aligned Bounding Box (AABB) for the triangle.
@@ -118,6 +121,126 @@ public class Triangle extends Polygon {
                 polygonVertices[1].scale(scaleVector),
                 polygonVertices[2].scale(scaleVector)
         );
+    }
+
+
+    @Override
+    public double signedDistance(Point point) {
+
+        // Compute normal of the triangle's plane
+        Vector normal = polygonPlane.getNormal();
+
+        // Signed distance to the triangle's plane
+       // double signedPlaneDistance = normal.dotProduct(point.subtract(p1));
+        double signedPlaneDistance = polygonPlane.signedDistance(point);
+
+        // Project the point onto the triangle's plane
+        Point projectedPoint = point.subtract(normal.scale(signedPlaneDistance));
+
+        // Barycentric coordinates to determine if the point is inside the triangle
+        Vector v0 = edge1;
+        Vector v1 = edge2;
+        Vector v2 = projectedPoint.subtract(p1);
+
+        double d00 = v0.dotProduct(v0);
+        double d01 = v0.dotProduct(v1);
+        double d11 = v1.dotProduct(v1);
+        double d20 = v2.dotProduct(v0);
+        double d21 = v2.dotProduct(v1);
+
+        double denom = d00 * d11 - d01 * d01;
+        double a = (d11 * d20 - d01 * d21) / denom;
+        double b = (d00 * d21 - d01 * d20) / denom;
+        double c = 1.0 - a - b;
+
+        // If the point is inside the triangle
+        if (a >= 0 && b >= 0 && c >= 0) {
+            return Math.abs(signedPlaneDistance); // Closest to the surface
+        }
+
+        // If outside, calculate distances to edges and vertices
+        double dist0 = distanceToEdge(point, p1, edge1);
+        double dist1 = distanceToEdge(point, p1, edge2);
+        double dist2 = distanceToEdge(point, p2, edge3);
+
+        return Math.min(Math.min(dist0, dist1), dist2);
+    }
+
+    /**
+     * Helper method to calculate the closest distance to an edge.
+     *
+     * @param point     The point to check.
+     * @param edgeStart The starting point of the edge.
+     * @param edge      The edge vector.
+     * @return The closest distance to the edge.
+     */
+    private double distanceToEdge(Point point, Point edgeStart, Vector edge) {
+        Vector toPoint = point.subtract(edgeStart);
+        double t = Math.max(0, Math.min(1, toPoint.dotProduct(edge) / edge.lengthSquared()));
+        Point closestPoint = edgeStart.add(edge.scale(t));
+        return closestPoint.distance(point);
+    }
+
+
+    public double signedDistance1(Point point) {
+        // Calculate edges
+
+
+        // Calculate normal
+        Vector normal = edge2.crossProduct(edge3).normalize();
+
+        // Calculate signed distance to the plane
+        Vector pointVec = point.subtract(p1);
+        double d = pointVec.dotProduct(normal);
+
+        // Project point onto triangle plane
+        Point projectedPoint = point.subtract(normal.scale(d));
+
+        // Check if projected point is inside the triangle using barycentric coordinates
+        if (isInsideTriangle(projectedPoint)) {
+            return d;
+        } else {
+            // Compute distance to the closest edge or vertex
+            return Math.sqrt(closestEdgeDistanceSquared(point));
+        }
+    }
+
+    private boolean isInsideTriangle(Point point) {
+        Vector v0 = p3.subtract(p1);
+        Vector v1 = p2.subtract(p1);
+        Vector v2 = point.subtract(p1);
+
+        double dot00 = v0.dotProduct(v0);
+        double dot01 = v0.dotProduct(v1);
+        double dot02 = v0.dotProduct(v2);
+        double dot11 = v1.dotProduct(v1);
+        double dot12 = v2.dotProduct(v2);
+
+        double invDenom = 1.0 / (dot00 * dot11 - dot01 * dot01);
+        double u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+        double v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+        // Point is inside the triangle if u, v are >= 0 and u + v <= 1
+        return (u >= 0) && (v >= 0) && (u + v <= 1);
+    }
+
+    private double closestEdgeDistanceSquared(Point point) {
+        // Calculate squared distance to each edge and return the minimum squared distance
+        double distance1 = distanceToSegmentSquared(point, p1, p2);
+        double distance2 = distanceToSegmentSquared(point, p2, p3);
+        double distance3 = distanceToSegmentSquared(point, p3, p1);
+        return Math.min(distance1, Math.min(distance2, distance3));
+    }
+
+    private double distanceToSegmentSquared(Point p, Point v, Point w) {
+        Vector pv = p.subtract(v);
+        Vector wv = w.subtract(v);
+
+        double t = Math.max(0, Math.min(1, pv.dotProduct(wv) / wv.dotProduct(wv)));
+        Point projection = v.add(wv.scale(t));
+
+        Vector projectionVec = p.subtract(projection);
+        return projectionVec.lengthSquared();
     }
 
 

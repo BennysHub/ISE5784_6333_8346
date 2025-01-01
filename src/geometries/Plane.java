@@ -48,6 +48,7 @@ public class Plane extends Geometry {
             throw new IllegalArgumentException("Constructing a plane with 3 points, The points must not be collinear.");
 
 
+
         this.referencePoint = p1;
         this.normalVector = normalCandidate.normalize();
     }
@@ -93,6 +94,12 @@ public class Plane extends Geometry {
     protected Plane translateHelper(Vector translationVector) {
         return new Plane(referencePoint.add(translationVector), normalVector);
     }
+
+    @Override
+    public double signedDistance(Point point) {
+        return normalVector.dotProduct(point.subtract(referencePoint));
+    }
+
 
 
     @Override

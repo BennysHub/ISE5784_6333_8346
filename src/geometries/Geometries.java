@@ -1,8 +1,6 @@
 package geometries;
 
-import primitives.Point;
-import primitives.Quaternion;
-import primitives.Ray;
+import primitives.*;
 import primitives.Vector;
 
 import java.util.*;
@@ -169,5 +167,34 @@ public class Geometries implements Intersectable, Transformable {
 
         geometriesCenter = new AABB(geometries).getCenter();
         return geometriesCenter;
+    }
+
+
+    /**
+     * Calculates the shortest distance to any object in the scene from the given point.
+     *
+     * @param point The point to evaluate.
+     * @return The minimum distance to the scene objects.
+     */
+    public double sceneDistance(Point point) {
+        double minDistance = Double.POSITIVE_INFINITY;
+        for (Geometry geometry : geometries) {
+            double distance = geometry.signedDistance(point);
+            minDistance = Math.min(minDistance, distance);
+        }
+        return minDistance;
+    }
+
+    public SignedDistance.SDFResult sceneDistanceWithMaterial(Point point) {
+        double minDistance = Double.POSITIVE_INFINITY;
+        Material material = null;
+        for (Geometry geometry : geometries) {
+            double distance = geometry.signedDistance(point);
+            if (distance < minDistance){
+                minDistance = distance;
+                material = geometry.getMaterial();
+            }
+        }
+        return new SignedDistance.SDFResult(minDistance, material);
     }
 }
